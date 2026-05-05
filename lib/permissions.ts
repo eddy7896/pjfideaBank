@@ -6,9 +6,11 @@ import type { Idea } from "@/types";
 export function usePermissions() {
   const { currentUser } = useAuthStore();
 
-  const canSubmitIdeas = currentUser.role !== "education-dept";
+  // Only schools can submit ideas
+  const canSubmitIdeas = currentUser?.role === "school";
 
   const canViewIdea = (idea: Idea): boolean => {
+    if (!currentUser) return false;
     switch (currentUser.role) {
       case "super-admin":
         return true;
@@ -21,22 +23,18 @@ export function usePermissions() {
     }
   };
 
+  // Only schools can edit their own ideas
   const canEditIdea = (idea: Idea): boolean => {
-    switch (currentUser.role) {
-      case "super-admin":
-        return true;
-      case "school":
-        return idea.schoolName === currentUser.schoolName;
-      case "education-dept":
-        return false;
-      default:
-        return false;
+    if (!currentUser) return false;
+    if (currentUser.role === "school") {
+      return idea.schoolName === currentUser.schoolName;
     }
+    return false;
   };
 
   const canDragIdea = (idea: Idea): boolean => canEditIdea(idea);
 
-  const isReadOnly = currentUser.role === "education-dept";
+  const isReadOnly = currentUser?.role !== "school";
 
   return {
     currentUser,

@@ -2,25 +2,33 @@
 
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import type { Role, User } from "@/types";
-import { MOCK_USERS } from "@/lib/constants";
+import type { User } from "@/types";
+import { DEMO_CREDENTIALS } from "@/lib/constants";
 
 interface AuthState {
-  currentUser: User;
-  switchUser: (user: User) => void;
-  switchRole: (role: Role, schoolName?: string) => void;
+  currentUser: User | null;
+  isAuthenticated: boolean;
+  login: (email: string, password: string) => { success: boolean; error?: string };
+  logout: () => void;
 }
 
 export const useAuthStore = create<AuthState>()(
   persist(
     (set) => ({
-      currentUser: MOCK_USERS[0], // Default: Super Admin
-      switchUser: (user) => set({ currentUser: user }),
-      switchRole: (role, schoolName) => {
-        const user = MOCK_USERS.find(
-          (u) => u.role === role && (role !== "school" || u.schoolName === schoolName)
+      currentUser: null,
+      isAuthenticated: false,
+      login: (email, password) => {
+        const cred = DEMO_CREDENTIALS.find(
+          (c) => c.email === email && c.password === password
         );
-        if (user) set({ currentUser: user });
+        if (cred) {
+          set({ currentUser: cred.user, isAuthenticated: true });
+          return { success: true };
+        }
+        return { success: false, error: "Invalid email or password. Try one of the demo credentials below." };
+      },
+      logout: () => {
+        set({ currentUser: null, isAuthenticated: false });
       },
     }),
     {

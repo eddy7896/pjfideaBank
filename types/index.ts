@@ -4,6 +4,15 @@ export interface User {
   role: Role;
   schoolName?: string;
   displayName: string;
+  email: string;
+}
+
+export interface DemoCredential {
+  email: string;
+  password: string;
+  user: User;
+  label: string;
+  description: string;
 }
 
 export type DesignThinkingStatus =
@@ -30,6 +39,6 @@ export interface ThemeMonth {
   shortMonth: string;
   theme: string;
   description: string;
-  icon: string; // Lucide icon name
-  gradient: string; // Tailwind gradient classes
+  icon: string;
+  gradient: string;
 }

@@ -11,8 +11,10 @@ function SubmitContent() {
   const { currentUser } = useAuthStore();
   const router = useRouter();
 
-  // Education Dept can't submit
-  if (currentUser.role === "education-dept") {
+  if (!currentUser) return null;
+
+  // Only school role can submit
+  if (currentUser.role !== "school") {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-center">
         <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-amber-50">
@@ -20,15 +22,14 @@ function SubmitContent() {
         </div>
         <h2 className="mt-4 text-lg font-semibold">Access Restricted</h2>
         <p className="mt-2 max-w-sm text-sm text-muted-foreground">
-          The Education Department role has read-only access. Switch to a school
-          or admin role to submit ideas.
+          Only school accounts can submit new ideas. Please use a school login.
         </p>
         <Button
           variant="outline"
           className="mt-6"
-          onClick={() => router.push("/repository")}
+          onClick={() => router.push("/dashboard")}
         >
-          View Repository
+          Back to Dashboard
         </Button>
       </div>
     );
@@ -36,7 +37,6 @@ function SubmitContent() {
 
   return (
     <div className="mx-auto max-w-2xl">
-      {/* Header */}
       <div className="mb-8 flex items-center gap-3">
         <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 shadow-lg shadow-emerald-500/25">
           <PenLine className="h-5 w-5 text-white" />
@@ -46,15 +46,11 @@ function SubmitContent() {
             Submit an Idea
           </h1>
           <p className="text-sm text-muted-foreground">
-            Submitting as{" "}
-            <strong>
-              {currentUser.schoolName || currentUser.displayName}
-            </strong>
+            Submitting as <strong>{currentUser.schoolName}</strong>
           </p>
         </div>
       </div>
 
-      {/* Form Card */}
       <div className="rounded-xl border border-border/50 bg-card p-6 shadow-sm sm:p-8">
         <IdeaForm />
       </div>

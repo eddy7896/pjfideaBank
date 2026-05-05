@@ -63,7 +63,7 @@ export function IdeaForm() {
     if (!validate()) return;
 
     const schoolName =
-      currentUser.role === "school"
+      currentUser?.role === "school"
         ? currentUser.schoolName!
         : "Admin Submission";
 
@@ -88,7 +88,7 @@ export function IdeaForm() {
       targetAudience: "",
     });
 
-    router.push("/repository");
+    router.push("/dashboard");
   };
 
   return (
