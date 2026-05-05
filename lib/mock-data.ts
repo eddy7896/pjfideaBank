@@ -1,0 +1,148 @@
+import type { Idea } from "@/types";
+
+export const MOCK_IDEAS: Idea[] = [
+  {
+    id: "1",
+    schoolName: "Springfield High",
+    title: "Solar Powered Desk Lamps",
+    theme: "February: Sustainability",
+    studentTeam: "Green Sparks",
+    problemStatement:
+      "Classrooms lack natural light during winter months, forcing schools to rely on grid electricity. This increases energy costs and carbon footprint for under-funded schools.",
+    targetAudience: "Students and school administrators",
+    status: "Ideate",
+    lastUpdated: "2026-05-01",
+  },
+  {
+    id: "2",
+    schoolName: "Riverside Academy",
+    title: "AI Homework Helper Chatbot",
+    theme: "March: EdTech",
+    studentTeam: "Code Wizards",
+    problemStatement:
+      "Students often struggle with homework after school hours when teachers are unavailable. A guided AI tutor could provide hints and explanations without giving away answers.",
+    targetAudience: "Middle school students (ages 11-14)",
+    status: "Prototype",
+    lastUpdated: "2026-04-28",
+  },
+  {
+    id: "3",
+    schoolName: "Oakwood School",
+    title: "Neighborhood Safety Mapping App",
+    theme: "January: Local Problems",
+    studentTeam: "SafeWalk Crew",
+    problemStatement:
+      "Students walking to school face unsafe intersections and poorly lit areas. Parents need a community-sourced map of safe routes.",
+    targetAudience: "Parents and young students",
+    status: "Define",
+    lastUpdated: "2026-04-25",
+  },
+  {
+    id: "4",
+    schoolName: "Maplewood Institute",
+    title: "Mental Health Check-In Kiosk",
+    theme: "April: Health",
+    studentTeam: "MindMatters",
+    problemStatement:
+      "Teens hesitate to seek mental health help due to stigma. An anonymous check-in kiosk in school lobbies can prompt self-assessment and connect students with resources.",
+    targetAudience: "High school students (ages 14-18)",
+    status: "Test",
+    lastUpdated: "2026-05-03",
+  },
+  {
+    id: "5",
+    schoolName: "Springfield High",
+    title: "Community Skill-Share Platform",
+    theme: "May: Community",
+    studentTeam: "The Connectors",
+    problemStatement:
+      "Local artisans and retirees have valuable skills but no platform to share them with younger generations. A matchmaking app could pair mentors with learners.",
+    targetAudience: "Community members of all ages",
+    status: "Empathize",
+    lastUpdated: "2026-05-02",
+  },
+  {
+    id: "6",
+    schoolName: "Riverside Academy",
+    title: "Rainwater Harvesting Tracker",
+    theme: "June: Climate",
+    studentTeam: "AquaSavers",
+    problemStatement:
+      "Schools waste thousands of gallons of rainwater annually. A sensor-based tracking system can measure collection and distribution to school gardens.",
+    targetAudience: "School facility managers and eco-clubs",
+    status: "Ideate",
+    lastUpdated: "2026-04-30",
+  },
+  {
+    id: "7",
+    schoolName: "Oakwood School",
+    title: "Interactive Mural Design Tool",
+    theme: "July: Arts",
+    studentTeam: "PixelPaint",
+    problemStatement:
+      "School walls are blank and uninspiring. An AR tool that lets students design and preview murals before painting would increase engagement and reduce wasted paint.",
+    targetAudience: "Art students and school councils",
+    status: "Prototype",
+    lastUpdated: "2026-04-22",
+  },
+  {
+    id: "8",
+    schoolName: "Maplewood Institute",
+    title: "Future Careers VR Explorer",
+    theme: "August: Future of Work",
+    studentTeam: "VisionaryVR",
+    problemStatement:
+      "Students lack exposure to emerging careers in AI, biotech, and renewable energy. A VR experience simulating a day in these careers can inspire informed choices.",
+    targetAudience: "High school career counselors and students",
+    status: "Empathize",
+    lastUpdated: "2026-05-04",
+  },
+  {
+    id: "9",
+    schoolName: "Springfield High",
+    title: "Smart School Bus Routing",
+    theme: "September: Transportation",
+    studentTeam: "RouteOptimizers",
+    problemStatement:
+      "School buses follow outdated fixed routes, wasting fuel and time. An algorithm-based routing system could reduce travel time by 30% and cut emissions.",
+    targetAudience: "School transport departments",
+    status: "Define",
+    lastUpdated: "2026-04-27",
+  },
+  {
+    id: "10",
+    schoolName: "Riverside Academy",
+    title: "Accessibility Audit Toolkit",
+    theme: "October: Social Justice",
+    studentTeam: "EqualAccess",
+    problemStatement:
+      "Many public buildings fail to meet accessibility standards. A student-led audit toolkit with checklists and photo evidence can push for improvements.",
+    targetAudience: "Local government and disability advocates",
+    status: "Ideate",
+    lastUpdated: "2026-04-29",
+  },
+  {
+    id: "11",
+    schoolName: "Oakwood School",
+    title: "Mini Satellite Weather Station",
+    theme: "November: Space",
+    studentTeam: "OrbitLab",
+    problemStatement:
+      "Rural areas lack accurate hyperlocal weather data. Student-built mini satellite ground stations can fill gaps left by national weather services.",
+    targetAudience: "Farmers and rural communities",
+    status: "Test",
+    lastUpdated: "2026-05-01",
+  },
+  {
+    id: "12",
+    schoolName: "Maplewood Institute",
+    title: "SDG Progress Dashboard",
+    theme: "December: Global Goals",
+    studentTeam: "GoalGetters",
+    problemStatement:
+      "Students learn about the UN SDGs in theory but have no way to track local progress. A visual dashboard mapping community projects to SDGs can bridge this gap.",
+    targetAudience: "Teachers, students, and local NGOs",
+    status: "Empathize",
+    lastUpdated: "2026-05-03",
+  },
+];
