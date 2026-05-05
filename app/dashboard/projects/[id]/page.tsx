@@ -116,11 +116,10 @@ export default function ProjectDetailPage({
                   className={cn(
                     "flex h-10 w-10 items-center justify-center rounded-full border-2 text-xs font-bold transition-all",
                     isActive &&
-                      `${colors.border} ${colors.bg} ${colors.text} ring-4 ring-offset-2`,
+                      `${colors.border} ${colors.bg} ${colors.text} ring-4 ring-offset-2 ring-current/20`,
                     isCompleted && `${colors.dot} text-white border-transparent`,
                     !isActive && !isCompleted && "border-border bg-muted text-muted-foreground"
                   )}
-                  style={isActive ? { ringColor: `${colors.dot}20` } : undefined}
                 >
                   {isCompleted ? "✓" : index + 1}
                 </div>
