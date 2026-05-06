@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/select";
 import { useIdeaStore } from "@/store/use-idea-store";
 import { useAuthStore } from "@/store/use-auth-store";
-import { THEME_MONTHS } from "@/lib/constants";
+import { useThemeStore } from "@/store/use-theme-store";
 import { toast } from "sonner";
 
 export function IdeaForm() {
@@ -25,14 +25,15 @@ export function IdeaForm() {
   const prefilledTheme = searchParams.get("theme") || "";
   const { addIdea } = useIdeaStore();
   const { currentUser } = useAuthStore();
+  const { themes } = useThemeStore();
 
   const [formData, setFormData] = useState({
     title: "",
     theme: prefilledTheme
-      ? THEME_MONTHS.find((tm) =>
+      ? themes.find((tm) =>
           tm.theme.toLowerCase() === prefilledTheme.toLowerCase()
         )
-        ? `${THEME_MONTHS.find((tm) => tm.theme.toLowerCase() === prefilledTheme.toLowerCase())!.month}: ${prefilledTheme}`
+        ? `${themes.find((tm) => tm.theme.toLowerCase() === prefilledTheme.toLowerCase())!.month}: ${prefilledTheme}`
         : ""
       : "",
     studentTeam: "",
@@ -130,7 +131,7 @@ export function IdeaForm() {
             <SelectValue placeholder="Select a monthly theme" />
           </SelectTrigger>
           <SelectContent>
-            {THEME_MONTHS.map((tm) => (
+            {themes.map((tm) => (
               <SelectItem
                 key={tm.month}
                 value={`${tm.month}: ${tm.theme}`}

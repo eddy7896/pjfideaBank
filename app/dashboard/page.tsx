@@ -7,9 +7,7 @@ import {
   School as SchoolIcon,
   BarChart3,
   Calendar,
-  ArrowRight,
   PlusCircle,
-  Users,
   ChevronRight,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -19,17 +17,20 @@ import {
   DESIGN_THINKING_STAGES,
   STATUS_COLORS,
   SCHOOLS,
-  THEME_MONTHS,
 } from "@/lib/constants";
 import { useIdeaStore } from "@/store/use-idea-store";
 import { useAuthStore } from "@/store/use-auth-store";
+import { useThemeStore } from "@/store/use-theme-store";
 import { usePermissions } from "@/lib/permissions";
+import { KanbanBoard } from "@/components/dashboard/kanban-board";
+import { ThemeCalendar } from "@/components/calendar/theme-calendar";
 import type { DesignThinkingStatus } from "@/types";
 import { cn } from "@/lib/utils";
 
 export default function DashboardPage() {
   const { currentUser } = useAuthStore();
   const { ideas } = useIdeaStore();
+  const { themes } = useThemeStore();
   const { canViewIdea } = usePermissions();
 
   if (!currentUser) return null;
@@ -128,6 +129,24 @@ export default function DashboardPage() {
         </div>
       </div>
 
+      {/* Yearly Thematic Calendar */}
+      <div className="mb-8 rounded-xl border border-border/50 bg-card p-5">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2">
+            <Calendar className="h-4 w-4 text-muted-foreground" />
+            <h2 className="text-sm font-semibold">Yearly Thematic Calendar</h2>
+          </div>
+          {currentUser.role === "super-admin" && (
+            <Link href="/dashboard/themes">
+              <Button variant="outline" size="sm" className="gap-1.5 text-xs">
+                Manage Calendar
+              </Button>
+            </Link>
+          )}
+        </div>
+        <ThemeCalendar compact />
+      </div>
+
       <div className="grid gap-6 lg:grid-cols-3">
         {/* Left: Stage Distribution */}
         <div className="lg:col-span-2 space-y-6">
@@ -217,11 +236,11 @@ export default function DashboardPage() {
 
           {/* School's own projects (School role) */}
           {currentUser.role === "school" && (
-            <div className="rounded-xl border border-border/50 bg-card p-5">
+            <div className="rounded-xl border border-border/50 bg-card p-5 overflow-hidden">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
                   <Lightbulb className="h-4 w-4 text-muted-foreground" />
-                  <h2 className="text-sm font-semibold">My Projects</h2>
+                  <h2 className="text-sm font-semibold">My Projects Kanban</h2>
                 </div>
                 <Link href="/dashboard/submit">
                   <Button variant="outline" size="sm" className="gap-1.5 text-xs">
@@ -235,25 +254,8 @@ export default function DashboardPage() {
                   No projects yet. Submit your first idea!
                 </div>
               ) : (
-                <div className="space-y-2">
-                  {visibleIdeas.map((idea) => (
-                    <Link
-                      key={idea.id}
-                      href={`/dashboard/projects/${idea.id}`}
-                      className="group flex items-center justify-between rounded-lg border border-border/40 p-3.5 transition-all hover:-translate-y-0.5 hover:shadow-md hover:border-indigo-200"
-                    >
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-center gap-2">
-                          <p className="text-sm font-semibold truncate">{idea.title}</p>
-                          <StatusBadge status={idea.status} className="text-[10px]" />
-                        </div>
-                        <p className="mt-1 text-xs text-muted-foreground truncate">
-                          {idea.theme} · {idea.studentTeam}
-                        </p>
-                      </div>
-                      <ChevronRight className="ml-2 h-4 w-4 flex-shrink-0 text-muted-foreground/40 transition-colors group-hover:text-indigo-500" />
-                    </Link>
-                  ))}
+                <div className="-mx-1">
+                  <KanbanBoard ideas={visibleIdeas} />
                 </div>
               )}
             </div>
@@ -297,7 +299,7 @@ export default function DashboardPage() {
           <div className="rounded-xl border border-border/50 bg-card p-5">
             <h2 className="mb-4 text-sm font-semibold">Ideas by Theme</h2>
             <div className="space-y-2">
-              {THEME_MONTHS.filter((tm) => {
+              {themes.filter((tm) => {
                 return visibleIdeas.some((i) =>
                   i.theme.toLowerCase().includes(tm.theme.toLowerCase())
                 );

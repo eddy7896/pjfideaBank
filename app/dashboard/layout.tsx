@@ -12,6 +12,7 @@ import {
   ShieldCheck,
   School,
   Building2,
+  Calendar,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -115,6 +116,18 @@ export default function DashboardLayout({
                 New Idea
               </Link>
             )}
+            <Link
+              href="/dashboard/themes"
+              className={cn(
+                "flex items-center gap-1.5 rounded-lg px-3.5 py-2 text-sm font-medium transition-all",
+                pathname === "/dashboard/themes"
+                  ? "bg-primary text-primary-foreground shadow-sm"
+                  : "text-muted-foreground hover:bg-accent hover:text-foreground"
+              )}
+            >
+              <Calendar className="h-4 w-4" />
+              Calendar
+            </Link>
           </nav>
 
           {/* Right: User info + Logout */}
