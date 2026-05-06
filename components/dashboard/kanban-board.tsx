@@ -101,7 +101,7 @@ export function KanbanBoard({ ideas, readOnly = false, visibleStages }: KanbanBo
                                 {idea.problemStatement}
                               </p>
                               <div className="flex items-center justify-between text-[11px] text-muted-foreground">
-                                <span className={cn("px-1.5 py-0.5 rounded-sm font-medium", colors.bg, colors.text)}>
+                                <span className={cn("px-2 py-0.5 rounded-full font-medium border", colors.bg, colors.text, colors.border)}>
                                   {idea.theme}
                                 </span>
                                 <span>{idea.studentTeam}</span>

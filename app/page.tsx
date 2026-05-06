@@ -1,15 +1,10 @@
 import Link from "next/link";
 import {
   Lightbulb,
-  CalendarDays,
-  Brain,
-  Users,
   ArrowRight,
-  Sparkles,
-  ChevronRight,
-  GraduationCap,
-  BarChart3,
-  Shield,
+  Eye,
+  Send,
+  Wrench,
 } from "lucide-react";
 
 export default function LandingPage() {
@@ -19,11 +14,11 @@ export default function LandingPage() {
       <header className="sticky top-0 z-50 border-b border-border/40 bg-background/80 backdrop-blur-xl">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-2.5">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 shadow-md shadow-indigo-500/20">
+            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary shadow-md shadow-primary/20">
               <Lightbulb className="h-5 w-5 text-white" />
             </div>
             <div>
-              <h1 className="text-lg font-semibold leading-none tracking-tight">Pi Jam</h1>
+              <h1 className="text-lg font-heading font-semibold leading-none tracking-tight text-foreground">Pi Jam</h1>
               <p className="text-xs text-muted-foreground">Idea Bank</p>
             </div>
           </div>
@@ -38,162 +33,145 @@ export default function LandingPage() {
       </header>
 
       {/* Hero */}
-      <section className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-indigo-50 via-white to-purple-50" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,rgba(99,102,241,0.08),transparent_60%)]" />
-        <div className="relative mx-auto max-w-7xl px-4 pb-20 pt-20 sm:px-6 sm:pt-28 lg:px-8">
-          <div className="mx-auto max-w-3xl text-center">
-            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-indigo-200 bg-indigo-50 px-4 py-1.5 text-sm text-indigo-700">
-              <Sparkles className="h-4 w-4" />
-              Design Thinking for Schools
-            </div>
-            <h2 className="text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
-              Where Student Ideas
-              <span className="mt-1 block bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-                Become Reality
-              </span>
-            </h2>
-            <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-muted-foreground">
-              Track and nurture student project ideas through the Design Thinking
-              framework. A thematic calendar-driven repository connecting schools,
-              students, and educators.
-            </p>
-            <div className="mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
-              <Link
-                href="/login"
-                className="inline-flex h-12 items-center gap-2 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 px-8 text-sm font-semibold text-white shadow-lg shadow-indigo-500/30 transition-all hover:shadow-xl hover:shadow-indigo-500/40"
-              >
-                Get Started
-                <ArrowRight className="h-4 w-4" />
-              </Link>
-              <a
-                href="#features"
-                className="inline-flex h-12 items-center gap-2 rounded-xl border border-border px-8 text-sm font-medium text-muted-foreground transition-all hover:bg-accent hover:text-foreground"
-              >
-                Learn More
-                <ChevronRight className="h-4 w-4" />
-              </a>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Features */}
-      <section id="features" className="border-t border-border/40 bg-muted/20 py-20">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="mb-14 text-center">
-            <h3 className="text-2xl font-bold tracking-tight sm:text-3xl">
-              Everything You Need to Manage Ideas
-            </h3>
-            <p className="mx-auto mt-3 max-w-xl text-muted-foreground">
-              From submission to testing — track every stage of the innovation journey.
-            </p>
-          </div>
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {[
-              {
-                icon: CalendarDays,
-                title: "Thematic Calendar",
-                desc: "12 monthly themes guide student ideation — from Sustainability to Space Exploration.",
-                gradient: "from-blue-500 to-indigo-600",
-              },
-              {
-                icon: Brain,
-                title: "Design Thinking Pipeline",
-                desc: "Track ideas through Empathize → Define → Ideate → Prototype → Test stages.",
-                gradient: "from-purple-500 to-fuchsia-600",
-              },
-              {
-                icon: Users,
-                title: "Multi-Role Access",
-                desc: "Schools submit ideas, Admins oversee progress, Education Dept reviews outcomes.",
-                gradient: "from-emerald-500 to-teal-600",
-              },
-              {
-                icon: BarChart3,
-                title: "Analytics Dashboard",
-                desc: "Visualize idea distribution by stage, theme, and school with real-time analytics.",
-                gradient: "from-orange-500 to-red-600",
-              },
-              {
-                icon: GraduationCap,
-                title: "School Portals",
-                desc: "Each school gets their own space to manage projects and track Design Thinking progress.",
-                gradient: "from-cyan-500 to-blue-600",
-              },
-              {
-                icon: Shield,
-                title: "Role-Based Security",
-                desc: "Schools edit their own ideas. Admins and Edu Dept have read-only oversight access.",
-                gradient: "from-rose-500 to-pink-600",
-              },
-            ].map((feature) => (
-              <div
-                key={feature.title}
-                className="group rounded-xl border border-border/50 bg-card p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-black/5"
-              >
-                <div
-                  className={`inline-flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br ${feature.gradient} shadow-md transition-transform group-hover:scale-110`}
+      <section className="relative overflow-hidden pt-20 pb-24 lg:pt-32 lg:pb-36">
+        <div className="absolute inset-0 bg-background" />
+        <div className="absolute top-0 right-0 -mr-20 -mt-20 h-[600px] w-[600px] rounded-full bg-primary/5 blur-[120px]" />
+        <div className="absolute bottom-0 left-0 -ml-20 -mb-20 h-[500px] w-[500px] rounded-full bg-accent/5 blur-[100px]" />
+        
+        <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="grid gap-12 lg:grid-cols-2 lg:gap-8 items-center">
+            <div className="max-w-2xl">
+              <h2 className="text-4xl font-heading font-bold tracking-tight text-foreground sm:text-5xl lg:text-6xl">
+                Empower the Next Generation of
+                <span className="text-primary block mt-2">Problem Solvers</span>
+              </h2>
+              <p className="mt-6 text-lg leading-relaxed text-muted-foreground">
+                Track and nurture student project ideas through the Design Thinking framework. Connect schools and educators in a unified, thematic computing curriculum.
+              </p>
+              <div className="mt-10 flex flex-col sm:flex-row gap-4">
+                <Link
+                  href="/login"
+                  className="inline-flex h-12 items-center justify-center gap-2 rounded-xl bg-primary px-8 text-sm font-semibold text-white shadow-lg shadow-primary/30 transition-all hover:shadow-xl hover:-translate-y-0.5"
                 >
-                  <feature.icon className="h-5 w-5 text-white" />
+                  Get Started
+                  <ArrowRight className="h-4 w-4" />
+                </Link>
+                <a
+                  href="#how-it-works"
+                  className="inline-flex h-12 items-center justify-center gap-2 rounded-xl border border-border bg-card px-8 text-sm font-medium text-foreground transition-all hover:bg-accent/10 hover:text-accent hover:border-accent/30"
+                >
+                  Learn More
+                </a>
+              </div>
+            </div>
+
+            {/* Abstract Geometric Illustration */}
+            <div className="relative h-[400px] w-full flex items-center justify-center">
+              <div className="relative w-[320px] h-[320px] animate-spin-slow">
+                {/* Center Core */}
+                <div className="absolute inset-[30%] bg-primary rounded-2xl rotate-12 shadow-2xl shadow-primary/40 flex items-center justify-center">
+                  <div className="w-16 h-16 bg-white/20 rounded-xl backdrop-blur-sm -rotate-12" />
                 </div>
-                <h4 className="mt-4 text-base font-semibold">{feature.title}</h4>
-                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                  {feature.desc}
-                </p>
+                {/* Orbiting Elements */}
+                <div className="absolute top-0 left-1/2 -ml-8 w-16 h-16 bg-accent rounded-full shadow-lg shadow-accent/40" />
+                <div className="absolute bottom-0 right-1/4 w-12 h-12 bg-indigo-300 rounded-lg shadow-lg rotate-45" />
+                <div className="absolute top-1/4 left-0 w-10 h-10 bg-purple-400 rounded-full shadow-lg" />
+                {/* Connecting Lines (SVG) */}
+                <svg className="absolute inset-0 w-full h-full text-border/50" viewBox="0 0 320 320">
+                  <circle cx="160" cy="160" r="158" fill="none" stroke="currentColor" strokeWidth="2" strokeDasharray="8 8" />
+                  <circle cx="160" cy="160" r="100" fill="none" stroke="currentColor" strokeWidth="2" strokeDasharray="4 4" />
+                </svg>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Value Proposition */}
+      <section id="how-it-works" className="border-t border-border/50 bg-card py-24">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h3 className="text-3xl font-heading font-bold text-foreground">The Design Thinking Process</h3>
+            <p className="mt-4 text-muted-foreground max-w-2xl mx-auto">A structured approach to computational problem solving.</p>
+          </div>
+          
+          <div className="grid md:grid-cols-3 gap-8 relative">
+            {/* Connecting line for desktop */}
+            <div className="hidden md:block absolute top-12 left-[15%] right-[15%] h-0.5 bg-border/80" />
+
+            {[
+              { 
+                title: "Observe", 
+                desc: "Identify community problems and empathize with users. Find real-world challenges waiting for a tech solution.",
+                icon: Eye,
+                color: "text-primary",
+                bg: "bg-primary/10"
+              },
+              { 
+                title: "Submit", 
+                desc: "Define the problem statement and ideate solutions. Submit the concept to the Idea Bank under a monthly theme.",
+                icon: Send,
+                color: "text-accent",
+                bg: "bg-accent/10"
+              },
+              { 
+                title: "Build", 
+                desc: "Prototype and test the solution. Refine the project iteratively until it delivers measurable impact.",
+                icon: Wrench,
+                color: "text-purple-500",
+                bg: "bg-purple-500/10"
+              }
+            ].map((step, i) => (
+              <div key={step.title} className="relative z-10 flex flex-col items-center text-center">
+                <div className={`w-24 h-24 rounded-full ${step.bg} flex items-center justify-center mb-6 shadow-sm border border-card`}>
+                  <step.icon className={`w-10 h-10 ${step.color}`} />
+                </div>
+                <h4 className="text-xl font-heading font-bold text-foreground mb-3">{step.title}</h4>
+                <p className="text-muted-foreground leading-relaxed">{step.desc}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* How It Works */}
-      <section className="border-t border-border/40 py-20">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="mb-14 text-center">
-            <h3 className="text-2xl font-bold tracking-tight sm:text-3xl">
-              How It Works
-            </h3>
-          </div>
-          <div className="mx-auto grid max-w-4xl gap-8 sm:grid-cols-3">
-            {[
-              { step: "01", title: "Choose a Theme", desc: "Pick a monthly theme from the calendar to focus your project." },
-              { step: "02", title: "Submit Your Idea", desc: "Schools describe their problem statement and target audience." },
-              { step: "03", title: "Track Progress", desc: "Move ideas through Design Thinking stages from Empathize to Test." },
-            ].map((item) => (
-              <div key={item.step} className="text-center">
-                <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-100 to-purple-100 text-xl font-bold text-indigo-600">
-                  {item.step}
-                </div>
-                <h4 className="mt-4 text-base font-semibold">{item.title}</h4>
-                <p className="mt-2 text-sm text-muted-foreground">{item.desc}</p>
-              </div>
-            ))}
+      {/* Social Proof Counters */}
+      <section className="py-24 bg-primary text-primary-foreground relative overflow-hidden">
+        <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.8),transparent_70%)]" />
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="grid grid-cols-2 gap-8 md:gap-16 text-center divide-x divide-primary-foreground/20">
+            <div>
+              <div className="text-5xl md:text-7xl font-heading font-bold tracking-tight mb-2">1,248</div>
+              <div className="text-lg md:text-xl text-primary-foreground/80 font-medium">Ideas Submitted</div>
+            </div>
+            <div>
+              <div className="text-5xl md:text-7xl font-heading font-bold tracking-tight mb-2">86</div>
+              <div className="text-lg md:text-xl text-primary-foreground/80 font-medium">Active Schools</div>
+            </div>
           </div>
         </div>
       </section>
 
       {/* CTA */}
-      <section className="border-t border-border/40 bg-gradient-to-br from-indigo-600 to-purple-700 py-16">
-        <div className="mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
-          <h3 className="text-2xl font-bold tracking-tight text-white sm:text-3xl">
-            Ready to Start?
+      <section className="border-t border-border/40 py-24 bg-card">
+        <div className="mx-auto max-w-4xl px-4 text-center sm:px-6 lg:px-8">
+          <h3 className="text-3xl font-heading font-bold tracking-tight text-foreground">
+            Ready to empower your students?
           </h3>
-          <p className="mx-auto mt-3 max-w-lg text-indigo-200">
-            Sign in with demo credentials to explore the full platform.
+          <p className="mt-4 text-lg text-muted-foreground">
+            Sign in with demo credentials to explore the platform.
           </p>
           <Link
             href="/login"
-            className="mt-8 inline-flex h-12 items-center gap-2 rounded-xl bg-white px-8 text-sm font-semibold text-indigo-700 shadow-lg transition-all hover:bg-indigo-50"
+            className="mt-8 inline-flex h-14 items-center gap-2 rounded-xl bg-primary px-10 text-base font-semibold text-white shadow-lg transition-all hover:bg-primary/90 hover:-translate-y-0.5"
           >
             Sign In Now
-            <ArrowRight className="h-4 w-4" />
+            <ArrowRight className="h-5 w-5" />
           </Link>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-border/40 py-8">
+      <footer className="border-t border-border/40 bg-background py-10">
         <div className="mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
           <p className="text-sm text-muted-foreground">
             © 2026 Pi Jam Idea Bank. Built for educators by makers.
