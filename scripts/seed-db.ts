@@ -1,6 +1,7 @@
 import { createUser, createTeam, createIdea } from '@/lib/db/repositories';
 import { DEMO_CREDENTIALS } from '@/lib/constants';
 import { MOCK_IDEAS } from '@/lib/mock-data';
+import type { StudentTeam } from '@/types';
 
 const createDate = (daysAgo: number) => {
   const d = new Date();
@@ -54,7 +55,7 @@ async function seedDatabase() {
 
   for (const team of teams) {
     try {
-      await createTeam(team as any);
+      await createTeam(team as StudentTeam);
     } catch (e) {
       // Team might already exist
     }
