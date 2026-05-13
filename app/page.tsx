@@ -16,8 +16,8 @@ export default function LandingPage() {
           <Image
             src="/pijam logo.jpeg"
             alt="Pi Jam Logo"
-            width={48}
-            height={48}
+            width={150}
+            height={60}
             className="rounded-lg"
             priority
           />

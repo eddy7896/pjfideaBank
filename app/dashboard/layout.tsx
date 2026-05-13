@@ -73,12 +73,12 @@ export default function DashboardLayout({
       {/* Sidebar Navigation */}
       <aside className="fixed inset-y-0 left-0 z-50 flex w-64 flex-col border-r border-border bg-card shadow-sm transition-all">
         {/* Logo Area */}
-        <div className="flex h-16 shrink-0 items-center justify-center px-6 border-b border-border/40">
+        <div className="flex h-24 shrink-0 items-center justify-center px-6 border-b border-border/40">
           <Image
             src="/pijam logo.jpeg"
             alt="Pi Jam Logo"
-            width={48}
-            height={48}
+            width={150}
+            height={60}
             className="rounded-lg"
             priority
           />

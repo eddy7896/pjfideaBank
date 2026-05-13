@@ -73,8 +73,8 @@ export default function LoginPage() {
             <Image
               src="/pijam logo.jpeg"
               alt="Pi Jam Logo"
-              width={40}
-              height={40}
+              width={120}
+              height={48}
               className="rounded-lg"
               priority
             />
