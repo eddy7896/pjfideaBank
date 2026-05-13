@@ -59,20 +59,20 @@ export default function AnalyticsPage() {
 
   const analytics = computeAnalytics(ideas, teams, []);
 
-  const statusChartData = Object.entries(analytics.ideasByStatus).map(
-    ([status, count]) => ({
+  const statusChartData = Object.entries(analytics.ideasByStatus)
+    .map(([status, count]) => ({
       name: status,
       count,
       fill: STATUS_COLORS[status],
-    })
-  );
+    }))
+    .filter((item) => item.count > 0);
 
   const genderChartData = [
     { name: "Female", value: analytics.studentsByGender.Female, fill: GENDER_COLORS["Female"] },
     { name: "Male", value: analytics.studentsByGender.Male, fill: GENDER_COLORS["Male"] },
     { name: "Non-binary", value: analytics.studentsByGender["Non-binary"], fill: GENDER_COLORS["Non-binary"] },
     { name: "Prefer not to say", value: analytics.studentsByGender["Prefer not to say"], fill: GENDER_COLORS["Prefer not to say"] },
-  ];
+  ].filter((item) => item.value > 0);
 
   const timelineData = Array.from({ length: 7 }, (_, i) => ({
     day: `Day ${7 - i}`,
@@ -351,6 +351,111 @@ export default function AnalyticsPage() {
             </CardContent>
           </Card>
         </div>
+
+        {/* Ideas by Theme */}
+        <Card className="border-border/20">
+          <CardHeader>
+            <CardTitle>Ideas by Theme</CardTitle>
+            <CardDescription className="text-xs">Distribution across themes</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={analytics.ideasByTheme}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+                <XAxis dataKey="theme" stroke="#94a3b8" style={{ fontSize: "12px" }} angle={-45} textAnchor="end" height={80} />
+                <YAxis stroke="#94a3b8" style={{ fontSize: "12px" }} />
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: "#ffffff",
+                    border: "1px solid #e2e8f0",
+                    borderRadius: "8px",
+                  }}
+                />
+                <Bar dataKey="count" fill="#8b5cf6" radius={[8, 8, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+
+        {/* Design Thinking Progression */}
+        <div className="grid gap-6 lg:grid-cols-2">
+          <Card className="border-border/20">
+            <CardHeader>
+              <CardTitle>Design Thinking Progression</CardTitle>
+              <CardDescription className="text-xs">Ideas through each stage</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={analytics.designProgressionPath}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+                  <XAxis dataKey="stage" stroke="#94a3b8" style={{ fontSize: "12px" }} />
+                  <YAxis stroke="#94a3b8" style={{ fontSize: "12px" }} />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: "#ffffff",
+                      border: "1px solid #e2e8f0",
+                      borderRadius: "8px",
+                    }}
+                    formatter={(value) => [value, "Ideas"]}
+                  />
+                  <Bar dataKey="ideasReached" fill="#10b981" radius={[8, 8, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </CardContent>
+          </Card>
+
+          {/* Grade Distribution */}
+          <Card className="border-border/20">
+            <CardHeader>
+              <CardTitle>Student Grade Distribution</CardTitle>
+              <CardDescription className="text-xs">Students by grade level</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={analytics.gradeDistribution}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+                  <XAxis dataKey="grade" stroke="#94a3b8" style={{ fontSize: "12px" }} />
+                  <YAxis stroke="#94a3b8" style={{ fontSize: "12px" }} />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: "#ffffff",
+                      border: "1px solid #e2e8f0",
+                      borderRadius: "8px",
+                    }}
+                    formatter={(value) => [value, "Students"]}
+                  />
+                  <Bar dataKey="count" fill="#ec4899" radius={[8, 8, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Team Size Distribution */}
+        <Card className="border-border/20">
+          <CardHeader>
+            <CardTitle>Team Size Distribution</CardTitle>
+            <CardDescription className="text-xs">Number of teams by member count</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={analytics.teamSizeDistribution}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+                <XAxis dataKey="size" stroke="#94a3b8" style={{ fontSize: "12px" }} label={{ value: "Team Size", position: "insideBottomRight", offset: -5 }} />
+                <YAxis stroke="#94a3b8" style={{ fontSize: "12px" }} label={{ value: "Count", angle: -90, position: "insideLeft" }} />
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: "#ffffff",
+                    border: "1px solid #e2e8f0",
+                    borderRadius: "8px",
+                  }}
+                  formatter={(value) => [value, "Teams"]}
+                />
+                <Bar dataKey="count" fill="#f59e0b" radius={[8, 8, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

@@ -12,7 +12,12 @@ export interface AnalyticsData {
   ideasPerTeam: { teamId: string; teamName: string; count: number }[];
   ideasPerSchool: { schoolName: string; count: number }[];
   teamsPerSchool: { schoolName: string; count: number }[];
-  genderRatio: number; // percentage female
+  genderRatio: number;
+  ideasByTheme: { theme: string; count: number }[];
+  designProgressionPath: { stage: string; ideasReached: number; percentage: number }[];
+  gradeDistribution: { grade: string; count: number }[];
+  teamSizeDistribution: { size: number; count: number }[];
+  studentsByGrade: Record<string, number>;
 }
 
 export function computeAnalytics(
@@ -108,6 +113,56 @@ export function computeAnalytics(
     }))
     .sort((a, b) => b.count - a.count);
 
+  // Ideas by theme
+  const ideaCountByTheme: Record<string, number> = {};
+  ideas.forEach((idea) => {
+    ideaCountByTheme[idea.theme] = (ideaCountByTheme[idea.theme] || 0) + 1;
+  });
+
+  const ideasByTheme = Object.entries(ideaCountByTheme)
+    .map(([theme, count]) => ({ theme, count }))
+    .sort((a, b) => b.count - a.count);
+
+  // Design thinking progression
+  const designProgressionPath = [
+    { stage: "Empathize", ideasReached: ideasByStatus.Empathize },
+    { stage: "Define", ideasReached: ideasByStatus.Define },
+    { stage: "Ideate", ideasReached: ideasByStatus.Ideate },
+    { stage: "Prototype", ideasReached: ideasByStatus.Prototype },
+    { stage: "Test", ideasReached: ideasByStatus.Test },
+  ].map((item) => ({
+    ...item,
+    percentage: ideas.length > 0 ? Math.round((item.ideasReached / ideas.length) * 100) : 0,
+  }));
+
+  // Grade distribution from team members
+  const studentsByGrade: Record<string, number> = {};
+  teams.forEach((team) => {
+    const members = team.members || [];
+    members.forEach((member) => {
+      studentsByGrade[member.grade] = (studentsByGrade[member.grade] || 0) + 1;
+    });
+  });
+
+  const gradeDistribution = Object.entries(studentsByGrade)
+    .map(([grade, count]) => ({ grade, count }))
+    .sort((a, b) => {
+      const aNum = parseInt(a.grade);
+      const bNum = parseInt(b.grade);
+      return isNaN(aNum) || isNaN(bNum) ? a.grade.localeCompare(b.grade) : aNum - bNum;
+    });
+
+  // Team size distribution
+  const teamSizeCounts: Record<number, number> = {};
+  teams.forEach((team) => {
+    const size = (team.members || []).length;
+    teamSizeCounts[size] = (teamSizeCounts[size] || 0) + 1;
+  });
+
+  const teamSizeDistribution = Object.entries(teamSizeCounts)
+    .map(([size, count]) => ({ size: parseInt(size), count }))
+    .sort((a, b) => a.size - b.size);
+
   return {
     totalSchools,
     totalIdeas: ideas.length,
@@ -120,5 +175,10 @@ export function computeAnalytics(
     ideasPerSchool,
     teamsPerSchool,
     genderRatio,
+    ideasByTheme,
+    designProgressionPath,
+    gradeDistribution,
+    teamSizeDistribution,
+    studentsByGrade,
   };
 }
