@@ -245,7 +245,7 @@ export async function getThemeActivities(month?: number, year?: number) {
       .where(
         month !== undefined ? eq(themeActivities.month, month) : undefined,
       );
-    return results.filter(a => a.year === year);
+    return results.filter((a: any) => a.year === year);
   }
   return await db.select().from(themeActivities);
 }
