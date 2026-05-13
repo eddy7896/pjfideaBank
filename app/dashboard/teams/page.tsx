@@ -148,7 +148,7 @@ export default function TeamsPage() {
                           Members
                         </p>
                         <p className="font-semibold text-foreground">
-                          {team.members.length}
+                          {(team.members || []).length}
                         </p>
                       </div>
                       <div>
@@ -164,13 +164,13 @@ export default function TeamsPage() {
                 </div>
 
                 {/* Members List */}
-                {team.members.length > 0 && (
+                {(team.members || []).length > 0 && (
                   <div className="pt-4 border-t border-border/20">
                     <p className="text-xs font-medium text-muted-foreground mb-3">
-                      Members ({team.members.length})
+                      Members ({(team.members || []).length})
                     </p>
                     <div className="space-y-2">
-                      {team.members.map((member, idx) => (
+                      {(team.members || []).map((member, idx) => (
                         <div
                           key={idx}
                           className="flex items-center justify-between rounded-lg border border-border/50 bg-muted/30 p-3 text-sm"
