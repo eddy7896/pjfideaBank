@@ -18,6 +18,8 @@ export default function ProjectsPage() {
   const schoolProjects =
     currentUser.role === "school"
       ? ideas.filter((idea) => idea.schoolName === currentUser.schoolName)
+      : currentUser.role === "student"
+      ? ideas.filter((idea) => idea.teamId === currentUser.teamId)
       : [];
 
   return (

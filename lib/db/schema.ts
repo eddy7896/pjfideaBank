@@ -18,7 +18,7 @@ export const studentTeams = sqliteTable('student_teams', {
   pin: text('pin').notNull(),
   name: text('name').notNull(),
   schoolName: text('school_name').notNull(),
-  memberNames: text('member_names'), // JSON string
+  members: text('members'), // JSON string: TeamMember[]
   createdAt: text('created_at').default(sql`CURRENT_TIMESTAMP`),
 });
 

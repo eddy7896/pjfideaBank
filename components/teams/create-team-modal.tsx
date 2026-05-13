@@ -5,14 +5,24 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { X, Plus, Copy, Check } from "lucide-react";
+import type { TeamMember } from "@/types";
 
 interface CreateTeamModalProps {
   open: boolean;
   schoolName: string;
   onClose: () => void;
-  onSubmit: (name: string, memberNames: string[]) => { id: string; pin: string };
+  onSubmit: (name: string, members: TeamMember[]) => { id: string; pin: string };
 }
+
+const GRADES = ["9", "10", "11", "12"];
 
 export function CreateTeamModal({
   open,
@@ -21,32 +31,47 @@ export function CreateTeamModal({
   onSubmit,
 }: CreateTeamModalProps) {
   const [teamName, setTeamName] = useState("");
-  const [memberNames, setMemberNames] = useState<string[]>([]);
-  const [newMember, setNewMember] = useState("");
+  const [members, setMembers] = useState<TeamMember[]>([]);
+  const [newMember, setNewMember] = useState({
+    name: "",
+    grade: "",
+    contactNumber: "",
+  });
   const [createdTeam, setCreatedTeam] = useState<{ id: string; pin: string } | null>(null);
   const [copiedField, setCopiedField] = useState<"id" | "pin" | null>(null);
 
   const handleAddMember = () => {
-    if (newMember.trim() && !memberNames.includes(newMember.trim())) {
-      setMemberNames([...memberNames, newMember.trim()]);
-      setNewMember("");
+    if (
+      newMember.name.trim() &&
+      newMember.grade &&
+      newMember.contactNumber.trim()
+    ) {
+      setMembers([
+        ...members,
+        {
+          name: newMember.name.trim(),
+          grade: newMember.grade,
+          contactNumber: newMember.contactNumber.trim(),
+        },
+      ]);
+      setNewMember({ name: "", grade: "", contactNumber: "" });
     }
   };
 
   const handleRemoveMember = (index: number) => {
-    setMemberNames(memberNames.filter((_, i) => i !== index));
+    setMembers(members.filter((_, i) => i !== index));
   };
 
   const handleCreate = () => {
     if (!teamName.trim()) return;
-    const result = onSubmit(teamName.trim(), memberNames);
+    const result = onSubmit(teamName.trim(), members);
     setCreatedTeam(result);
   };
 
   const handleClose = () => {
     setTeamName("");
-    setMemberNames([]);
-    setNewMember("");
+    setMembers([]);
+    setNewMember({ name: "", grade: "", contactNumber: "" });
     setCreatedTeam(null);
     onClose();
   };
@@ -129,7 +154,7 @@ export function CreateTeamModal({
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="max-w-md">
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Create New Team</DialogTitle>
         </DialogHeader>
@@ -148,33 +173,90 @@ export function CreateTeamModal({
           </div>
 
           <div className="space-y-3">
-            <Label className="text-sm font-medium">Team Members (Optional)</Label>
-            <div className="flex gap-2">
-              <Input
-                placeholder="Add member name..."
-                value={newMember}
-                onChange={(e) => setNewMember(e.target.value)}
-                onKeyPress={(e) => e.key === "Enter" && handleAddMember()}
-              />
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={handleAddMember}
-                disabled={!newMember.trim()}
-              >
-                <Plus className="h-4 w-4" />
-              </Button>
+            <Label className="text-sm font-medium">Team Members</Label>
+            <div className="space-y-3 rounded-lg border border-border/50 bg-muted/30 p-4">
+              <div className="grid gap-3 sm:grid-cols-3">
+                <div>
+                  <Label htmlFor="memberName" className="text-xs text-muted-foreground mb-1">
+                    Student Name
+                  </Label>
+                  <Input
+                    id="memberName"
+                    placeholder="e.g., Alice Johnson"
+                    value={newMember.name}
+                    onChange={(e) =>
+                      setNewMember({ ...newMember, name: e.target.value })
+                    }
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor="memberGrade" className="text-xs text-muted-foreground mb-1">
+                    Grade
+                  </Label>
+                  <Select value={newMember.grade || ""} onValueChange={(val) =>
+                    setNewMember({ ...newMember, grade: val || "" })
+                  }>
+                    <SelectTrigger id="memberGrade">
+                      <SelectValue placeholder="Select grade" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {GRADES.map((grade) => (
+                        <SelectItem key={grade} value={grade}>
+                          Grade {grade}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div>
+                  <Label htmlFor="memberContact" className="text-xs text-muted-foreground mb-1">
+                    Contact Number
+                  </Label>
+                  <div className="flex gap-2">
+                    <Input
+                      id="memberContact"
+                      placeholder="e.g., 555-0123"
+                      value={newMember.contactNumber}
+                      onChange={(e) =>
+                        setNewMember({ ...newMember, contactNumber: e.target.value })
+                      }
+                    />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={handleAddMember}
+                      disabled={
+                        !newMember.name.trim() ||
+                        !newMember.grade ||
+                        !newMember.contactNumber.trim()
+                      }
+                    >
+                      <Plus className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+              </div>
             </div>
 
-            {memberNames.length > 0 && (
+            {members.length > 0 && (
               <div className="space-y-2">
-                {memberNames.map((member, index) => (
+                <p className="text-xs text-muted-foreground font-medium">
+                  {members.length} member{members.length !== 1 ? "s" : ""} added
+                </p>
+                {members.map((member, index) => (
                   <div
                     key={index}
                     className="flex items-center justify-between rounded-lg border border-border/50 bg-background p-3"
                   >
-                    <span className="text-sm">{member}</span>
+                    <div className="flex-1">
+                      <p className="text-sm font-medium">{member.name}</p>
+                      <p className="text-xs text-muted-foreground">
+                        Grade {member.grade} · {member.contactNumber}
+                      </p>
+                    </div>
                     <button
                       onClick={() => handleRemoveMember(index)}
                       className="text-muted-foreground hover:text-foreground transition"
@@ -191,7 +273,11 @@ export function CreateTeamModal({
             <Button variant="outline" onClick={handleClose} className="flex-1">
               Cancel
             </Button>
-            <Button onClick={handleCreate} disabled={!teamName.trim()} className="flex-1">
+            <Button
+              onClick={handleCreate}
+              disabled={!teamName.trim() || members.length === 0}
+              className="flex-1"
+            >
               Create Team
             </Button>
           </div>

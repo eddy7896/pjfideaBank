@@ -34,7 +34,7 @@ export async function createTeam(team: StudentTeam) {
     pin: team.pin,
     name: team.name,
     schoolName: team.schoolName,
-    memberNames: JSON.stringify(team.memberNames),
+    members: JSON.stringify(team.members),
   }).returning();
 }
 
@@ -44,7 +44,7 @@ export async function getTeamById(id: string) {
   if (result[0]) {
     return {
       ...result[0],
-      memberNames: result[0].memberNames ? JSON.parse(result[0].memberNames) : [],
+      members: result[0].members ? JSON.parse(result[0].members) : [],
     } as StudentTeam;
   }
   return null;
@@ -55,7 +55,7 @@ export async function getTeamsBySchool(schoolName: string) {
   const results = await db.select().from(studentTeams).where(eq(studentTeams.schoolName, schoolName));
   return results.map((t: any) => ({
     ...t,
-    memberNames: t.memberNames ? JSON.parse(t.memberNames) : [],
+    members: t.members ? JSON.parse(t.members) : [],
   })) as StudentTeam[];
 }
 
@@ -64,7 +64,7 @@ export async function getAllTeams() {
   const results = await db.select().from(studentTeams);
   return results.map((t: any) => ({
     ...t,
-    memberNames: t.memberNames ? JSON.parse(t.memberNames) : [],
+    members: t.members ? JSON.parse(t.members) : [],
   })) as StudentTeam[];
 }
 

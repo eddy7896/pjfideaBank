@@ -32,7 +32,11 @@ async function seedDatabase() {
       pin: '123456',
       name: 'Green Sparks',
       schoolName: 'Springfield High',
-      memberNames: ['Alice Johnson', 'Bob Smith', 'Carol Davis'],
+      members: [
+        { name: 'Alice Johnson', grade: '10', contactNumber: '555-0101' },
+        { name: 'Bob Smith', grade: '10', contactNumber: '555-0102' },
+        { name: 'Carol Davis', grade: '10', contactNumber: '555-0103' },
+      ],
       createdAt: new Date().toISOString(),
     },
     {
@@ -40,7 +44,10 @@ async function seedDatabase() {
       pin: '654321',
       name: 'Tech Pioneers',
       schoolName: 'Springfield High',
-      memberNames: ['David Wilson', 'Emma Brown'],
+      members: [
+        { name: 'David Wilson', grade: '11', contactNumber: '555-0104' },
+        { name: 'Emma Brown', grade: '11', contactNumber: '555-0105' },
+      ],
       createdAt: new Date().toISOString(),
     },
   ];

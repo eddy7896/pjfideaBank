@@ -8,12 +8,18 @@ export interface User {
   teamId?: string;
 }
 
+export interface TeamMember {
+  name: string;
+  grade: string;
+  contactNumber: string;
+}
+
 export interface StudentTeam {
   id: string;
   pin: string;
   name: string;
   schoolName: string;
-  memberNames: string[];
+  members: TeamMember[];
   createdAt: string;
 }
 

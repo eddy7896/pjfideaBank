@@ -41,8 +41,8 @@ export default function TeamsPage() {
     return ideas.filter((i) => i.teamId === teamId).length;
   };
 
-  const handleCreateTeam = (name: string, memberNames: string[]) => {
-    const newTeam = createTeam(name, currentUser.schoolName!, memberNames);
+  const handleCreateTeam = (name: string, members: any[]) => {
+    const newTeam = createTeam(name, currentUser.schoolName!, members);
     toast.success(`Team "${name}" created successfully!`);
     setIsModalOpen(false);
     return { id: newTeam.id, pin: newTeam.pin };
@@ -153,7 +153,7 @@ export default function TeamsPage() {
                           Members
                         </p>
                         <p className="font-semibold text-foreground">
-                          {team.memberNames.length}
+                          {team.members.length}
                         </p>
                       </div>
                       <div>
@@ -169,16 +169,27 @@ export default function TeamsPage() {
                 </div>
 
                 {/* Members List */}
-                {team.memberNames.length > 0 && (
+                {team.members.length > 0 && (
                   <div className="pt-4 border-t border-border/50">
                     <p className="text-xs font-medium text-muted-foreground mb-3">
-                      Members
+                      Members ({team.members.length})
                     </p>
-                    <div className="flex flex-wrap gap-2">
-                      {team.memberNames.map((member, idx) => (
-                        <Badge key={idx} variant="outline">
-                          {member}
-                        </Badge>
+                    <div className="space-y-2">
+                      {team.members.map((member, idx) => (
+                        <div
+                          key={idx}
+                          className="flex items-center justify-between rounded-lg border border-border/50 bg-muted/30 p-3 text-sm"
+                        >
+                          <div className="flex-1">
+                            <p className="font-medium">{member.name}</p>
+                            <p className="text-xs text-muted-foreground">
+                              Grade {member.grade}
+                            </p>
+                          </div>
+                          <p className="font-mono text-xs text-muted-foreground">
+                            {member.contactNumber}
+                          </p>
+                        </div>
                       ))}
                     </div>
                   </div>
