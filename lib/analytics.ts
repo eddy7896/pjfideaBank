@@ -33,10 +33,11 @@ export function computeAnalytics(
   };
 
   const totalStudents = teams.reduce((acc, team) => {
-    team.members.forEach((member) => {
+    const members = team.members || [];
+    members.forEach((member) => {
       studentsByGender[member.gender]++;
     });
-    return acc + team.members.length;
+    return acc + members.length;
   }, 0);
 
   const genderRatio =
@@ -60,7 +61,7 @@ export function computeAnalytics(
   const studentsPerTeam = teams.map((team) => ({
     teamId: team.id,
     teamName: team.name,
-    count: team.members.length,
+    count: (team.members || []).length,
   }));
 
   // Ideas per team
