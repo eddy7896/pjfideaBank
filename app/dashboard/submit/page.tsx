@@ -52,6 +52,11 @@ function SubmitContent() {
       </div>
 
       <div className="rounded-xl border border-border/50 bg-card p-6 shadow-sm sm:p-8">
+        <div className="mb-6 rounded-lg border border-primary/20 bg-primary/5 p-4">
+          <p className="text-sm text-foreground">
+            Submit your initial idea here. It will enter the <strong>Empathize</strong> stage where you&apos;ll document the problem through user research, empathy mapping, and root cause analysis using the 5 Whys framework.
+          </p>
+        </div>
         <IdeaForm />
       </div>
     </div>

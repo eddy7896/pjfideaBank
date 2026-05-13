@@ -1,5 +1,11 @@
 import type { Idea } from "@/types";
 
+const createDate = (daysAgo: number) => {
+  const d = new Date();
+  d.setDate(d.getDate() - daysAgo);
+  return d.toISOString();
+};
+
 export const MOCK_IDEAS: Idea[] = [
   {
     id: "1",
@@ -12,6 +18,8 @@ export const MOCK_IDEAS: Idea[] = [
     targetAudience: "Students and school administrators",
     status: "Ideate",
     lastUpdated: "2026-05-01",
+    stageData: {},
+    timeline: [{ id: "t1-1", type: "created", timestamp: createDate(4), content: "Project created" }],
   },
   {
     id: "2",
@@ -24,6 +32,8 @@ export const MOCK_IDEAS: Idea[] = [
     targetAudience: "Middle school students (ages 11-14)",
     status: "Prototype",
     lastUpdated: "2026-04-28",
+    stageData: {},
+    timeline: [{ id: "t2-1", type: "created", timestamp: createDate(7), content: "Project created" }],
   },
   {
     id: "3",
@@ -36,6 +46,8 @@ export const MOCK_IDEAS: Idea[] = [
     targetAudience: "Parents and young students",
     status: "Define",
     lastUpdated: "2026-04-25",
+    stageData: {},
+    timeline: [{ id: "t3-1", type: "created", timestamp: createDate(10), content: "Project created" }],
   },
   {
     id: "4",
@@ -48,6 +60,8 @@ export const MOCK_IDEAS: Idea[] = [
     targetAudience: "High school students (ages 14-18)",
     status: "Test",
     lastUpdated: "2026-05-03",
+    stageData: {},
+    timeline: [{ id: "t4-1", type: "created", timestamp: createDate(2), content: "Project created" }],
   },
   {
     id: "5",
@@ -60,6 +74,8 @@ export const MOCK_IDEAS: Idea[] = [
     targetAudience: "Community members of all ages",
     status: "Empathize",
     lastUpdated: "2026-05-02",
+    stageData: {},
+    timeline: [{ id: "t5-1", type: "created", timestamp: createDate(3), content: "Project created" }],
   },
   {
     id: "6",
@@ -72,6 +88,8 @@ export const MOCK_IDEAS: Idea[] = [
     targetAudience: "School facility managers and eco-clubs",
     status: "Ideate",
     lastUpdated: "2026-04-30",
+    stageData: {},
+    timeline: [{ id: "t6-1", type: "created", timestamp: createDate(5), content: "Project created" }],
   },
   {
     id: "7",
@@ -84,6 +102,8 @@ export const MOCK_IDEAS: Idea[] = [
     targetAudience: "Art students and school councils",
     status: "Prototype",
     lastUpdated: "2026-04-22",
+    stageData: {},
+    timeline: [{ id: "t7-1", type: "created", timestamp: createDate(13), content: "Project created" }],
   },
   {
     id: "8",
@@ -96,6 +116,8 @@ export const MOCK_IDEAS: Idea[] = [
     targetAudience: "High school career counselors and students",
     status: "Empathize",
     lastUpdated: "2026-05-04",
+    stageData: {},
+    timeline: [{ id: "t8-1", type: "created", timestamp: createDate(1), content: "Project created" }],
   },
   {
     id: "9",
@@ -108,6 +130,8 @@ export const MOCK_IDEAS: Idea[] = [
     targetAudience: "School transport departments",
     status: "Define",
     lastUpdated: "2026-04-27",
+    stageData: {},
+    timeline: [{ id: "t9-1", type: "created", timestamp: createDate(8), content: "Project created" }],
   },
   {
     id: "10",
@@ -120,6 +144,8 @@ export const MOCK_IDEAS: Idea[] = [
     targetAudience: "Local government and disability advocates",
     status: "Ideate",
     lastUpdated: "2026-04-29",
+    stageData: {},
+    timeline: [{ id: "t10-1", type: "created", timestamp: createDate(6), content: "Project created" }],
   },
   {
     id: "11",
@@ -132,6 +158,8 @@ export const MOCK_IDEAS: Idea[] = [
     targetAudience: "Farmers and rural communities",
     status: "Test",
     lastUpdated: "2026-05-01",
+    stageData: {},
+    timeline: [{ id: "t11-1", type: "created", timestamp: createDate(4), content: "Project created" }],
   },
   {
     id: "12",
@@ -144,5 +172,7 @@ export const MOCK_IDEAS: Idea[] = [
     targetAudience: "Teachers, students, and local NGOs",
     status: "Empathize",
     lastUpdated: "2026-05-03",
+    stageData: {},
+    timeline: [{ id: "t12-1", type: "created", timestamp: createDate(2), content: "Project created" }],
   },
 ];
