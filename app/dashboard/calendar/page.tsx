@@ -137,30 +137,13 @@ export default function CalendarPage() {
         </div>
 
         {isAdmin && (
-          <div className="space-y-4">
-            <h2 className="text-xl font-semibold">Monthly Themes</h2>
-            <div className="grid gap-4 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4">
-              {themes.map((theme, idx) => (
-                <Card key={theme.month} className="border-border/20 p-4 hover:shadow-md transition-shadow">
-                  <div className="flex items-start justify-between mb-2">
-                    <div className="flex-1">
-                      <p className="text-xs font-semibold text-muted-foreground">{theme.shortMonth}</p>
-                      <p className="text-sm font-semibold text-foreground line-clamp-2">{theme.theme}</p>
-                    </div>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleEditTheme(idx)}
-                      className="h-7 w-7 p-0"
-                    >
-                      <Pencil className="h-3 w-3" />
-                    </Button>
-                  </div>
-                  <p className="text-xs text-muted-foreground line-clamp-2">{theme.description}</p>
-                </Card>
-              ))}
-            </div>
-          </div>
+          <Button
+            onClick={() => setIsThemeModalOpen(true)}
+            className="gap-2"
+          >
+            <Pencil className="h-4 w-4" />
+            Edit Monthly Themes
+          </Button>
         )}
 
         <div className="space-y-4">
@@ -211,45 +194,61 @@ export default function CalendarPage() {
       </div>
 
       {isAdmin && <Dialog open={isThemeModalOpen} onOpenChange={setIsThemeModalOpen}>
-        <DialogContent>
+        <DialogContent className="max-w-2xl max-h-96 overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Edit Theme</DialogTitle>
+            <DialogTitle>Monthly Themes</DialogTitle>
             <DialogDescription>
-              Update theme for {selectedMonth !== null ? themes[selectedMonth]?.month : ""}
+              Click a month to edit its theme
             </DialogDescription>
           </DialogHeader>
 
-          <div className="space-y-4">
-            <div>
-              <Label htmlFor="theme-name">Theme Name *</Label>
-              <Input
-                id="theme-name"
-                value={themeForm.theme}
-                onChange={(e) => setThemeForm({ ...themeForm, theme: e.target.value })}
-                placeholder="E.g., Sustainability"
-              />
-            </div>
+          {selectedMonth !== null ? (
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="theme-name">Theme Name *</Label>
+                <Input
+                  id="theme-name"
+                  value={themeForm.theme}
+                  onChange={(e) => setThemeForm({ ...themeForm, theme: e.target.value })}
+                  placeholder="E.g., Sustainability"
+                />
+              </div>
 
-            <div>
-              <Label htmlFor="theme-desc">Description</Label>
-              <Textarea
-                id="theme-desc"
-                value={themeForm.description}
-                onChange={(e) => setThemeForm({ ...themeForm, description: e.target.value })}
-                placeholder="Describe this month's theme..."
-                className="min-h-20"
-              />
-            </div>
+              <div>
+                <Label htmlFor="theme-desc">Description</Label>
+                <Textarea
+                  id="theme-desc"
+                  value={themeForm.description}
+                  onChange={(e) => setThemeForm({ ...themeForm, description: e.target.value })}
+                  placeholder="Describe this month's theme..."
+                  className="min-h-20"
+                />
+              </div>
 
-            <div className="flex gap-3 justify-end">
-              <Button variant="outline" onClick={() => setIsThemeModalOpen(false)}>
-                Cancel
-              </Button>
-              <Button onClick={handleSaveTheme}>
-                Save Theme
-              </Button>
+              <div className="flex gap-3 justify-end">
+                <Button variant="outline" onClick={() => setSelectedMonth(null)}>
+                  Back
+                </Button>
+                <Button onClick={handleSaveTheme}>
+                  Save Theme
+                </Button>
+              </div>
             </div>
-          </div>
+          ) : (
+            <div className="grid gap-3 grid-cols-3">
+              {themes.map((theme, idx) => (
+                <Card
+                  key={theme.month}
+                  onClick={() => handleEditTheme(idx)}
+                  className="border-border/20 p-3 hover:shadow-md transition-all cursor-pointer hover:bg-accent/5"
+                >
+                  <p className="text-xs font-semibold text-muted-foreground">{theme.shortMonth}</p>
+                  <p className="text-sm font-semibold text-foreground line-clamp-2">{theme.theme}</p>
+                  <p className="text-xs text-muted-foreground line-clamp-1 mt-1">{theme.description}</p>
+                </Card>
+              ))}
+            </div>
+          )}
         </DialogContent>
       </Dialog>}
 
