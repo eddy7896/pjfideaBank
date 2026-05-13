@@ -27,7 +27,7 @@ export function AnimatedBackground() {
         transition={{
           duration: 15,
           repeat: Infinity,
-          ease: "easeInOut",
+          repeatType: "loop",
         }}
         style={{
           top: "-10%",
@@ -44,7 +44,7 @@ export function AnimatedBackground() {
         transition={{
           duration: 20,
           repeat: Infinity,
-          ease: "easeInOut",
+          repeatType: "loop",
         }}
         style={{
           bottom: "-10%",

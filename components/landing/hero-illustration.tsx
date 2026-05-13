@@ -25,11 +25,6 @@ export function HeroIllustration() {
     animate: (i: number) => ({
       y: [0, -20, 0],
       x: [0, i % 2 === 0 ? 10 : -10, 0],
-      transition: {
-        duration: 4 + i * 0.5,
-        repeat: Infinity,
-        ease: "easeInOut",
-      },
     }),
   };
 
@@ -37,11 +32,6 @@ export function HeroIllustration() {
     animate: {
       scale: [1, 1.05, 1],
       opacity: [0.5, 1, 0.5],
-      transition: {
-        duration: 3,
-        repeat: Infinity,
-        ease: "easeInOut",
-      },
     },
   };
 
@@ -66,8 +56,15 @@ export function HeroIllustration() {
       {/* Central Element - Pulsing Circle */}
       <motion.div
         className="absolute w-40 h-40 rounded-full bg-primary/20 blur-xl"
-        variants={pulseVariants}
-        animate="animate"
+        animate={{
+          scale: [1, 1.05, 1],
+          opacity: [0.5, 1, 0.5],
+        }}
+        transition={{
+          duration: 3,
+          repeat: Infinity,
+          repeatType: "loop",
+        }}
         style={{
           top: "50%",
           left: "50%",
@@ -78,36 +75,60 @@ export function HeroIllustration() {
       {/* Floating Cards */}
       <motion.div
         className="absolute top-12 left-8 w-20 h-20 rounded-xl bg-primary/10 border border-primary/20 backdrop-blur-sm"
-        variants={floatingVariants}
-        custom={0}
-        animate="animate"
+        animate={{
+          y: [0, -20, 0],
+          x: [0, 10, 0],
+        }}
+        transition={{
+          duration: 4,
+          repeat: Infinity,
+          repeatType: "loop",
+        }}
       >
         <div className="flex h-full items-center justify-center text-2xl">💡</div>
       </motion.div>
 
       <motion.div
         className="absolute bottom-16 right-12 w-24 h-24 rounded-xl bg-primary/10 border border-primary/20 backdrop-blur-sm"
-        variants={floatingVariants}
-        custom={1}
-        animate="animate"
+        animate={{
+          y: [0, -20, 0],
+          x: [0, -10, 0],
+        }}
+        transition={{
+          duration: 4.5,
+          repeat: Infinity,
+          repeatType: "loop",
+        }}
       >
         <div className="flex h-full items-center justify-center text-3xl">🚀</div>
       </motion.div>
 
       <motion.div
         className="absolute top-1/3 right-8 w-16 h-16 rounded-lg bg-primary/10 border border-primary/20 backdrop-blur-sm"
-        variants={floatingVariants}
-        custom={2}
-        animate="animate"
+        animate={{
+          y: [0, -20, 0],
+          x: [0, 10, 0],
+        }}
+        transition={{
+          duration: 5,
+          repeat: Infinity,
+          repeatType: "loop",
+        }}
       >
         <div className="flex h-full items-center justify-center text-xl">⚡</div>
       </motion.div>
 
       <motion.div
         className="absolute bottom-20 left-1/4 w-14 h-14 rounded-lg bg-primary/10 border border-primary/20 backdrop-blur-sm"
-        variants={floatingVariants}
-        custom={3}
-        animate="animate"
+        animate={{
+          y: [0, -20, 0],
+          x: [0, -10, 0],
+        }}
+        transition={{
+          duration: 5.5,
+          repeat: Infinity,
+          repeatType: "loop",
+        }}
       >
         <div className="flex h-full items-center justify-center text-lg">🎯</div>
       </motion.div>
@@ -122,7 +143,7 @@ export function HeroIllustration() {
             "0 0 20px rgba(91,164,199,0.5)",
           ],
         }}
-        transition={{ duration: 2.5, repeat: Infinity }}
+        transition={{ duration: 2.5, repeat: Infinity, repeatType: "loop" }}
         style={{
           top: "50%",
           left: "50%",
