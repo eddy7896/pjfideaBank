@@ -14,6 +14,7 @@ import {
   Building2,
   Calendar,
   Settings,
+  Folder,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -113,18 +114,33 @@ export default function DashboardLayout({
           </Link>
 
           {currentUser.role === "school" && (
-            <Link
-              href="/dashboard/submit"
-              className={cn(
-                "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all",
-                pathname === "/dashboard/submit"
-                  ? "bg-primary text-primary-foreground shadow-sm"
-                  : "text-muted-foreground hover:bg-accent/10 hover:text-foreground"
-              )}
-            >
-              <PlusCircle className="h-4 w-4" />
-              New Idea
-            </Link>
+            <>
+              <Link
+                href="/dashboard/projects"
+                className={cn(
+                  "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all",
+                  pathname.startsWith("/dashboard/projects")
+                    ? "bg-primary text-primary-foreground shadow-sm"
+                    : "text-muted-foreground hover:bg-accent/10 hover:text-foreground"
+                )}
+              >
+                <Folder className="h-4 w-4" />
+                Projects
+              </Link>
+
+              <Link
+                href="/dashboard/submit"
+                className={cn(
+                  "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all",
+                  pathname === "/dashboard/submit"
+                    ? "bg-primary text-primary-foreground shadow-sm"
+                    : "text-muted-foreground hover:bg-accent/10 hover:text-foreground"
+                )}
+              >
+                <PlusCircle className="h-4 w-4" />
+                New Idea
+              </Link>
+            </>
           )}
 
           <Link
