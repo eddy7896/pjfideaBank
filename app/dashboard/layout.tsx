@@ -22,6 +22,9 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Toaster } from "@/components/ui/sonner";
 import { useAuthStore } from "@/store/use-auth-store";
+import { useTeamStore } from "@/store/use-team-store";
+import { useIdeaStore } from "@/store/use-idea-store";
+import { useActivityStore } from "@/store/use-activity-store";
 import { cn } from "@/lib/utils";
 
 const roleIcons: Record<string, typeof ShieldCheck> = {
@@ -46,6 +49,9 @@ export default function DashboardLayout({
   const router = useRouter();
   const pathname = usePathname();
   const { currentUser, isAuthenticated, logout } = useAuthStore();
+  const { loadTeams } = useTeamStore();
+  const { loadIdeas } = useIdeaStore();
+  const { loadActivities } = useActivityStore();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -57,6 +63,25 @@ export default function DashboardLayout({
       router.replace("/login");
     }
   }, [mounted, isAuthenticated, router]);
+
+  useEffect(() => {
+    if (mounted && isAuthenticated) {
+      const seed = async () => {
+        try {
+          await fetch("/api/seed", {
+            method: "POST",
+            headers: { "Authorization": "Bearer seed-token-pijam" },
+          });
+        } catch (e) {
+          // Seed may fail if data exists, that's ok
+        }
+        loadTeams();
+        loadIdeas();
+        loadActivities();
+      };
+      seed();
+    }
+  }, [mounted, isAuthenticated, loadTeams, loadIdeas, loadActivities]);
 
   if (!mounted || !isAuthenticated || !currentUser) {
     return (
@@ -161,18 +186,32 @@ export default function DashboardLayout({
           )}
 
           {currentUser.role === "super-admin" && (
-            <Link
-              href="/dashboard/analytics"
-              className={cn(
-                "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all",
-                pathname === "/dashboard/analytics"
-                  ? "bg-primary text-primary-foreground shadow-sm"
-                  : "text-muted-foreground hover:bg-accent/10 hover:text-foreground"
-              )}
-            >
-              <BarChart3 className="h-4 w-4" />
-              Analytics
-            </Link>
+            <>
+              <Link
+                href="/dashboard/calendar"
+                className={cn(
+                  "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all",
+                  pathname === "/dashboard/calendar"
+                    ? "bg-primary text-primary-foreground shadow-sm"
+                    : "text-muted-foreground hover:bg-accent/10 hover:text-foreground"
+                )}
+              >
+                <Calendar className="h-4 w-4" />
+                Calendar
+              </Link>
+              <Link
+                href="/dashboard/analytics"
+                className={cn(
+                  "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all",
+                  pathname === "/dashboard/analytics"
+                    ? "bg-primary text-primary-foreground shadow-sm"
+                    : "text-muted-foreground hover:bg-accent/10 hover:text-foreground"
+                )}
+              >
+                <BarChart3 className="h-4 w-4" />
+                Analytics
+              </Link>
+            </>
           )}
 
           <Link

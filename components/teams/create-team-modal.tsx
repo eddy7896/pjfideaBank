@@ -19,7 +19,7 @@ interface CreateTeamModalProps {
   open: boolean;
   schoolName: string;
   onClose: () => void;
-  onSubmit: (name: string, members: TeamMember[]) => { id: string; pin: string };
+  onSubmit: (name: string, members: TeamMember[]) => Promise<{ id: string; pin: string }>;
 }
 
 const GRADES = ["9", "10", "11", "12"];
@@ -66,9 +66,9 @@ export function CreateTeamModal({
     setMembers(members.filter((_, i) => i !== index));
   };
 
-  const handleCreate = () => {
+  const handleCreate = async () => {
     if (!teamName.trim()) return;
-    const result = onSubmit(teamName.trim(), members);
+    const result = await onSubmit(teamName.trim(), members);
     setCreatedTeam(result);
   };
 

@@ -136,3 +136,15 @@ export interface ThemeMonth {
   icon: string;
   gradient: string;
 }
+
+export interface ThemeActivity {
+  id: string;
+  date: number;
+  month: number;
+  year: number;
+  title: string;
+  theme: string;
+  schoolName?: string;
+  description?: string;
+  createdAt: string;
+}

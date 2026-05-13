@@ -4,7 +4,9 @@
       "WebFetch(domain:thepijam.org)",
       "Bash(npm list *)",
       "Bash(npm install *)",
-      "Bash(npm run *)"
+      "Bash(npm run *)",
+      "Bash(xargs grep -l \"firebase\\\\|supabase\\\\|mongodb\\\\|prisma\")",
+      "Bash(grep -E \"\\\\.\\(ts|tsx\\)$\")"
     ]
   }
 }

@@ -77,6 +77,17 @@ function initializeDatabase() {
       author TEXT,
       timestamp TEXT NOT NULL
     )`,
+    `CREATE TABLE IF NOT EXISTS theme_activities (
+      id TEXT PRIMARY KEY,
+      date INTEGER NOT NULL,
+      month INTEGER NOT NULL,
+      year INTEGER NOT NULL,
+      title TEXT NOT NULL,
+      theme TEXT NOT NULL,
+      school_name TEXT,
+      description TEXT,
+      created_at TEXT DEFAULT CURRENT_TIMESTAMP
+    )`,
   ];
 
   createTableStatements.forEach((sql) => {

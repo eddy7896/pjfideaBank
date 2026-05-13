@@ -63,7 +63,7 @@ export default function ProjectDetailPage({
     setIsSubmitting(true);
     try {
       if (nextStage) {
-        const success = advanceStage(idea.id, nextStage, formData);
+        const success = await advanceStage(idea.id, nextStage, formData);
         if (success) {
           toast.success(`Moved to ${nextStage} stage`);
           setIsGateModalOpen(false);

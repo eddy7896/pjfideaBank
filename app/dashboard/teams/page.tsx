@@ -41,15 +41,15 @@ export default function TeamsPage() {
     return ideas.filter((i) => i.teamId === teamId).length;
   };
 
-  const handleCreateTeam = (name: string, members: any[]) => {
-    const newTeam = createTeam(name, currentUser.schoolName!, members);
+  const handleCreateTeam = async (name: string, members: any[]) => {
+    const newTeam = await createTeam(name, currentUser.schoolName!, members);
     toast.success(`Team "${name}" created successfully!`);
     setIsModalOpen(false);
     return { id: newTeam.id, pin: newTeam.pin };
   };
 
-  const handleDeleteTeam = (id: string) => {
-    deleteTeam(id);
+  const handleDeleteTeam = async (id: string) => {
+    await deleteTeam(id);
     setDeleteTarget(null);
     toast.success("Team deleted");
   };

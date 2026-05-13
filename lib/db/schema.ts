@@ -64,3 +64,16 @@ export const timelineEvents = sqliteTable('timeline_events', {
   author: text('author'),
   timestamp: text('timestamp').notNull(),
 });
+
+// Theme Activities table
+export const themeActivities = sqliteTable('theme_activities', {
+  id: text('id').primaryKey(),
+  date: integer('date').notNull(), // 1-31
+  month: integer('month').notNull(), // 0-11
+  year: integer('year').notNull(),
+  title: text('title').notNull(),
+  theme: text('theme').notNull(),
+  schoolName: text('school_name'),
+  description: text('description'),
+  createdAt: text('created_at').default(sql`CURRENT_TIMESTAMP`),
+});

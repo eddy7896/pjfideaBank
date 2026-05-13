@@ -1,7 +1,7 @@
 import { eq } from 'drizzle-orm';
 import { getDb } from './index';
-import { schools, users, studentTeams, ideas, timelineEvents } from './schema';
-import type { User, StudentTeam, Idea, TimelineEvent, School } from '@/types';
+import { schools, users, studentTeams, ideas, timelineEvents, themeActivities } from './schema';
+import type { User, StudentTeam, Idea, TimelineEvent, School, ThemeActivity } from '@/types';
 
 // SCHOOLS
 export async function createSchool(school: Omit<School, 'id' | 'createdAt'>) {
@@ -221,4 +221,36 @@ export async function getTimelineByIdeaId(ideaId: string) {
 export async function deleteTimelineEvent(id: string) {
   const db = getDb();
   return await db.delete(timelineEvents).where(eq(timelineEvents.id, id));
+}
+
+// THEME ACTIVITIES
+export async function createThemeActivity(activity: ThemeActivity) {
+  const db = getDb();
+  return await db.insert(themeActivities).values({
+    id: activity.id,
+    date: activity.date,
+    month: activity.month,
+    year: activity.year,
+    title: activity.title,
+    theme: activity.theme,
+    schoolName: activity.schoolName,
+    description: activity.description,
+  }).returning();
+}
+
+export async function getThemeActivities(month?: number, year?: number) {
+  const db = getDb();
+  if (month !== undefined && year !== undefined) {
+    const results = await db.select().from(themeActivities)
+      .where(
+        month !== undefined ? eq(themeActivities.month, month) : undefined,
+      );
+    return results.filter(a => a.year === year);
+  }
+  return await db.select().from(themeActivities);
+}
+
+export async function deleteThemeActivity(id: string) {
+  const db = getDb();
+  return await db.delete(themeActivities).where(eq(themeActivities.id, id));
 }
