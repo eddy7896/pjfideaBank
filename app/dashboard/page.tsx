@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import Link from "next/link";
 import {
   Lightbulb,
@@ -21,9 +22,11 @@ import {
 import { useIdeaStore } from "@/store/use-idea-store";
 import { useAuthStore } from "@/store/use-auth-store";
 import { useThemeStore } from "@/store/use-theme-store";
+import { useActivityStore } from "@/store/use-activity-store";
 import { usePermissions } from "@/lib/permissions";
 import { KanbanBoard } from "@/components/dashboard/kanban-board";
 import { ThemeCalendar } from "@/components/calendar/theme-calendar";
+import { GoogleStyleCalendar } from "@/components/calendar/google-style-calendar";
 import type { DesignThinkingStatus } from "@/types";
 import { cn } from "@/lib/utils";
 
@@ -31,7 +34,14 @@ export default function DashboardPage() {
   const { currentUser } = useAuthStore();
   const { ideas } = useIdeaStore();
   const { themes } = useThemeStore();
+  const { activities, isLoaded, loadActivities } = useActivityStore();
   const { canViewIdea } = usePermissions();
+
+  useEffect(() => {
+    if (!isLoaded) {
+      loadActivities();
+    }
+  }, [isLoaded, loadActivities]);
 
   if (!currentUser) return null;
 
@@ -134,6 +144,27 @@ export default function DashboardPage() {
             )}
           </div>
           <ThemeCalendar compact />
+        </div>
+      )}
+
+      {/* Theme Activities Calendar */}
+      {currentUser.role !== "super-admin" && (
+        <div className="mt-8">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h2 className="text-xl font-semibold text-foreground">Monthly Activities</h2>
+              <p className="text-sm text-muted-foreground">
+                Planned activities for your school this month
+              </p>
+            </div>
+          </div>
+          {(() => {
+            const filteredActs = activities.filter((a) => {
+              if (!a.schoolName) return true;
+              return a.schoolName === currentUser.schoolName;
+            });
+            return <GoogleStyleCalendar activities={filteredActs} isAdmin={false} />;
+          })()}
         </div>
       )}
 

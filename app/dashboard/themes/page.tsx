@@ -1,9 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useThemeStore } from "@/store/use-theme-store";
 import { useAuthStore } from "@/store/use-auth-store";
 import { useIdeaStore } from "@/store/use-idea-store";
+import { useActivityStore } from "@/store/use-activity-store";
+import { GoogleStyleCalendar } from "@/components/calendar/google-style-calendar";
 import {
   Calendar, Plus, Trash2, ShieldAlert, Pencil, X, Check,
   RotateCcw, Sparkles, Eye,
@@ -37,7 +39,14 @@ export default function ThemesPage() {
   const { themes, addTheme, removeTheme, updateTheme, resetToDefaults } = useThemeStore();
   const { currentUser } = useAuthStore();
   const { ideas } = useIdeaStore();
+  const { activities, isLoaded, loadActivities } = useActivityStore();
   const router = useRouter();
+
+  useEffect(() => {
+    if (!isLoaded) {
+      loadActivities();
+    }
+  }, [isLoaded, loadActivities]);
 
   const [editingMonth, setEditingMonth] = useState<string | null>(null);
   const [editForm, setEditForm] = useState<Partial<ThemeMonth>>({});
@@ -120,10 +129,25 @@ export default function ThemesPage() {
     return ideas.filter((i) => i.theme.toLowerCase().includes(theme.toLowerCase())).length;
   };
 
+  // Filter activities for user's school
+  const filteredActivities = activities.filter((a) => {
+    if (!a.schoolName) return true;
+    return a.schoolName === currentUser?.schoolName;
+  });
+
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-      {/* Header */}
-      <div className="mb-8 flex items-center justify-between">
+      <div className="space-y-12">
+        {/* Calendar Section */}
+        {!isAdmin && (
+          <div>
+            <h2 className="text-2xl font-semibold tracking-tight mb-4">Theme Calendar</h2>
+            <GoogleStyleCalendar activities={filteredActivities} isAdmin={false} />
+          </div>
+        )}
+
+        {/* Header */}
+        <div className="mb-8 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 shadow-lg shadow-indigo-500/25">
             <Calendar className="h-6 w-6 text-white" />
@@ -459,6 +483,7 @@ export default function ThemesPage() {
             <span className="text-sm font-medium">Add New Theme</span>
           </button>
         )}
+      </div>
       </div>
     </div>
   );
