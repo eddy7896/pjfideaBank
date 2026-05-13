@@ -117,7 +117,7 @@ export default function CalendarPage() {
       toast.success("Activity created");
       setIsActivityModalOpen(false);
       setActivityForm({ title: "", description: "", schoolName: "" });
-      loadActivities();
+      await useActivityStore.getState().loadActivities();
     } catch (error) {
       toast.error("Failed to create activity");
     }
@@ -128,6 +128,7 @@ export default function CalendarPage() {
       await deleteActivity(id);
       toast.success("Activity deleted");
       setDeleteActivityId(null);
+      await useActivityStore.getState().loadActivities();
     } catch (error) {
       toast.error("Failed to delete activity");
     }

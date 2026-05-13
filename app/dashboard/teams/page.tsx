@@ -45,6 +45,7 @@ export default function TeamsPage() {
     const newTeam = await createTeam(name, currentUser.schoolName!, members);
     toast.success(`Team "${name}" created successfully!`);
     setIsModalOpen(false);
+    await useTeamStore.getState().loadTeams();
     return { id: newTeam.id, pin: newTeam.pin };
   };
 
@@ -52,6 +53,7 @@ export default function TeamsPage() {
     await deleteTeam(id);
     setDeleteTarget(null);
     toast.success("Team deleted");
+    await useTeamStore.getState().loadTeams();
   };
 
   const togglePinVisibility = (teamId: string) => {

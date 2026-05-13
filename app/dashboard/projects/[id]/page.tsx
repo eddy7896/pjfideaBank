@@ -67,6 +67,7 @@ export default function ProjectDetailPage({
         if (success) {
           toast.success(`Moved to ${nextStage} stage`);
           setIsGateModalOpen(false);
+          await useIdeaStore.getState().loadIdeas();
         } else {
           toast.error("Failed to advance stage");
         }
