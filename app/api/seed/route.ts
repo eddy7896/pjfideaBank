@@ -107,6 +107,7 @@ const MOCK_ACTIVITIES = [
     theme: "Local Problems",
     schoolName: "Springfield High",
     description: "Identify neighborhood issues and brainstorm solutions",
+    createdAt: new Date().toISOString(),
   },
   {
     id: "ACT-002",
@@ -117,6 +118,7 @@ const MOCK_ACTIVITIES = [
     theme: "Local Problems",
     schoolName: undefined,
     description: "Map unsafe areas and safety concerns",
+    createdAt: new Date().toISOString(),
   },
   {
     id: "ACT-003",
@@ -127,6 +129,7 @@ const MOCK_ACTIVITIES = [
     theme: "Sustainability",
     schoolName: "Riverside Academy",
     description: "Design eco-friendly solutions for classrooms",
+    createdAt: new Date().toISOString(),
   },
   {
     id: "ACT-004",
@@ -137,6 +140,7 @@ const MOCK_ACTIVITIES = [
     theme: "Sustainability",
     schoolName: undefined,
     description: "Create renewable energy solutions",
+    createdAt: new Date().toISOString(),
   },
   {
     id: "ACT-005",
@@ -147,6 +151,7 @@ const MOCK_ACTIVITIES = [
     theme: "EdTech",
     schoolName: "Oakwood School",
     description: "Explore technology in education",
+    createdAt: new Date().toISOString(),
   },
   {
     id: "ACT-006",
@@ -157,6 +162,7 @@ const MOCK_ACTIVITIES = [
     theme: "EdTech",
     schoolName: undefined,
     description: "Build digital skills for all students",
+    createdAt: new Date().toISOString(),
   },
   {
     id: "ACT-007",
@@ -167,6 +173,7 @@ const MOCK_ACTIVITIES = [
     theme: "Social Impact",
     schoolName: "Springfield High",
     description: "Share solutions that make a difference",
+    createdAt: new Date().toISOString(),
   },
 ];
 
