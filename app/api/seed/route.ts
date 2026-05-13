@@ -38,6 +38,30 @@ const MOCK_TEAMS = [
     ],
     createdAt: new Date().toISOString(),
   },
+  {
+    id: "TM-DEMO04",
+    pin: "222222",
+    name: "SafeWalk Crew",
+    schoolName: "Oakwood School",
+    members: [
+      { name: "Isabel Garcia", grade: "10", contactNumber: "555-0109", gender: "Female" as const },
+      { name: "Jack Martinez", grade: "10", contactNumber: "555-0110", gender: "Male" as const },
+      { name: "Karen Patel", grade: "10", contactNumber: "555-0111", gender: "Female" as const },
+      { name: "Leo Kim", grade: "10", contactNumber: "555-0112", gender: "Male" as const },
+    ],
+    createdAt: new Date().toISOString(),
+  },
+  {
+    id: "TM-DEMO05",
+    pin: "333333",
+    name: "Eco Warriors",
+    schoolName: "Springfield High",
+    members: [
+      { name: "Maya Sharma", grade: "9", contactNumber: "555-0113", gender: "Female" as const },
+      { name: "Nathan Chen", grade: "9", contactNumber: "555-0114", gender: "Male" as const },
+    ],
+    createdAt: new Date().toISOString(),
+  },
 ];
 
 const MOCK_SCHOOLS = [
@@ -70,6 +94,79 @@ const MOCK_SCHOOLS = [
     website: "https://oakwood-school.edu",
     principalName: "Mr. Robert Oak",
     udaiseCode: "UDAISE-003",
+  },
+];
+
+const MOCK_ACTIVITIES = [
+  {
+    id: "ACT-001",
+    date: 5,
+    month: 0, // January
+    year: 2026,
+    title: "Local Problems Workshop",
+    theme: "Local Problems",
+    schoolName: "Springfield High",
+    description: "Identify neighborhood issues and brainstorm solutions",
+  },
+  {
+    id: "ACT-002",
+    date: 10,
+    month: 0,
+    year: 2026,
+    title: "Community Mapping Activity",
+    theme: "Local Problems",
+    schoolName: undefined,
+    description: "Map unsafe areas and safety concerns",
+  },
+  {
+    id: "ACT-003",
+    date: 3,
+    month: 1, // February
+    year: 2026,
+    title: "Sustainability Challenge",
+    theme: "Sustainability",
+    schoolName: "Riverside Academy",
+    description: "Design eco-friendly solutions for classrooms",
+  },
+  {
+    id: "ACT-004",
+    date: 15,
+    month: 1,
+    year: 2026,
+    title: "Green Energy Hackathon",
+    theme: "Sustainability",
+    schoolName: undefined,
+    description: "Create renewable energy solutions",
+  },
+  {
+    id: "ACT-005",
+    date: 7,
+    month: 2, // March
+    year: 2026,
+    title: "EdTech Innovation Day",
+    theme: "EdTech",
+    schoolName: "Oakwood School",
+    description: "Explore technology in education",
+  },
+  {
+    id: "ACT-006",
+    date: 20,
+    month: 2,
+    year: 2026,
+    title: "Digital Literacy Program",
+    theme: "EdTech",
+    schoolName: undefined,
+    description: "Build digital skills for all students",
+  },
+  {
+    id: "ACT-007",
+    date: 8,
+    month: 4, // May
+    year: 2026,
+    title: "Social Impact Symposium",
+    theme: "Social Impact",
+    schoolName: "Springfield High",
+    description: "Share solutions that make a difference",
   },
 ];
 
@@ -112,6 +209,15 @@ export async function POST(request: NextRequest) {
         await repos.createIdea(idea);
       } catch (e) {
         // Idea might already exist
+      }
+    }
+
+    // Seed activities
+    for (const activity of MOCK_ACTIVITIES) {
+      try {
+        await repos.createThemeActivity(activity);
+      } catch (e) {
+        // Activity might already exist
       }
     }
 
