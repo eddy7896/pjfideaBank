@@ -1,7 +1,9 @@
 {
   "permissions": {
     "allow": [
-      "WebFetch(domain:thepijam.org)"
+      "WebFetch(domain:thepijam.org)",
+      "Bash(npm list *)",
+      "Bash(npm install *)"
     ]
   }
 }
