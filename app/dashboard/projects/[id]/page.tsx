@@ -130,20 +130,25 @@ export default function ProjectDetailPage({
 
           {/* DT Progress */}
           <div className="rounded-xl border border-border/50 bg-card p-6">
-            <h2 className="mb-4 text-sm font-semibold">Design Thinking Progress</h2>
-            <div className="flex items-center gap-1 overflow-x-auto">
+            <div className="mb-6 space-y-1">
+              <h2 className="text-base font-semibold">Design Thinking Progress</h2>
+              <p className="text-xs text-muted-foreground">
+                Stage {currentStageIndex + 1} of {DESIGN_THINKING_STAGES.length}
+              </p>
+            </div>
+            <div className="space-y-4">
               {DESIGN_THINKING_STAGES.map((stage, index) => {
                 const colors = STATUS_COLORS[stage];
                 const isActive = stage === idea.status;
                 const isCompleted = index < currentStageIndex;
 
                 return (
-                  <div key={stage} className="flex items-center gap-1">
+                  <div key={stage} className="flex items-center gap-4">
                     <div
                       className={cn(
                         "flex h-10 w-10 items-center justify-center rounded-full border-2 text-xs font-bold transition-all flex-shrink-0",
                         isActive &&
-                          `${colors.border} ${colors.bg} ${colors.text} ring-4 ring-offset-2 ring-current/20`,
+                          `${colors.border} ${colors.bg} ${colors.text} ring-2 ring-offset-2 ring-current/20`,
                         isCompleted && `${colors.dot} text-white border-transparent`,
                         !isActive &&
                           !isCompleted &&
@@ -152,8 +157,24 @@ export default function ProjectDetailPage({
                     >
                       {isCompleted ? "✓" : index + 1}
                     </div>
-                    {index < DESIGN_THINKING_STAGES.length - 1 && (
-                      <div className={cn("h-0.5 w-6", isCompleted ? colors.dot : "bg-border")} />
+                    <div className="flex-1 min-w-0">
+                      <p className={cn(
+                        "text-sm font-medium capitalize",
+                        isActive && "text-primary",
+                        isCompleted && "text-foreground",
+                        !isActive && !isCompleted && "text-muted-foreground"
+                      )}>
+                        {stage}
+                      </p>
+                      {isActive && (
+                        <p className="text-xs text-primary/80 mt-0.5">Current stage</p>
+                      )}
+                      {isCompleted && (
+                        <p className="text-xs text-muted-foreground mt-0.5">Completed</p>
+                      )}
+                    </div>
+                    {isCompleted && (
+                      <div className={cn("h-1 w-12 rounded-full", colors.dot)} />
                     )}
                   </div>
                 );
@@ -161,28 +182,51 @@ export default function ProjectDetailPage({
             </div>
           </div>
 
-          {/* Tabs */}
-          <Tabs defaultValue="overview" className="rounded-xl border border-border/50 bg-card">
-            <TabsList className="w-full justify-start rounded-none border-b border-border/50 p-0">
-              <TabsTrigger value="overview" className="rounded-none">
-                Overview
-              </TabsTrigger>
-              <TabsTrigger value="kanban" className="rounded-none">
-                Kanban
-              </TabsTrigger>
-              <TabsTrigger value="timeline" className="rounded-none">
-                Timeline
-              </TabsTrigger>
-            </TabsList>
-
-            {/* Overview Tab */}
-            <TabsContent value="overview" className="p-6 space-y-6">
-              {/* Current Stage Data */}
-              {hasStageData && (
+          {/* Project Overview Details */}
+          <div className="rounded-xl border border-border/50 bg-card p-6 space-y-6">
+            <div>
+              <h3 className="text-base font-semibold mb-4">Project Overview</h3>
+              <div className="grid gap-4 sm:grid-cols-2">
                 <div className="rounded-lg border border-border/50 bg-background p-5">
-                  <h3 className="font-semibold mb-4 capitalize">
-                    {idea.status} Stage Documentation
-                  </h3>
+                  <h4 className="mb-2 flex items-center gap-2 text-sm font-semibold">
+                    <Target className="h-4 w-4 text-muted-foreground" />
+                    Problem Statement
+                  </h4>
+                  <p className="text-sm leading-relaxed text-foreground/90">
+                    {idea.problemStatement}
+                  </p>
+                </div>
+
+                <div className="rounded-lg border border-border/50 bg-background p-5">
+                  <h4 className="mb-2 flex items-center gap-2 text-sm font-semibold">
+                    <Users className="h-4 w-4 text-muted-foreground" />
+                    Target Audience
+                  </h4>
+                  <p className="text-sm leading-relaxed text-foreground/90">
+                    {idea.targetAudience}
+                  </p>
+                </div>
+
+                <div className="rounded-lg border border-border/50 bg-background p-5">
+                  <h4 className="mb-2 text-sm font-semibold">Theme</h4>
+                  <Badge variant="outline">{idea.theme}</Badge>
+                </div>
+
+                <div className="rounded-lg border border-border/50 bg-background p-5">
+                  <h4 className="mb-2 text-sm font-semibold">Team</h4>
+                  <p className="text-sm">{idea.studentTeam}</p>
+                  <p className="mt-1 text-xs text-muted-foreground">{idea.schoolName}</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Current Stage Data */}
+            {hasStageData && (
+              <div className="border-t border-border/50 pt-6">
+                <h3 className="text-base font-semibold mb-4 capitalize">
+                  {idea.status} Stage Documentation
+                </h3>
+                <div className="rounded-lg border border-border/50 bg-background p-5">
                   <div className="space-y-3 text-sm text-muted-foreground">
                     {(() => {
                       const data = idea.stageData[idea.status];
@@ -243,42 +287,20 @@ export default function ProjectDetailPage({
                     })()}
                   </div>
                 </div>
-              )}
-
-              {/* Project Details Grid */}
-              <div className="grid gap-4 sm:grid-cols-2">
-                <div className="rounded-lg border border-border/50 bg-background p-5">
-                  <h3 className="mb-2 flex items-center gap-2 text-sm font-semibold">
-                    <Target className="h-4 w-4 text-muted-foreground" />
-                    Problem Statement
-                  </h3>
-                  <p className="text-sm leading-relaxed text-foreground/90">
-                    {idea.problemStatement}
-                  </p>
-                </div>
-
-                <div className="rounded-lg border border-border/50 bg-background p-5">
-                  <h3 className="mb-2 flex items-center gap-2 text-sm font-semibold">
-                    <Users className="h-4 w-4 text-muted-foreground" />
-                    Target Audience
-                  </h3>
-                  <p className="text-sm leading-relaxed text-foreground/90">
-                    {idea.targetAudience}
-                  </p>
-                </div>
-
-                <div className="rounded-lg border border-border/50 bg-background p-5">
-                  <h3 className="mb-2 text-sm font-semibold">Theme</h3>
-                  <Badge variant="outline">{idea.theme}</Badge>
-                </div>
-
-                <div className="rounded-lg border border-border/50 bg-background p-5">
-                  <h3 className="mb-2 text-sm font-semibold">Team</h3>
-                  <p className="text-sm">{idea.studentTeam}</p>
-                  <p className="mt-1 text-xs text-muted-foreground">{idea.schoolName}</p>
-                </div>
               </div>
-            </TabsContent>
+            )}
+          </div>
+
+          {/* Tabs - Kanban & Timeline */}
+          <Tabs defaultValue="kanban" className="rounded-xl border border-border/50 bg-card">
+            <TabsList className="w-full justify-start rounded-none border-b border-border/50 p-0">
+              <TabsTrigger value="kanban" className="rounded-none">
+                Kanban
+              </TabsTrigger>
+              <TabsTrigger value="timeline" className="rounded-none">
+                Timeline
+              </TabsTrigger>
+            </TabsList>
 
             {/* Kanban Tab */}
             <TabsContent value="kanban" className="p-6">
