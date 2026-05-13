@@ -31,7 +31,7 @@ export default function LandingPage() {
     visible: {
       opacity: 1,
       y: 0,
-      transition: { duration: 0.8 },
+      transition: { duration: 0.6 },
     },
   };
 
@@ -77,7 +77,6 @@ export default function LandingPage() {
                 variants={itemVariants}
                 initial="hidden"
                 animate="visible"
-                transition={{ duration: 0.8, delay: 0.1 }}
                 className="inline-flex w-fit items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-2 mb-6"
               >
                 <Zap className="h-4 w-4 text-primary" />
@@ -88,7 +87,6 @@ export default function LandingPage() {
                 variants={itemVariants}
                 initial="hidden"
                 animate="visible"
-                transition={{ duration: 0.8, delay: 0.2 }}
                 className="text-5xl sm:text-6xl font-heading font-bold tracking-tight text-foreground leading-tight"
               >
                 The Idea Bank for Problem Solvers
@@ -98,7 +96,6 @@ export default function LandingPage() {
                 variants={itemVariants}
                 initial="hidden"
                 animate="visible"
-                transition={{ duration: 0.8, delay: 0.3 }}
                 className="mt-6 text-lg text-muted-foreground leading-relaxed"
               >
                 A collaborative repository where students identify real-world problems, develop solutions, and create measurable impact. Built for schools that nurture computational thinking and design-driven innovation.
@@ -108,7 +105,6 @@ export default function LandingPage() {
                 variants={itemVariants}
                 initial="hidden"
                 animate="visible"
-                transition={{ duration: 0.8, delay: 0.4 }}
                 className="mt-8 flex flex-col sm:flex-row gap-4"
               >
                 <Link
@@ -130,7 +126,6 @@ export default function LandingPage() {
                 variants={itemVariants}
                 initial="hidden"
                 animate="visible"
-                transition={{ duration: 0.8, delay: 0.5 }}
                 className="mt-10 flex flex-col gap-3"
               >
                 {[
@@ -151,7 +146,6 @@ export default function LandingPage() {
               variants={itemVariants}
               initial="hidden"
               animate="visible"
-              transition={{ duration: 0.8, delay: 0.3 }}
               className="hidden lg:block"
             >
               <HeroIllustration />
