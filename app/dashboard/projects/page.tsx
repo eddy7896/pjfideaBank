@@ -27,16 +27,11 @@ export default function ProjectsPage() {
       <div className="space-y-8">
         {/* Header */}
         <div className="flex items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
-              <Folder className="h-5 w-5 text-primary" />
-            </div>
-            <div>
-              <h1 className="text-3xl font-bold tracking-tight">Projects</h1>
-              <p className="text-sm text-muted-foreground">
-                {schoolProjects.length} project{schoolProjects.length !== 1 ? "s" : ""}
-              </p>
-            </div>
+          <div>
+            <h1 className="text-3xl font-semibold tracking-tight">Projects</h1>
+            <p className="text-sm text-muted-foreground mt-1">
+              {schoolProjects.length} project{schoolProjects.length !== 1 ? "s" : ""}
+            </p>
           </div>
           {canSubmitIdeas && (
             <Link href="/dashboard/submit">
@@ -55,7 +50,7 @@ export default function ProjectsPage() {
               <Link
                 key={idea.id}
                 href={`/dashboard/projects/${idea.id}`}
-                className="group block rounded-xl border border-border/50 bg-card p-6 hover:border-primary/30 hover:shadow-md transition-all"
+                className="group block rounded-xl border border-border/20 bg-white p-6 hover:border-border/40 hover:bg-muted/30 transition-all"
               >
                 <div className="flex items-start justify-between gap-4 mb-3">
                   <div className="flex-1 min-w-0">
@@ -105,12 +100,9 @@ export default function ProjectsPage() {
             ))}
           </div>
         ) : (
-          <div className="flex flex-col items-center justify-center rounded-xl border border-border/50 bg-card p-12 text-center">
-            <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10 mb-4">
-              <Folder className="h-8 w-8 text-primary" />
-            </div>
-            <h2 className="text-lg font-semibold">No projects yet</h2>
-            <p className="text-sm text-muted-foreground mt-1 mb-6">
+          <div className="flex flex-col items-center justify-center rounded-xl border border-border/20 bg-white p-12 text-center">
+            <h2 className="text-lg font-semibold text-foreground">No projects yet</h2>
+            <p className="text-sm text-muted-foreground mt-2 mb-6">
               Start by submitting your first idea to the Idea Bank
             </p>
             {canSubmitIdeas && (

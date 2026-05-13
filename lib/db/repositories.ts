@@ -1,7 +1,41 @@
 import { eq } from 'drizzle-orm';
 import { getDb } from './index';
-import { users, studentTeams, ideas, timelineEvents } from './schema';
-import type { User, StudentTeam, Idea, TimelineEvent } from '@/types';
+import { schools, users, studentTeams, ideas, timelineEvents } from './schema';
+import type { User, StudentTeam, Idea, TimelineEvent, School } from '@/types';
+
+// SCHOOLS
+export async function createSchool(school: Omit<School, 'id' | 'createdAt'>) {
+  const db = getDb();
+  const id = `SCH-${Date.now()}`;
+  return await db.insert(schools).values({
+    id,
+    name: school.name,
+    location: school.location,
+    address: school.address,
+    phone: school.phone,
+    website: school.website,
+    principalName: school.principalName,
+    udaiseCode: school.udaiseCode,
+    createdBy: school.createdBy,
+  }).returning();
+}
+
+export async function getSchoolByName(name: string) {
+  const db = getDb();
+  const result = await db.select().from(schools).where(eq(schools.name, name));
+  return result[0] || null;
+}
+
+export async function getSchoolByUdaise(udaiseCode: string) {
+  const db = getDb();
+  const result = await db.select().from(schools).where(eq(schools.udaiseCode, udaiseCode));
+  return result[0] || null;
+}
+
+export async function getAllSchools() {
+  const db = getDb();
+  return await db.select().from(schools);
+}
 
 // USERS
 export async function getUserByEmail(email: string) {

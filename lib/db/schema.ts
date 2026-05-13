@@ -1,6 +1,20 @@
 import { sqliteTable, text, integer, real } from 'drizzle-orm/sqlite-core';
 import { sql } from 'drizzle-orm';
 
+// Schools table
+export const schools = sqliteTable('schools', {
+  id: text('id').primaryKey(),
+  name: text('name').notNull().unique(),
+  location: text('location').notNull(),
+  address: text('address').notNull(),
+  phone: text('phone').notNull(),
+  website: text('website'),
+  principalName: text('principal_name').notNull(),
+  udaiseCode: text('udaise_code').notNull().unique(),
+  createdAt: text('created_at').default(sql`CURRENT_TIMESTAMP`),
+  createdBy: text('created_by'),
+});
+
 // Users table
 export const users = sqliteTable('users', {
   id: integer('id').primaryKey(),

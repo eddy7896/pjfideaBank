@@ -98,48 +98,33 @@ export default function DashboardPage() {
 
       {/* Stats Cards - Hide for students */}
       {currentUser.role !== "student" && (
-        <div className="mb-8 grid grid-cols-2 gap-3 sm:grid-cols-4">
-          <div className="rounded-xl border border-border/50 bg-card p-4 transition-all hover:shadow-sm">
-            <div className="flex items-center gap-2 text-muted-foreground">
-              <Lightbulb className="h-4 w-4" />
-              <span className="text-xs font-medium">
-                {currentUser.role === "school" ? "My Ideas" : "Total Ideas"}
-              </span>
-            </div>
-            <p className="mt-2 text-2xl font-bold">{totalIdeas}</p>
+        <div className="mb-10 grid grid-cols-2 gap-6 sm:grid-cols-4">
+          <div className="rounded-xl border border-border/20 bg-white p-6 transition-all hover:border-border/40">
+            <p className="text-xs font-medium text-muted-foreground">
+              {currentUser.role === "school" ? "My Ideas" : "Total Ideas"}
+            </p>
+            <p className="mt-3 text-3xl font-semibold text-foreground">{totalIdeas}</p>
           </div>
-          <div className="rounded-xl border border-border/50 bg-card p-4 transition-all hover:shadow-sm">
-            <div className="flex items-center gap-2 text-muted-foreground">
-              <SchoolIcon className="h-4 w-4" />
-              <span className="text-xs font-medium">Schools</span>
-            </div>
-            <p className="mt-2 text-2xl font-bold">{schoolsCount}</p>
+          <div className="rounded-xl border border-border/20 bg-white p-6 transition-all hover:border-border/40">
+            <p className="text-xs font-medium text-muted-foreground">Schools</p>
+            <p className="mt-3 text-3xl font-semibold text-foreground">{schoolsCount}</p>
           </div>
-          <div className="rounded-xl border border-border/50 bg-card p-4 transition-all hover:shadow-sm">
-            <div className="flex items-center gap-2 text-muted-foreground">
-              <TrendingUp className="h-4 w-4" />
-              <span className="text-xs font-medium">Advanced Stage</span>
-            </div>
-            <p className="mt-2 text-2xl font-bold">{advancedCount}</p>
+          <div className="rounded-xl border border-border/20 bg-white p-6 transition-all hover:border-border/40">
+            <p className="text-xs font-medium text-muted-foreground">Advanced</p>
+            <p className="mt-3 text-3xl font-semibold text-foreground">{advancedCount}</p>
           </div>
-          <div className="rounded-xl border border-border/50 bg-card p-4 transition-all hover:shadow-sm">
-            <div className="flex items-center gap-2 text-muted-foreground">
-              <Calendar className="h-4 w-4" />
-              <span className="text-xs font-medium">Themes Active</span>
-            </div>
-            <p className="mt-2 text-2xl font-bold">{themesWithIdeas}</p>
+          <div className="rounded-xl border border-border/20 bg-white p-6 transition-all hover:border-border/40">
+            <p className="text-xs font-medium text-muted-foreground">Active Themes</p>
+            <p className="mt-3 text-3xl font-semibold text-foreground">{themesWithIdeas}</p>
           </div>
         </div>
       )}
 
       {/* Yearly Thematic Calendar - Hide for students */}
       {currentUser.role !== "student" && (
-        <div className="mb-8 rounded-xl border border-border/50 bg-card p-5">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-2">
-              <Calendar className="h-4 w-4 text-muted-foreground" />
-              <h2 className="text-sm font-semibold">Yearly Thematic Calendar</h2>
-            </div>
+        <div className="mb-10 rounded-xl border border-border/20 bg-white p-6">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-sm font-semibold text-foreground">Yearly Thematic Calendar</h2>
             {currentUser.role === "super-admin" && (
               <Link href="/dashboard/themes">
                 <Button variant="outline" size="sm" className="gap-1.5 text-xs">
@@ -212,11 +197,8 @@ export default function DashboardPage() {
           {/* Left: Stage Distribution */}
           <div className="lg:col-span-2 space-y-6">
             {/* Stage chart */}
-            <div className="rounded-xl border border-border/50 bg-card p-5">
-              <div className="flex items-center gap-2 mb-4">
-                <BarChart3 className="h-4 w-4 text-muted-foreground" />
-                <h2 className="text-sm font-semibold">Design Thinking Pipeline</h2>
-              </div>
+            <div className="rounded-xl border border-border/20 bg-white p-6">
+              <h2 className="text-sm font-semibold text-foreground mb-6">Design Thinking Pipeline</h2>
               <div className="space-y-3">
                 {DESIGN_THINKING_STAGES.map((stage) => {
                   const count = stageCounts[stage];
@@ -260,13 +242,8 @@ export default function DashboardPage() {
 
             {/* School cards (Admin & Edu Dept) */}
             {currentUser.role !== "school" && (
-              <div className="rounded-xl border border-border/50 bg-card p-5">
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center gap-2">
-                    <SchoolIcon className="h-4 w-4 text-muted-foreground" />
-                    <h2 className="text-sm font-semibold">Schools</h2>
-                  </div>
-                </div>
+              <div className="rounded-xl border border-border/20 bg-white p-6">
+                <h2 className="text-sm font-semibold text-foreground mb-6">Schools</h2>
                 <div className="grid gap-3 sm:grid-cols-2">
                   {schoolIdeaCounts.map((school) => (
                     <Link
@@ -297,12 +274,9 @@ export default function DashboardPage() {
 
             {/* School's own projects (School role) */}
             {currentUser.role === "school" && (
-              <div className="rounded-xl border border-border/50 bg-card p-5 overflow-hidden">
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center gap-2">
-                    <Lightbulb className="h-4 w-4 text-muted-foreground" />
-                    <h2 className="text-sm font-semibold">My Projects Kanban</h2>
-                  </div>
+              <div className="rounded-xl border border-border/20 bg-white p-6 overflow-hidden">
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-sm font-semibold text-foreground">My Projects Kanban</h2>
                   <Link href="/dashboard/submit">
                     <Button variant="outline" size="sm" className="gap-1.5 text-xs">
                       <PlusCircle className="h-3.5 w-3.5" />
@@ -326,8 +300,8 @@ export default function DashboardPage() {
           {/* Right sidebar */}
           <div className="space-y-6">
           {/* Recent Activity */}
-          <div className="rounded-xl border border-border/50 bg-card p-5">
-            <h2 className="mb-4 text-sm font-semibold">Recent Activity</h2>
+          <div className="rounded-xl border border-border/20 bg-white p-6">
+            <h2 className="mb-6 text-sm font-semibold text-foreground">Recent Activity</h2>
             {recentIdeas.length === 0 ? (
               <p className="text-xs text-muted-foreground">No recent activity.</p>
             ) : (
@@ -357,8 +331,8 @@ export default function DashboardPage() {
           </div>
 
           {/* Theme Distribution */}
-          <div className="rounded-xl border border-border/50 bg-card p-5">
-            <h2 className="mb-4 text-sm font-semibold">Ideas by Theme</h2>
+          <div className="rounded-xl border border-border/20 bg-white p-6">
+            <h2 className="mb-6 text-sm font-semibold text-foreground">Ideas by Theme</h2>
             <div className="space-y-2">
               {themes.filter((tm) => {
                 return visibleIdeas.some((i) =>

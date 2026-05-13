@@ -1,5 +1,18 @@
 export type Role = "super-admin" | "school" | "education-dept" | "student";
 
+export interface School {
+  id: string;
+  name: string;
+  location: string;
+  address: string;
+  phone: string;
+  website?: string;
+  principalName: string;
+  udaiseCode: string;
+  createdAt: string;
+  createdBy?: string;
+}
+
 export interface User {
   role: Role;
   schoolName?: string;

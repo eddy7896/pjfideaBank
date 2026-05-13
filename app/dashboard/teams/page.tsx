@@ -69,16 +69,11 @@ export default function TeamsPage() {
       <div className="space-y-8">
         {/* Header */}
         <div className="flex items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
-              <Users className="h-5 w-5 text-primary" />
-            </div>
-            <div>
-              <h1 className="text-3xl font-bold tracking-tight">Teams</h1>
-              <p className="text-sm text-muted-foreground">
-                {schoolTeams.length} team{schoolTeams.length !== 1 ? "s" : ""}
-              </p>
-            </div>
+          <div>
+            <h1 className="text-3xl font-semibold tracking-tight">Teams</h1>
+            <p className="text-sm text-muted-foreground mt-1">
+              {schoolTeams.length} team{schoolTeams.length !== 1 ? "s" : ""}
+            </p>
           </div>
           <Button onClick={() => setIsModalOpen(true)}>
             <Plus className="h-4 w-4 mr-2" />
@@ -92,7 +87,7 @@ export default function TeamsPage() {
             {schoolTeams.map((team) => (
               <div
                 key={team.id}
-                className="rounded-xl border border-border/50 bg-card p-6"
+                className="rounded-xl border border-border/20 bg-white p-6"
               >
                 <div className="flex items-start justify-between gap-4 mb-4">
                   <div className="flex-1">
@@ -114,17 +109,17 @@ export default function TeamsPage() {
 
                 <div className="grid gap-4 sm:grid-cols-3 mb-4">
                   {/* Team ID */}
-                  <div className="rounded-lg border border-border/50 bg-background p-4">
+                  <div className="rounded-lg border border-border/20 bg-muted/30 p-4">
                     <p className="text-xs font-medium text-muted-foreground mb-2">
                       Team ID
                     </p>
-                    <p className="font-mono text-sm font-semibold text-foreground">
+                    <p className="font-mono text-sm font-medium text-foreground">
                       {team.id}
                     </p>
                   </div>
 
                   {/* PIN */}
-                  <div className="rounded-lg border border-border/50 bg-background p-4">
+                  <div className="rounded-lg border border-border/20 bg-muted/30 p-4">
                     <div className="flex items-center justify-between mb-2">
                       <p className="text-xs font-medium text-muted-foreground">
                         6-Digit PIN
@@ -140,13 +135,13 @@ export default function TeamsPage() {
                         )}
                       </button>
                     </div>
-                    <p className="font-mono text-sm font-semibold text-foreground tracking-widest">
+                    <p className="font-mono text-sm font-medium text-foreground tracking-widest">
                       {visiblePins.has(team.id) ? team.pin : "••••••"}
                     </p>
                   </div>
 
                   {/* Stats */}
-                  <div className="rounded-lg border border-border/50 bg-background p-4">
+                  <div className="rounded-lg border border-border/20 bg-muted/30 p-4">
                     <div className="space-y-2">
                       <div>
                         <p className="text-xs font-medium text-muted-foreground">
@@ -170,7 +165,7 @@ export default function TeamsPage() {
 
                 {/* Members List */}
                 {team.members.length > 0 && (
-                  <div className="pt-4 border-t border-border/50">
+                  <div className="pt-4 border-t border-border/20">
                     <p className="text-xs font-medium text-muted-foreground mb-3">
                       Members ({team.members.length})
                     </p>
@@ -198,12 +193,9 @@ export default function TeamsPage() {
             ))}
           </div>
         ) : (
-          <div className="flex flex-col items-center justify-center rounded-xl border border-border/50 bg-card p-12 text-center">
-            <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10 mb-4">
-              <Users className="h-8 w-8 text-primary" />
-            </div>
-            <h2 className="text-lg font-semibold">No teams yet</h2>
-            <p className="text-sm text-muted-foreground mt-1 mb-6">
+          <div className="flex flex-col items-center justify-center rounded-xl border border-border/20 bg-white p-12 text-center">
+            <h2 className="text-lg font-semibold text-foreground">No teams yet</h2>
+            <p className="text-sm text-muted-foreground mt-2 mb-6">
               Create your first team to start assigning projects to students
             </p>
             <Button onClick={() => setIsModalOpen(true)}>
