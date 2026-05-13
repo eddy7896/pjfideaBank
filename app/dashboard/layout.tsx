@@ -188,6 +188,18 @@ export default function DashboardLayout({
           {currentUser.role === "super-admin" && (
             <>
               <Link
+                href="/dashboard/schools"
+                className={cn(
+                  "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all",
+                  pathname === "/dashboard/schools"
+                    ? "bg-primary text-primary-foreground shadow-sm"
+                    : "text-muted-foreground hover:bg-accent/10 hover:text-foreground"
+                )}
+              >
+                <School className="h-4 w-4" />
+                Schools
+              </Link>
+              <Link
                 href="/dashboard/analytics"
                 className={cn(
                   "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all",

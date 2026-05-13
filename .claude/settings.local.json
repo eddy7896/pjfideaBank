@@ -10,7 +10,8 @@
       "PowerShell($env:DATABASE_URL = \"postgresql://neondb_owner:npg_vnLj6sl0cDyT@ep-super-block-apy6dnuv-pooler.c-7.us-east-1.aws.neon.tech/neondb?channel_binding=require&sslmode=require\"; Set-Location \"f:\\\\Devlopment Projects\\\\pijam-ideabank\"; npm run db:seed 2>&1 | tail -50)",
       "PowerShell($env:DATABASE_URL = \"postgresql://neondb_owner:npg_vnLj6sl0cDyT@ep-super-block-apy6dnuv-pooler.c-7.us-east-1.aws.neon.tech/neondb?channel_binding=require&sslmode=require\"; Set-Location \"f:\\\\Devlopment Projects\\\\pijam-ideabank\"; npm run build 2>&1 | tail -150)",
       "PowerShell($env:DATABASE_URL = \"postgresql://neondb_owner:npg_vnLj6sl0cDyT@ep-super-block-apy6dnuv-pooler.c-7.us-east-1.aws.neon.tech/neondb?channel_binding=require&sslmode=require\"; Set-Location \"f:\\\\Devlopment Projects\\\\pijam-ideabank\"; npm run build 2>&1 | tail -50)",
-      "PowerShell($env:DATABASE_URL = \"postgresql://neondb_owner:npg_vnLj6sl0cDyT@ep-super-block-apy6dnuv-pooler.c-7.us-east-1.aws.neon.tech/neondb?channel_binding=require&sslmode=require\"; Set-Location \"f:\\\\Devlopment Projects\\\\pijam-ideabank\"; npm run dev 2>&1 | head -30)"
+      "PowerShell($env:DATABASE_URL = \"postgresql://neondb_owner:npg_vnLj6sl0cDyT@ep-super-block-apy6dnuv-pooler.c-7.us-east-1.aws.neon.tech/neondb?channel_binding=require&sslmode=require\"; Set-Location \"f:\\\\Devlopment Projects\\\\pijam-ideabank\"; npm run dev 2>&1 | head -30)",
+      "PowerShell($env:DATABASE_URL = \"postgresql://neondb_owner:npg_vnLj6sl0cDyT@ep-super-block-apy6dnuv-pooler.c-7.us-east-1.aws.neon.tech/neondb?channel_binding=require&sslmode=require\"; Set-Location \"f:\\\\Devlopment Projects\\\\pijam-ideabank\"; npm run build 2>&1 | tail -40)"
     ]
   }
 }
