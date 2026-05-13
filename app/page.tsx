@@ -22,10 +22,7 @@ export default function LandingPage() {
               className="rounded-lg"
               priority
             />
-            <div>
-              <h1 className="text-lg font-heading font-semibold leading-none tracking-tight text-foreground">Pi Jam</h1>
-              <p className="text-xs text-muted-foreground">Idea Bank</p>
-            </div>
+            <h1 className="text-lg font-heading font-semibold leading-none tracking-tight text-foreground">Pi Jam</h1>
           </div>
           <Link
             href="/login"

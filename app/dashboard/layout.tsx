@@ -82,14 +82,9 @@ export default function DashboardLayout({
             className="rounded-lg"
             priority
           />
-          <div>
-            <h1 className="text-lg font-heading font-semibold leading-none tracking-tight text-foreground">
-              Pi Jam
-            </h1>
-            <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium mt-0.5">
-              Idea Bank
-            </p>
-          </div>
+          <h1 className="text-lg font-heading font-semibold leading-none tracking-tight text-foreground">
+            Pi Jam
+          </h1>
         </div>
 
         {/* Links */}

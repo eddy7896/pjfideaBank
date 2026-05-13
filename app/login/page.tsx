@@ -78,7 +78,7 @@ export default function LoginPage() {
               className="rounded-lg"
               priority
             />
-            <span className="text-sm font-semibold">Pi Jam Idea Bank</span>
+            <span className="text-sm font-semibold">Pi Jam</span>
           </Link>
         </div>
       </div>
