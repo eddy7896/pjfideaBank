@@ -3,8 +3,8 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import {
-  Lightbulb,
   Mail,
   Lock,
   ArrowRight,
@@ -70,9 +70,14 @@ export default function LoginPage() {
       <div className="border-b border-border/40 bg-background/80 backdrop-blur-xl">
         <div className="mx-auto flex h-14 max-w-7xl items-center px-4 sm:px-6 lg:px-8">
           <Link href="/" className="flex items-center gap-2 transition-opacity hover:opacity-80">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600">
-              <Lightbulb className="h-4 w-4 text-white" />
-            </div>
+            <Image
+              src="/pijam logo.jpeg"
+              alt="Pi Jam Logo"
+              width={32}
+              height={32}
+              className="rounded-lg"
+              priority
+            />
             <span className="text-sm font-semibold">Pi Jam Idea Bank</span>
           </Link>
         </div>

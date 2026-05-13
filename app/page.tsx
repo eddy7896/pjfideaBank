@@ -1,6 +1,6 @@
 import Link from "next/link";
+import Image from "next/image";
 import {
-  Lightbulb,
   ArrowRight,
   Eye,
   Send,
@@ -14,9 +14,14 @@ export default function LandingPage() {
       <header className="sticky top-0 z-50 border-b border-border/40 bg-background/80 backdrop-blur-xl">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-2.5">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary shadow-md shadow-primary/20">
-              <Lightbulb className="h-5 w-5 text-white" />
-            </div>
+            <Image
+              src="/pijam logo.jpeg"
+              alt="Pi Jam Logo"
+              width={40}
+              height={40}
+              className="rounded-lg"
+              priority
+            />
             <div>
               <h1 className="text-lg font-heading font-semibold leading-none tracking-tight text-foreground">Pi Jam</h1>
               <p className="text-xs text-muted-foreground">Idea Bank</p>

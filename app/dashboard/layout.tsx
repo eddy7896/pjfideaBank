@@ -3,9 +3,9 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import {
-  Lightbulb,
   LogOut,
   LayoutDashboard,
   PlusCircle,
@@ -74,9 +74,14 @@ export default function DashboardLayout({
       <aside className="fixed inset-y-0 left-0 z-50 flex w-64 flex-col border-r border-border bg-card shadow-sm transition-all">
         {/* Logo Area */}
         <div className="flex h-16 shrink-0 items-center gap-3 px-6 border-b border-border/40">
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary shadow-md shadow-primary/20">
-            <Lightbulb className="h-5 w-5 text-white" />
-          </div>
+          <Image
+            src="/pijam logo.jpeg"
+            alt="Pi Jam Logo"
+            width={36}
+            height={36}
+            className="rounded-lg"
+            priority
+          />
           <div>
             <h1 className="text-lg font-heading font-semibold leading-none tracking-tight text-foreground">
               Pi Jam
