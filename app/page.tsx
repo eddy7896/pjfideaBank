@@ -1,10 +1,12 @@
 import Link from "next/link";
 import Image from "next/image";
 import {
+  Lightbulb,
+  BookOpen,
+  Users,
+  Target,
   ArrowRight,
-  Eye,
-  Send,
-  Wrench,
+  Zap,
 } from "lucide-react";
 
 export default function LandingPage() {
@@ -13,14 +15,16 @@ export default function LandingPage() {
       {/* Navbar */}
       <header className="sticky top-0 z-50 border-b border-border/40 bg-background/80 backdrop-blur-xl">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-          <Image
-            src="/pijam logo.jpeg"
-            alt="Pi Jam Logo"
-            width={150}
-            height={60}
-            className="rounded-lg"
-            priority
-          />
+          <Link href="/" className="flex items-center">
+            <Image
+              src="/pijam logo.jpeg"
+              alt="Pi Jam Logo"
+              width={150}
+              height={60}
+              className="rounded-lg"
+              priority
+            />
+          </Link>
           <Link
             href="/login"
             className="inline-flex h-9 items-center gap-2 rounded-lg bg-primary px-4 text-sm font-medium text-primary-foreground shadow-sm transition-all hover:bg-primary/90"
@@ -31,150 +35,212 @@ export default function LandingPage() {
         </div>
       </header>
 
-      {/* Hero */}
-      <section className="relative overflow-hidden pt-20 pb-24 lg:pt-32 lg:pb-36">
+      {/* Hero Section */}
+      <section className="relative overflow-hidden pt-20 pb-32 lg:pt-32 lg:pb-40">
         <div className="absolute inset-0 bg-background" />
-        <div className="absolute top-0 right-0 -mr-20 -mt-20 h-[600px] w-[600px] rounded-full bg-primary/5 blur-[120px]" />
-        <div className="absolute bottom-0 left-0 -ml-20 -mb-20 h-[500px] w-[500px] rounded-full bg-accent/5 blur-[100px]" />
-        
+        <div className="absolute top-0 right-0 -mr-32 -mt-32 h-[800px] w-[800px] rounded-full bg-primary/8 blur-[120px]" />
+        <div className="absolute bottom-0 left-0 -ml-32 -mb-32 h-[600px] w-[600px] rounded-full bg-primary/5 blur-[100px]" />
+
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="grid gap-12 lg:grid-cols-2 lg:gap-8 items-center">
-            <div className="max-w-2xl">
-              <h2 className="text-4xl font-heading font-bold tracking-tight text-foreground sm:text-5xl lg:text-6xl">
-                Empower the Next Generation of
-                <span className="text-primary block mt-2">Problem Solvers</span>
-              </h2>
-              <p className="mt-6 text-lg leading-relaxed text-muted-foreground">
-                Track and nurture student project ideas through the Design Thinking framework. Connect schools and educators in a unified, thematic computing curriculum.
-              </p>
-              <div className="mt-10 flex flex-col sm:flex-row gap-4">
-                <Link
-                  href="/login"
-                  className="inline-flex h-12 items-center justify-center gap-2 rounded-xl bg-primary px-8 text-sm font-semibold text-white shadow-lg shadow-primary/30 transition-all hover:shadow-xl hover:-translate-y-0.5"
-                >
-                  Get Started
-                  <ArrowRight className="h-4 w-4" />
-                </Link>
-                <a
-                  href="#how-it-works"
-                  className="inline-flex h-12 items-center justify-center gap-2 rounded-xl border border-border bg-card px-8 text-sm font-medium text-foreground transition-all hover:bg-accent/10 hover:text-accent hover:border-accent/30"
-                >
-                  Learn More
-                </a>
-              </div>
+          <div className="text-center max-w-3xl mx-auto">
+            <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-1.5 mb-8 border border-primary/20">
+              <Zap className="h-4 w-4 text-primary" />
+              <span className="text-sm font-semibold text-primary">Built by Pi Jam Foundation</span>
             </div>
 
-            {/* Abstract Geometric Illustration */}
-            <div className="relative h-[400px] w-full flex items-center justify-center">
-              <div className="relative w-[320px] h-[320px] animate-spin-slow">
-                {/* Center Core */}
-                <div className="absolute inset-[30%] bg-primary rounded-2xl rotate-12 shadow-2xl shadow-primary/40 flex items-center justify-center">
-                  <div className="w-16 h-16 bg-white/20 rounded-xl backdrop-blur-sm -rotate-12" />
-                </div>
-                {/* Orbiting Elements */}
-                <div className="absolute top-0 left-1/2 -ml-8 w-16 h-16 bg-accent rounded-full shadow-lg shadow-accent/40" />
-                <div className="absolute bottom-0 right-1/4 w-12 h-12 bg-indigo-300 rounded-lg shadow-lg rotate-45" />
-                <div className="absolute top-1/4 left-0 w-10 h-10 bg-purple-400 rounded-full shadow-lg" />
-                {/* Connecting Lines (SVG) */}
-                <svg className="absolute inset-0 w-full h-full text-border/50" viewBox="0 0 320 320">
-                  <circle cx="160" cy="160" r="158" fill="none" stroke="currentColor" strokeWidth="2" strokeDasharray="8 8" />
-                  <circle cx="160" cy="160" r="100" fill="none" stroke="currentColor" strokeWidth="2" strokeDasharray="4 4" />
-                </svg>
-              </div>
+            <h1 className="text-5xl sm:text-6xl lg:text-7xl font-heading font-bold tracking-tight text-foreground leading-tight">
+              A Repository of Ideas and Solutions
+            </h1>
+
+            <p className="mt-8 text-xl text-muted-foreground leading-relaxed max-w-2xl mx-auto">
+              Pi Jam Idea Bank is a collaborative platform where students identify, document, and develop solutions to real-world problems in their communities. Built for schools and educators to nurture computational thinking and design-driven problem solving.
+            </p>
+
+            <div className="mt-12 flex flex-col sm:flex-row gap-4 justify-center">
+              <Link
+                href="/login"
+                className="inline-flex h-12 items-center justify-center gap-2 rounded-xl bg-primary px-8 text-base font-semibold text-white shadow-lg shadow-primary/30 transition-all hover:shadow-xl hover:-translate-y-0.5"
+              >
+                Explore the Platform
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+              <a
+                href="#features"
+                className="inline-flex h-12 items-center justify-center gap-2 rounded-xl border border-primary/20 bg-primary/5 px-8 text-base font-semibold text-primary transition-all hover:bg-primary/10"
+              >
+                Learn More
+              </a>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Value Proposition */}
-      <section id="how-it-works" className="border-t border-border/50 bg-card py-24">
+      {/* Features Section */}
+      <section id="features" className="border-t border-border/50 bg-card py-24">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h3 className="text-3xl font-heading font-bold text-foreground">The Design Thinking Process</h3>
-            <p className="mt-4 text-muted-foreground max-w-2xl mx-auto">A structured approach to computational problem solving.</p>
+            <h2 className="text-4xl font-heading font-bold text-foreground mb-4">What is Idea Bank?</h2>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              A centralized platform for schools to foster innovation, collaboration, and problem-solving among students
+            </p>
           </div>
-          
-          <div className="grid md:grid-cols-3 gap-8 relative">
-            {/* Connecting line for desktop */}
-            <div className="hidden md:block absolute top-12 left-[15%] right-[15%] h-0.5 bg-border/80" />
 
+          <div className="grid md:grid-cols-3 gap-8">
             {[
-              { 
-                title: "Observe", 
-                desc: "Identify community problems and empathize with users. Find real-world challenges waiting for a tech solution.",
-                icon: Eye,
-                color: "text-primary",
-                bg: "bg-primary/10"
+              {
+                icon: Lightbulb,
+                title: "Identify & Document",
+                desc: "Students identify real-world problems in their communities and document them with context, research, and potential solutions."
               },
-              { 
-                title: "Submit", 
-                desc: "Define the problem statement and ideate solutions. Submit the concept to the Idea Bank under a monthly theme.",
-                icon: Send,
-                color: "text-accent",
-                bg: "bg-accent/10"
+              {
+                icon: Users,
+                title: "Collaborate & Build",
+                desc: "Teams work together to develop prototypes and solutions. Track progress, share resources, and iterate based on feedback."
               },
-              { 
-                title: "Build", 
-                desc: "Prototype and test the solution. Refine the project iteratively until it delivers measurable impact.",
-                icon: Wrench,
-                color: "text-purple-500",
-                bg: "bg-purple-500/10"
+              {
+                icon: Target,
+                title: "Create Impact",
+                desc: "Transform ideas into tangible projects that solve community problems. Measure impact and scale successful solutions across schools."
               }
-            ].map((step, i) => (
-              <div key={step.title} className="relative z-10 flex flex-col items-center text-center">
-                <div className={`w-24 h-24 rounded-full ${step.bg} flex items-center justify-center mb-6 shadow-sm border border-card`}>
-                  <step.icon className={`w-10 h-10 ${step.color}`} />
+            ].map((feature) => (
+              <div key={feature.title} className="rounded-2xl border border-border/50 bg-background p-8 hover:border-primary/30 transition-colors">
+                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 mb-6">
+                  <feature.icon className="h-6 w-6 text-primary" />
                 </div>
-                <h4 className="text-xl font-heading font-bold text-foreground mb-3">{step.title}</h4>
-                <p className="text-muted-foreground leading-relaxed">{step.desc}</p>
+                <h3 className="text-xl font-heading font-bold text-foreground mb-3">{feature.title}</h3>
+                <p className="text-muted-foreground leading-relaxed">{feature.desc}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Social Proof Counters */}
+      {/* How It Works */}
+      <section className="py-24 bg-background">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-heading font-bold text-foreground mb-4">How It Works</h2>
+            <p className="text-lg text-muted-foreground">A structured process inspired by design thinking and computational problem solving</p>
+          </div>
+
+          <div className="grid md:grid-cols-4 gap-6">
+            {[
+              { num: "1", title: "Observe", desc: "Identify community challenges" },
+              { num: "2", title: "Define", desc: "Document problem statements" },
+              { num: "3", title: "Ideate", desc: "Brainstorm and develop solutions" },
+              { num: "4", title: "Build", desc: "Prototype and test implementations" }
+            ].map((step) => (
+              <div key={step.num} className="relative">
+                <div className="rounded-2xl border border-primary/20 bg-card p-6 text-center">
+                  <div className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-primary text-sm font-bold text-white mb-4">
+                    {step.num}
+                  </div>
+                  <h4 className="text-lg font-heading font-bold text-foreground mb-2">{step.title}</h4>
+                  <p className="text-sm text-muted-foreground">{step.desc}</p>
+                </div>
+                {step.num !== "4" && (
+                  <div className="hidden md:block absolute top-1/2 -right-3 w-6 h-0.5 bg-primary/30 transform -translate-y-1/2" />
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Stats Section */}
       <section className="py-24 bg-primary text-primary-foreground relative overflow-hidden">
         <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.8),transparent_70%)]" />
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="grid grid-cols-2 gap-8 md:gap-16 text-center divide-x divide-primary-foreground/20">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-heading font-bold mb-4">Building the Future</h2>
+            <p className="text-primary-foreground/80 text-lg">Pi Jam Idea Bank is growing to support schools across India</p>
+          </div>
+          <div className="grid grid-cols-2 gap-8 md:gap-16 text-center">
             <div>
-              <div className="text-5xl md:text-7xl font-heading font-bold tracking-tight mb-2">1,248</div>
-              <div className="text-lg md:text-xl text-primary-foreground/80 font-medium">Ideas Submitted</div>
+              <div className="text-5xl md:text-6xl font-heading font-bold tracking-tight mb-2">500+</div>
+              <div className="text-lg text-primary-foreground/80 font-medium">Ideas Shared</div>
             </div>
             <div>
-              <div className="text-5xl md:text-7xl font-heading font-bold tracking-tight mb-2">86</div>
-              <div className="text-lg md:text-xl text-primary-foreground/80 font-medium">Active Schools</div>
+              <div className="text-5xl md:text-6xl font-heading font-bold tracking-tight mb-2">50+</div>
+              <div className="text-lg text-primary-foreground/80 font-medium">Schools Connected</div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* CTA */}
-      <section className="border-t border-border/40 py-24 bg-card">
+      {/* About Pi Jam */}
+      <section className="py-24 bg-card">
+        <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
+          <div className="rounded-2xl border border-border/50 bg-background p-10 md:p-12">
+            <div className="flex items-start gap-4 mb-6">
+              <BookOpen className="h-8 w-8 text-primary flex-shrink-0 mt-1" />
+              <div>
+                <h3 className="text-2xl font-heading font-bold text-foreground mb-4">About Pi Jam Foundation</h3>
+                <p className="text-muted-foreground leading-relaxed mb-4">
+                  Pi Jam Foundation is dedicated to building ecosystems that enable future-ready problem solvers. We believe in the power of computational thinking and design-driven education to transform how students approach challenges.
+                </p>
+                <p className="text-muted-foreground leading-relaxed mb-6">
+                  Idea Bank is our platform for democratizing problem identification and solution development across schools, enabling students to learn by doing, collaborate with peers, and create measurable impact in their communities.
+                </p>
+                <a
+                  href="https://thepijam.org"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 text-primary font-semibold hover:gap-3 transition-all"
+                >
+                  Learn more about Pi Jam
+                  <ArrowRight className="h-4 w-4" />
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="border-t border-border/40 py-24 bg-background">
         <div className="mx-auto max-w-4xl px-4 text-center sm:px-6 lg:px-8">
-          <h3 className="text-3xl font-heading font-bold tracking-tight text-foreground">
-            Ready to empower your students?
-          </h3>
-          <p className="mt-4 text-lg text-muted-foreground">
-            Sign in with demo credentials to explore the platform.
+          <h2 className="text-4xl font-heading font-bold tracking-tight text-foreground mb-6">
+            Ready to start solving problems?
+          </h2>
+          <p className="text-xl text-muted-foreground mb-10">
+            Join schools across India building the next generation of problem solvers
           </p>
           <Link
             href="/login"
-            className="mt-8 inline-flex h-14 items-center gap-2 rounded-xl bg-primary px-10 text-base font-semibold text-white shadow-lg transition-all hover:bg-primary/90 hover:-translate-y-0.5"
+            className="inline-flex h-14 items-center gap-2 rounded-xl bg-primary px-10 text-base font-semibold text-white shadow-lg transition-all hover:bg-primary/90 hover:-translate-y-0.5"
           >
-            Sign In Now
+            Explore Idea Bank
             <ArrowRight className="h-5 w-5" />
           </Link>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-border/40 bg-background py-10">
-        <div className="mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
-          <p className="text-sm text-muted-foreground">
-            © 2026 Pi Jam Idea Bank. Built for educators by makers.
-          </p>
+      <footer className="border-t border-border/40 bg-card py-12">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="grid md:grid-cols-3 gap-8 mb-8">
+            <div>
+              <h4 className="font-semibold text-foreground mb-4">Pi Jam Idea Bank</h4>
+              <p className="text-sm text-muted-foreground">A repository of ideas and solutions for problem-solving education</p>
+            </div>
+            <div>
+              <h4 className="font-semibold text-foreground mb-4">Resources</h4>
+              <ul className="space-y-2 text-sm">
+                <li><a href="https://thepijam.org" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary transition">Pi Jam Foundation</a></li>
+                <li><a href="#" className="text-muted-foreground hover:text-primary transition">Documentation</a></li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="font-semibold text-foreground mb-4">Contact</h4>
+              <p className="text-sm text-muted-foreground">Support for schools and educators</p>
+            </div>
+          </div>
+          <div className="border-t border-border/50 pt-8">
+            <p className="text-sm text-muted-foreground text-center">
+              © 2026 Pi Jam Idea Bank. Developed by Pi Jam Foundation. Visit <a href="https://thepijam.org" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">thepijam.org</a> for more.
+            </p>
+          </div>
         </div>
       </footer>
     </div>
