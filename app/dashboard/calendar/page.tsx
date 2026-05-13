@@ -42,16 +42,6 @@ export default function CalendarPage() {
 
   const isAdmin = currentUser?.role === "super-admin";
 
-  if (!isAdmin) {
-    return (
-      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-        <div className="text-center py-12">
-          <p className="text-muted-foreground">Only super admin can manage calendar.</p>
-        </div>
-      </div>
-    );
-  }
-
   const handleEditTheme = (monthIndex: number) => {
     const theme = themes[monthIndex];
     if (theme) {
@@ -138,46 +128,50 @@ export default function CalendarPage() {
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
       <div className="space-y-8">
         <div>
-          <h1 className="text-3xl font-semibold tracking-tight">Theme Calendar Manager</h1>
+          <h1 className="text-3xl font-semibold tracking-tight">
+            {isAdmin ? "Theme Calendar Manager" : "Theme Calendar"}
+          </h1>
           <p className="text-sm text-muted-foreground mt-1">
-            Set monthly themes and manage activities for schools
+            {isAdmin ? "Set monthly themes and manage activities for schools" : "View upcoming activities and monthly themes"}
           </p>
         </div>
 
-        <div className="space-y-4">
-          <h2 className="text-xl font-semibold">Monthly Themes</h2>
-          <div className="grid gap-4 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4">
-            {themes.map((theme, idx) => (
-              <Card key={theme.month} className="border-border/20 p-4 hover:shadow-md transition-shadow">
-                <div className="flex items-start justify-between mb-2">
-                  <div className="flex-1">
-                    <p className="text-xs font-semibold text-muted-foreground">{theme.shortMonth}</p>
-                    <p className="text-sm font-semibold text-foreground line-clamp-2">{theme.theme}</p>
+        {isAdmin && (
+          <div className="space-y-4">
+            <h2 className="text-xl font-semibold">Monthly Themes</h2>
+            <div className="grid gap-4 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4">
+              {themes.map((theme, idx) => (
+                <Card key={theme.month} className="border-border/20 p-4 hover:shadow-md transition-shadow">
+                  <div className="flex items-start justify-between mb-2">
+                    <div className="flex-1">
+                      <p className="text-xs font-semibold text-muted-foreground">{theme.shortMonth}</p>
+                      <p className="text-sm font-semibold text-foreground line-clamp-2">{theme.theme}</p>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleEditTheme(idx)}
+                      className="h-7 w-7 p-0"
+                    >
+                      <Pencil className="h-3 w-3" />
+                    </Button>
                   </div>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleEditTheme(idx)}
-                    className="h-7 w-7 p-0"
-                  >
-                    <Pencil className="h-3 w-3" />
-                  </Button>
-                </div>
-                <p className="text-xs text-muted-foreground line-clamp-2">{theme.description}</p>
-              </Card>
-            ))}
+                  <p className="text-xs text-muted-foreground line-clamp-2">{theme.description}</p>
+                </Card>
+              ))}
+            </div>
           </div>
-        </div>
+        )}
 
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <h2 className="text-xl font-semibold">Activities Calendar</h2>
-            <p className="text-xs text-muted-foreground">Click dates to add activities</p>
+            {isAdmin && <p className="text-xs text-muted-foreground">Click dates to add activities</p>}
           </div>
-          <GoogleStyleCalendar activities={activities} onAddActivity={handleAddActivity} isAdmin={true} />
+          <GoogleStyleCalendar activities={activities} onAddActivity={isAdmin ? handleAddActivity : undefined} isAdmin={isAdmin} />
         </div>
 
-        {activities.length > 0 && (
+        {activities.length > 0 && isAdmin && (
           <div className="space-y-4">
             <h2 className="text-xl font-semibold">Upcoming Activities</h2>
             <div className="grid gap-3 max-h-96 overflow-y-auto">
@@ -216,7 +210,7 @@ export default function CalendarPage() {
         )}
       </div>
 
-      <Dialog open={isThemeModalOpen} onOpenChange={setIsThemeModalOpen}>
+      {isAdmin && <Dialog open={isThemeModalOpen} onOpenChange={setIsThemeModalOpen}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Edit Theme</DialogTitle>
@@ -257,9 +251,9 @@ export default function CalendarPage() {
             </div>
           </div>
         </DialogContent>
-      </Dialog>
+      </Dialog>}
 
-      <Dialog open={isActivityModalOpen} onOpenChange={setIsActivityModalOpen}>
+      {isAdmin && <Dialog open={isActivityModalOpen} onOpenChange={setIsActivityModalOpen}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Add Activity</DialogTitle>
@@ -310,9 +304,9 @@ export default function CalendarPage() {
             </div>
           </div>
         </DialogContent>
-      </Dialog>
+      </Dialog>}
 
-      <Dialog open={deleteActivityId !== null} onOpenChange={(open) => !open && setDeleteActivityId(null)}>
+      {isAdmin && <Dialog open={deleteActivityId !== null} onOpenChange={(open) => !open && setDeleteActivityId(null)}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Delete Activity</DialogTitle>
@@ -332,7 +326,7 @@ export default function CalendarPage() {
             </Button>
           </div>
         </DialogContent>
-      </Dialog>
+      </Dialog>}
     </div>
   );
 }
