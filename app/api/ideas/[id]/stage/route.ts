@@ -3,11 +3,12 @@ import * as repos from '@/lib/db/repositories';
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const stageData = await request.json();
-    await repos.updateIdeaStageData(params.id, stageData);
+    await repos.updateIdeaStageData(id, stageData);
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('Error updating idea stage data:', error);

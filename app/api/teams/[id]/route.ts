@@ -3,10 +3,11 @@ import * as repos from '@/lib/db/repositories';
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    await repos.deleteTeam(params.id);
+    const { id } = await params;
+    await repos.deleteTeam(id);
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('Error deleting team:', error);

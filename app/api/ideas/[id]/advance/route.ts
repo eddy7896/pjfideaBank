@@ -3,17 +3,18 @@ import * as repos from '@/lib/db/repositories';
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const { toStage, formData } = await request.json();
-    const idea = await repos.getIdeaById(params.id);
+    const idea = await repos.getIdeaById(id);
     if (!idea) {
       return NextResponse.json({ error: 'Idea not found' }, { status: 404 });
     }
 
-    await repos.updateIdeaStageData(params.id, { [idea.status]: formData });
-    await repos.updateIdeaStatus(params.id, toStage);
+    await repos.updateIdeaStageData(id, { [idea.status]: formData });
+    await repos.updateIdeaStatus(id, toStage);
 
     return NextResponse.json({ success: true });
   } catch (error) {
