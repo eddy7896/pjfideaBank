@@ -90,31 +90,46 @@ export function StageGateModal({
 }: StageGateModalProps) {
   const nextStage = getNextStage(idea.status);
   const currentStage = idea.status;
-  const hasCompletedStageData = !!idea.stageData[currentStage];
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="text-2xl">
-            Complete {currentStage} Stage
-          </DialogTitle>
-          <DialogDescription className="text-base mt-2">
+          <div className="space-y-3">
+            <DialogTitle className="text-2xl font-bold">
+              {currentStage} Documentation
+            </DialogTitle>
             {nextStage && (
-              <div className="flex items-center gap-2 text-foreground">
-                <span className="font-semibold">{currentStage}</span>
-                <ArrowRight className="h-4 w-4 text-primary" />
-                <span className="font-semibold text-primary">{nextStage}</span>
+              <div className="flex items-center gap-3 pt-2">
+                <div className="flex items-center gap-2">
+                  <div className="inline-flex items-center justify-center h-8 w-8 rounded-full bg-primary/10 border border-primary/20">
+                    <span className="text-sm font-semibold text-primary">✓</span>
+                  </div>
+                  <span className="text-sm font-medium text-foreground">{currentStage}</span>
+                </div>
+                <ArrowRight className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                <div className="inline-flex items-center justify-center h-8 w-8 rounded-full bg-primary/10">
+                  <span className="text-sm font-semibold text-primary">→</span>
+                </div>
+                <span className="text-sm font-medium text-primary">{nextStage}</span>
               </div>
             )}
-            <p className="text-muted-foreground text-sm mt-2">
-              Fill out the {currentStage} stage documentation below to advance
-              to the next stage.
-            </p>
-          </DialogDescription>
+            <DialogDescription className="text-sm text-muted-foreground">
+              Complete the {currentStage} stage documentation to proceed to the next step.
+            </DialogDescription>
+          </div>
         </DialogHeader>
 
-        <div className="mt-6">
+        <div className="mt-8 rounded-lg border border-primary/10 bg-primary/5 p-4 mb-6">
+          <p className="text-xs font-medium text-primary/80 uppercase tracking-wide">
+            {currentStage} Stage
+          </p>
+          <p className="text-sm text-foreground/80 mt-1">
+            Fill out the required information below to advance to {nextStage || "completion"}.
+          </p>
+        </div>
+
+        <div>
           {getFormComponent(currentStage, idea, onSubmit)}
         </div>
       </DialogContent>

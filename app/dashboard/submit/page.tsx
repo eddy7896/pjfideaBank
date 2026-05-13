@@ -37,25 +37,37 @@ function SubmitContent() {
 
   return (
     <div className="mx-auto max-w-2xl">
-      <div className="mb-8 flex items-center gap-3">
-        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 shadow-lg shadow-emerald-500/25">
-          <PenLine className="h-5 w-5 text-white" />
-        </div>
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
-            Submit an Idea
-          </h1>
-          <p className="text-sm text-muted-foreground">
-            Submitting as <strong>{currentUser.schoolName}</strong>
-          </p>
+      <div className="mb-8 space-y-2">
+        <div className="flex items-center gap-3">
+          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-primary/60 to-primary shadow-lg shadow-primary/25">
+            <PenLine className="h-6 w-6 text-white" />
+          </div>
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">
+              Submit an Idea
+            </h1>
+            <p className="text-sm text-muted-foreground mt-1">
+              <strong className="text-foreground">{currentUser.schoolName}</strong>
+            </p>
+          </div>
         </div>
       </div>
 
       <div className="rounded-xl border border-border/50 bg-card p-6 shadow-sm sm:p-8">
-        <div className="mb-6 rounded-lg border border-primary/20 bg-primary/5 p-4">
-          <p className="text-sm text-foreground">
-            Submit your initial idea here. It will enter the <strong>Empathize</strong> stage where you&apos;ll document the problem through user research, empathy mapping, and root cause analysis using the 5 Whys framework.
-          </p>
+        <div className="mb-8 space-y-3 rounded-lg border border-primary/20 bg-primary/5 p-5">
+          <div className="flex items-start gap-3">
+            <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary/20 flex-shrink-0 mt-0.5">
+              <span className="text-xs font-bold text-primary">→</span>
+            </div>
+            <div className="space-y-1">
+              <p className="text-sm font-semibold text-foreground">
+                Starting with Empathize Stage
+              </p>
+              <p className="text-sm text-foreground/80">
+                Document the problem through user research, empathy mapping, and root cause analysis using the 5 Whys framework.
+              </p>
+            </div>
+          </div>
         </div>
         <IdeaForm />
       </div>
