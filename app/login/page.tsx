@@ -69,16 +69,15 @@ export default function LoginPage() {
       {/* Top bar */}
       <div className="border-b border-border/40 bg-background/80 backdrop-blur-xl">
         <div className="mx-auto flex h-14 max-w-7xl items-center px-4 sm:px-6 lg:px-8">
-          <Link href="/" className="flex items-center gap-2 transition-opacity hover:opacity-80">
+          <Link href="/" className="transition-opacity hover:opacity-80">
             <Image
               src="/pijam logo.jpeg"
               alt="Pi Jam Logo"
-              width={32}
-              height={32}
+              width={40}
+              height={40}
               className="rounded-lg"
               priority
             />
-            <span className="text-sm font-semibold">Pi Jam</span>
           </Link>
         </div>
       </div>

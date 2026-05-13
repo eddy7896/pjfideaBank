@@ -13,17 +13,14 @@ export default function LandingPage() {
       {/* Navbar */}
       <header className="sticky top-0 z-50 border-b border-border/40 bg-background/80 backdrop-blur-xl">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center gap-2.5">
-            <Image
-              src="/pijam logo.jpeg"
-              alt="Pi Jam Logo"
-              width={40}
-              height={40}
-              className="rounded-lg"
-              priority
-            />
-            <h1 className="text-lg font-heading font-semibold leading-none tracking-tight text-foreground">Pi Jam</h1>
-          </div>
+          <Image
+            src="/pijam logo.jpeg"
+            alt="Pi Jam Logo"
+            width={48}
+            height={48}
+            className="rounded-lg"
+            priority
+          />
           <Link
             href="/login"
             className="inline-flex h-9 items-center gap-2 rounded-lg bg-primary px-4 text-sm font-medium text-primary-foreground shadow-sm transition-all hover:bg-primary/90"
