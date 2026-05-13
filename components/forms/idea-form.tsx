@@ -17,6 +17,7 @@ import {
 import { useIdeaStore } from "@/store/use-idea-store";
 import { useAuthStore } from "@/store/use-auth-store";
 import { useThemeStore } from "@/store/use-theme-store";
+import { useTeamStore } from "@/store/use-team-store";
 import { toast } from "sonner";
 
 export function IdeaForm() {
@@ -26,6 +27,11 @@ export function IdeaForm() {
   const { addIdea } = useIdeaStore();
   const { currentUser } = useAuthStore();
   const { themes } = useThemeStore();
+  const { getTeamsBySchool } = useTeamStore();
+
+  const schoolTeams = currentUser?.role === "school" && currentUser.schoolName
+    ? getTeamsBySchool(currentUser.schoolName)
+    : [];
 
   const [formData, setFormData] = useState({
     title: "",
@@ -36,6 +42,7 @@ export function IdeaForm() {
         ? `${themes.find((tm) => tm.theme.toLowerCase() === prefilledTheme.toLowerCase())!.month}: ${prefilledTheme}`
         : ""
       : "",
+    teamId: "",
     studentTeam: "",
     problemStatement: "",
     targetAudience: "",
@@ -47,8 +54,7 @@ export function IdeaForm() {
     const newErrors: Record<string, string> = {};
     if (!formData.title.trim()) newErrors.title = "Project title is required";
     if (!formData.theme) newErrors.theme = "Please select a theme";
-    if (!formData.studentTeam.trim())
-      newErrors.studentTeam = "Team name is required";
+    if (!formData.teamId) newErrors.teamId = "Please select a team";
     if (!formData.problemStatement.trim())
       newErrors.problemStatement = "Problem statement is required";
     if (formData.problemStatement.trim().length < 20)
@@ -68,11 +74,14 @@ export function IdeaForm() {
         ? currentUser.schoolName!
         : "Admin Submission";
 
+    const selectedTeam = schoolTeams.find((t) => t.id === formData.teamId);
+
     addIdea({
       schoolName,
       title: formData.title.trim(),
       theme: formData.theme,
-      studentTeam: formData.studentTeam.trim(),
+      teamId: formData.teamId,
+      studentTeam: selectedTeam?.name || formData.studentTeam.trim(),
       problemStatement: formData.problemStatement.trim(),
       targetAudience: formData.targetAudience.trim(),
     });
@@ -84,6 +93,7 @@ export function IdeaForm() {
     setFormData({
       title: "",
       theme: "",
+      teamId: "",
       studentTeam: "",
       problemStatement: "",
       targetAudience: "",
@@ -146,22 +156,39 @@ export function IdeaForm() {
         )}
       </div>
 
-      {/* Team Name */}
+      {/* Team Selection */}
       <div className="space-y-2">
-        <Label htmlFor="studentTeam" className="text-sm font-medium">
-          Student / Team Name <span className="text-destructive">*</span>
+        <Label htmlFor="teamId" className="text-sm font-medium">
+          Student Team <span className="text-destructive">*</span>
         </Label>
-        <Input
-          id="studentTeam"
-          placeholder="e.g., Green Sparks"
-          value={formData.studentTeam}
-          onChange={(e) =>
-            setFormData({ ...formData, studentTeam: e.target.value })
+        <Select
+          value={formData.teamId}
+          onValueChange={(value) =>
+            setFormData({ ...formData, teamId: value || "" })
           }
-          className={errors.studentTeam ? "border-destructive" : ""}
-        />
-        {errors.studentTeam && (
-          <p className="text-xs text-destructive">{errors.studentTeam}</p>
+        >
+          <SelectTrigger
+            id="teamId"
+            className={errors.teamId ? "border-destructive" : ""}
+          >
+            <SelectValue placeholder="Select a team" />
+          </SelectTrigger>
+          <SelectContent>
+            {schoolTeams.length > 0 ? (
+              schoolTeams.map((team) => (
+                <SelectItem key={team.id} value={team.id}>
+                  {team.name}
+                </SelectItem>
+              ))
+            ) : (
+              <SelectItem value="" disabled>
+                No teams available. Create teams first.
+              </SelectItem>
+            )}
+          </SelectContent>
+        </Select>
+        {errors.teamId && (
+          <p className="text-xs text-destructive">{errors.teamId}</p>
         )}
       </div>
 

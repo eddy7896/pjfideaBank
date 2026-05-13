@@ -1,10 +1,20 @@
-export type Role = "super-admin" | "school" | "education-dept";
+export type Role = "super-admin" | "school" | "education-dept" | "student";
 
 export interface User {
   role: Role;
   schoolName?: string;
   displayName: string;
   email: string;
+  teamId?: string;
+}
+
+export interface StudentTeam {
+  id: string;
+  pin: string;
+  name: string;
+  schoolName: string;
+  memberNames: string[];
+  createdAt: string;
 }
 
 export interface DemoCredential {
@@ -83,6 +93,7 @@ export interface Idea {
   title: string;
   theme: string;
   studentTeam: string;
+  teamId?: string;
   problemStatement: string;
   targetAudience: string;
   status: DesignThinkingStatus;

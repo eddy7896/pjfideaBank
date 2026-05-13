@@ -15,6 +15,7 @@ import {
   Calendar,
   Settings,
   Folder,
+  Users as UsersIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -22,16 +23,18 @@ import { Toaster } from "@/components/ui/sonner";
 import { useAuthStore } from "@/store/use-auth-store";
 import { cn } from "@/lib/utils";
 
-const roleIcons = {
+const roleIcons: Record<string, typeof ShieldCheck> = {
   "super-admin": ShieldCheck,
   school: School,
   "education-dept": Building2,
+  student: UsersIcon,
 };
 
-const roleBadgeColors = {
+const roleBadgeColors: Record<string, string> = {
   "super-admin": "bg-primary/10 text-primary border-primary/20",
   school: "bg-emerald-100 text-emerald-700 border-emerald-200",
   "education-dept": "bg-accent/10 text-accent border-accent/20",
+  student: "bg-blue-100 text-blue-700 border-blue-200",
 };
 
 export default function DashboardLayout({
@@ -62,7 +65,7 @@ export default function DashboardLayout({
     );
   }
 
-  const RoleIcon = roleIcons[currentUser.role];
+  const RoleIcon = roleIcons[currentUser.role] || ShieldCheck;
 
   const handleLogout = () => {
     logout();
@@ -115,6 +118,19 @@ export default function DashboardLayout({
 
           {currentUser.role === "school" && (
             <>
+              <Link
+                href="/dashboard/teams"
+                className={cn(
+                  "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all",
+                  pathname === "/dashboard/teams"
+                    ? "bg-primary text-primary-foreground shadow-sm"
+                    : "text-muted-foreground hover:bg-accent/10 hover:text-foreground"
+                )}
+              >
+                <UsersIcon className="h-4 w-4" />
+                Teams
+              </Link>
+
               <Link
                 href="/dashboard/projects"
                 className={cn(

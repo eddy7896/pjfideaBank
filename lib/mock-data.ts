@@ -12,6 +12,7 @@ export const MOCK_IDEAS: Idea[] = [
     schoolName: "Springfield High",
     title: "Solar Powered Desk Lamps",
     theme: "February: Sustainability",
+    teamId: "TM-DEMO01",
     studentTeam: "Green Sparks",
     problemStatement:
       "Classrooms lack natural light during winter months, forcing schools to rely on grid electricity. This increases energy costs and carbon footprint for under-funded schools.",
@@ -68,7 +69,8 @@ export const MOCK_IDEAS: Idea[] = [
     schoolName: "Springfield High",
     title: "Community Skill-Share Platform",
     theme: "May: Community",
-    studentTeam: "The Connectors",
+    teamId: "TM-DEMO02",
+    studentTeam: "Tech Pioneers",
     problemStatement:
       "Local artisans and retirees have valuable skills but no platform to share them with younger generations. A matchmaking app could pair mentors with learners.",
     targetAudience: "Community members of all ages",

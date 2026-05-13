@@ -18,23 +18,28 @@ export function usePermissions() {
         return idea.schoolName === currentUser.schoolName;
       case "education-dept":
         return idea.status === "Prototype" || idea.status === "Test";
+      case "student":
+        return idea.teamId === currentUser.teamId;
       default:
         return false;
     }
   };
 
-  // Only schools can edit their own ideas
+  // Schools and students can edit their own ideas
   const canEditIdea = (idea: Idea): boolean => {
     if (!currentUser) return false;
     if (currentUser.role === "school") {
       return idea.schoolName === currentUser.schoolName;
+    }
+    if (currentUser.role === "student") {
+      return idea.teamId === currentUser.teamId;
     }
     return false;
   };
 
   const canDragIdea = (idea: Idea): boolean => canEditIdea(idea);
 
-  const isReadOnly = currentUser?.role !== "school";
+  const isReadOnly = currentUser?.role !== "school" && currentUser?.role !== "student";
 
   return {
     currentUser,
