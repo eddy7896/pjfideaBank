@@ -72,7 +72,7 @@ export default function CalendarPage() {
 
     try {
       const original = themes[selectedMonth];
-      updateTheme(selectedMonth, {
+      updateTheme(original.month, {
         month: original.month,
         shortMonth: original.shortMonth,
         theme: themeForm.theme,
