@@ -130,10 +130,10 @@ export default function DashboardLayout({
           </Link>
 
           <Link
-            href="/dashboard/themes"
+            href="/dashboard/calendar"
             className={cn(
               "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all",
-              pathname.startsWith("/dashboard/themes")
+              pathname === "/dashboard/calendar"
                 ? "bg-primary text-primary-foreground shadow-sm"
                 : "text-muted-foreground hover:bg-accent/10 hover:text-foreground"
             )}
