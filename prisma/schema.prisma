@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -22,30 +19,27 @@ model School {
   createdAt     DateTime @default(now())
   createdBy     String?
 
-  teams  StudentTeam[]
-  ideas  Idea[]
-  users  User[]
+  teams StudentTeam[]
+  ideas Idea[]
 }
 
 model User {
   id          Int      @id @default(autoincrement())
-  role        String   // 'super-admin' | 'school' | 'education-dept' | 'student'
+  role        String
   schoolName  String?
   displayName String
   email       String   @unique
   teamId      String?
   createdAt   DateTime @default(now())
-
-  school StudentTeam? @relation(fields: [schoolName], references: [name])
 }
 
 model TeamMember {
-  id              String   @id @default(cuid())
-  studentTeamId   String
-  name            String
-  grade           String
-  contactNumber   String
-  gender          String   // 'Male' | 'Female' | 'Non-binary' | 'Prefer not to say'
+  id            String   @id @default(cuid())
+  studentTeamId String
+  name          String
+  grade         String
+  contactNumber String
+  gender        String
 
   studentTeam StudentTeam @relation(fields: [studentTeamId], references: [id], onDelete: Cascade)
 }
@@ -60,31 +54,36 @@ model StudentTeam {
   members TeamMember[]
   ideas   Idea[]
   school  School     @relation(fields: [schoolName], references: [name])
+
+  @@index([schoolName])
 }
 
 model Idea {
-  id                String   @id
-  schoolName        String
-  title             String
-  theme             String
-  teamId            String?
-  studentTeam       String
-  problemStatement  String
-  targetAudience    String
-  status            String   // Design Thinking status
-  lastUpdated       String
-  stageData         Json?    // JSON data for stages
-  createdAt         DateTime @default(now())
+  id               String   @id
+  schoolName       String
+  title            String
+  theme            String
+  teamId           String?
+  studentTeam      String
+  problemStatement String
+  targetAudience   String
+  status           String
+  lastUpdated      String
+  stageData        Json?
+  createdAt        DateTime @default(now())
 
-  school     School       @relation(fields: [schoolName], references: [name])
-  team       StudentTeam? @relation(fields: [teamId], references: [id])
-  timeline   TimelineEvent[]
+  school   School       @relation(fields: [schoolName], references: [name])
+  team     StudentTeam? @relation(fields: [teamId], references: [id])
+  timeline TimelineEvent[]
+
+  @@index([schoolName])
+  @@index([teamId])
 }
 
 model TimelineEvent {
   id        String   @id
   ideaId    String
-  type      String   // 'created' | 'stage_change' | 'form_submitted' | 'comment' | 'test_failed'
+  type      String
   stage     String?
   fromStage String?
   toStage   String?
@@ -93,16 +92,21 @@ model TimelineEvent {
   timestamp String
 
   idea Idea @relation(fields: [ideaId], references: [id], onDelete: Cascade)
+
+  @@index([ideaId])
 }
 
 model ThemeActivity {
   id          String   @id
-  date        Int      // 1-31
-  month       Int      // 0-11
+  date        Int
+  month       Int
   year        Int
   title       String
   theme       String
   schoolName  String?
   description String?
   createdAt   DateTime @default(now())
+
+  @@index([month])
+  @@index([year])
 }
