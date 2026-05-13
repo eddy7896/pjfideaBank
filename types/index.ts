@@ -25,6 +25,7 @@ export interface TeamMember {
   name: string;
   grade: string;
   contactNumber: string;
+  gender: "Male" | "Female" | "Non-binary" | "Prefer not to say";
 }
 
 export interface StudentTeam {

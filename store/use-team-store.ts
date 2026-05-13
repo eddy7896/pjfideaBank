@@ -35,9 +35,9 @@ const mockTeams: StudentTeam[] = [
     name: "Green Sparks",
     schoolName: "Springfield High",
     members: [
-      { name: "Alice Johnson", grade: "10", contactNumber: "555-0101" },
-      { name: "Bob Smith", grade: "10", contactNumber: "555-0102" },
-      { name: "Carol Davis", grade: "10", contactNumber: "555-0103" },
+      { name: "Alice Johnson", grade: "10", contactNumber: "555-0101", gender: "Female" },
+      { name: "Bob Smith", grade: "10", contactNumber: "555-0102", gender: "Male" },
+      { name: "Carol Davis", grade: "10", contactNumber: "555-0103", gender: "Female" },
     ],
     createdAt: new Date().toISOString(),
   },
@@ -47,8 +47,8 @@ const mockTeams: StudentTeam[] = [
     name: "Tech Pioneers",
     schoolName: "Springfield High",
     members: [
-      { name: "David Wilson", grade: "11", contactNumber: "555-0104" },
-      { name: "Emma Brown", grade: "11", contactNumber: "555-0105" },
+      { name: "David Wilson", grade: "11", contactNumber: "555-0104", gender: "Male" },
+      { name: "Emma Brown", grade: "11", contactNumber: "555-0105", gender: "Female" },
     ],
     createdAt: new Date().toISOString(),
   },

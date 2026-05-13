@@ -23,6 +23,7 @@ interface CreateTeamModalProps {
 }
 
 const GRADES = ["9", "10", "11", "12"];
+const GENDERS = ["Male", "Female", "Non-binary", "Prefer not to say"];
 
 export function CreateTeamModal({
   open,
@@ -36,6 +37,7 @@ export function CreateTeamModal({
     name: "",
     grade: "",
     contactNumber: "",
+    gender: "",
   });
   const [createdTeam, setCreatedTeam] = useState<{ id: string; pin: string } | null>(null);
   const [copiedField, setCopiedField] = useState<"id" | "pin" | null>(null);
@@ -44,7 +46,8 @@ export function CreateTeamModal({
     if (
       newMember.name.trim() &&
       newMember.grade &&
-      newMember.contactNumber.trim()
+      newMember.contactNumber.trim() &&
+      newMember.gender
     ) {
       setMembers([
         ...members,
@@ -52,9 +55,10 @@ export function CreateTeamModal({
           name: newMember.name.trim(),
           grade: newMember.grade,
           contactNumber: newMember.contactNumber.trim(),
+          gender: newMember.gender as "Male" | "Female" | "Non-binary" | "Prefer not to say",
         },
       ]);
-      setNewMember({ name: "", grade: "", contactNumber: "" });
+      setNewMember({ name: "", grade: "", contactNumber: "", gender: "" });
     }
   };
 
@@ -71,7 +75,7 @@ export function CreateTeamModal({
   const handleClose = () => {
     setTeamName("");
     setMembers([]);
-    setNewMember({ name: "", grade: "", contactNumber: "" });
+    setNewMember({ name: "", grade: "", contactNumber: "", gender: "" });
     setCreatedTeam(null);
     onClose();
   };
@@ -175,7 +179,7 @@ export function CreateTeamModal({
           <div className="space-y-3">
             <Label className="text-sm font-medium">Team Members</Label>
             <div className="space-y-3 rounded-lg border border-border/50 bg-muted/30 p-4">
-              <div className="grid gap-3 sm:grid-cols-3">
+              <div className="grid gap-3 sm:grid-cols-2">
                 <div>
                   <Label htmlFor="memberName" className="text-xs text-muted-foreground mb-1">
                     Student Name
@@ -188,6 +192,26 @@ export function CreateTeamModal({
                       setNewMember({ ...newMember, name: e.target.value })
                     }
                   />
+                </div>
+
+                <div>
+                  <Label htmlFor="memberGender" className="text-xs text-muted-foreground mb-1">
+                    Gender
+                  </Label>
+                  <Select value={newMember.gender || ""} onValueChange={(val) =>
+                    setNewMember({ ...newMember, gender: val || "" })
+                  }>
+                    <SelectTrigger id="memberGender">
+                      <SelectValue placeholder="Select gender" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {GENDERS.map((gender) => (
+                        <SelectItem key={gender} value={gender}>
+                          {gender}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
 
                 <div>
@@ -231,6 +255,7 @@ export function CreateTeamModal({
                       disabled={
                         !newMember.name.trim() ||
                         !newMember.grade ||
+                        !newMember.gender ||
                         !newMember.contactNumber.trim()
                       }
                     >
@@ -254,7 +279,7 @@ export function CreateTeamModal({
                     <div className="flex-1">
                       <p className="text-sm font-medium">{member.name}</p>
                       <p className="text-xs text-muted-foreground">
-                        Grade {member.grade} · {member.contactNumber}
+                        Grade {member.grade} · {member.gender} · {member.contactNumber}
                       </p>
                     </div>
                     <button

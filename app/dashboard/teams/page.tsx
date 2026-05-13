@@ -178,7 +178,7 @@ export default function TeamsPage() {
                           <div className="flex-1">
                             <p className="font-medium">{member.name}</p>
                             <p className="text-xs text-muted-foreground">
-                              Grade {member.grade}
+                              Grade {member.grade} · {member.gender}
                             </p>
                           </div>
                           <p className="font-mono text-xs text-muted-foreground">
