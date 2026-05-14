@@ -137,6 +137,38 @@ export interface ThemeMonth {
   gradient: string;
 }
 
+export interface ActivityReport {
+  id: string;
+  activityId: string;
+  schoolName: string;
+  teacherName: string;
+  sessionDate: string;
+  timeIn: string;
+  timeOut: string;
+  grades: string;
+  totalStudents: number;
+  boysCount: number;
+  girlsCount: number;
+  lcmsCode?: string;
+  topicsLessons: string;
+  learningGoal: string;
+  materials: Array<{
+    name: string;
+    quantityUsed: number;
+    stockStatus: string;
+  }>;
+  safetyBriefing: boolean;
+  ppeWorn: boolean;
+  labCleanup: boolean;
+  incidentNotes?: string;
+  studentEngagement: "Low" | "Moderate" | "High";
+  successes: string;
+  challenges: string;
+  followUpActions: string;
+  createdAt: string;
+  submittedBy: string;
+}
+
 export interface ThemeActivity {
   id: string;
   date: number;

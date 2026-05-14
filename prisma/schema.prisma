@@ -110,3 +110,34 @@ model ThemeActivity {
   @@index([month])
   @@index([year])
 }
+
+model ActivityReport {
+  id                String   @id @default(cuid())
+  activityId        String
+  schoolName        String
+  teacherName       String
+  sessionDate       String
+  timeIn            String
+  timeOut           String
+  grades            String
+  totalStudents     Int
+  boysCount         Int
+  girlsCount        Int
+  lcmsCode          String?
+  topicsLessons     String
+  learningGoal      String
+  materials         Json
+  safetyBriefing    Boolean
+  ppeWorn           Boolean
+  labCleanup        Boolean
+  incidentNotes     String?
+  studentEngagement String
+  successes         String
+  challenges        String
+  followUpActions   String
+  createdAt         DateTime @default(now())
+  submittedBy       String
+
+  @@index([schoolName])
+  @@index([activityId])
+}
