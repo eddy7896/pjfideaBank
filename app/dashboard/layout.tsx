@@ -19,6 +19,7 @@ import {
   BarChart3,
   Menu,
   X,
+  FileText,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -168,6 +169,19 @@ export default function DashboardLayout({
           {currentUser.role === "school" && (
             <>
               <Link
+                href="/dashboard/activities"
+                className={cn(
+                  "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all",
+                  pathname === "/dashboard/activities"
+                    ? "bg-primary text-primary-foreground shadow-sm"
+                    : "text-muted-foreground hover:bg-accent/10 hover:text-foreground"
+                )}
+              >
+                <FileText className="h-4 w-4" />
+                Activities
+              </Link>
+
+              <Link
                 href="/dashboard/teams"
                 className={cn(
                   "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all",
@@ -210,6 +224,18 @@ export default function DashboardLayout({
 
           {currentUser.role === "super-admin" && (
             <>
+              <Link
+                href="/dashboard/activities"
+                className={cn(
+                  "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all",
+                  pathname === "/dashboard/activities"
+                    ? "bg-primary text-primary-foreground shadow-sm"
+                    : "text-muted-foreground hover:bg-accent/10 hover:text-foreground"
+                )}
+              >
+                <FileText className="h-4 w-4" />
+                Activities
+              </Link>
               <Link
                 href="/dashboard/schools"
                 className={cn(
