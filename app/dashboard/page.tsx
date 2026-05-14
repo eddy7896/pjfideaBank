@@ -108,24 +108,24 @@ export default function DashboardPage() {
 
       {/* Stats Cards - Hide for students */}
       {currentUser.role !== "student" && (
-        <div className="mb-10 grid grid-cols-2 gap-6 sm:grid-cols-4">
-          <div className="rounded-xl border border-border/20 bg-white p-6 transition-all hover:border-border/40">
+        <div className="mb-10 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4 lg:gap-6">
+          <div className="rounded-xl border border-border/20 bg-white p-4 sm:p-6 transition-all hover:border-border/40">
             <p className="text-xs font-medium text-muted-foreground">
               {currentUser.role === "school" ? "My Ideas" : "Total Ideas"}
             </p>
-            <p className="mt-3 text-3xl font-semibold text-foreground">{totalIdeas}</p>
+            <p className="mt-2 text-2xl sm:text-3xl font-semibold text-foreground">{totalIdeas}</p>
           </div>
-          <div className="rounded-xl border border-border/20 bg-white p-6 transition-all hover:border-border/40">
+          <div className="rounded-xl border border-border/20 bg-white p-4 sm:p-6 transition-all hover:border-border/40">
             <p className="text-xs font-medium text-muted-foreground">Schools</p>
-            <p className="mt-3 text-3xl font-semibold text-foreground">{schoolsCount}</p>
+            <p className="mt-2 text-2xl sm:text-3xl font-semibold text-foreground">{schoolsCount}</p>
           </div>
-          <div className="rounded-xl border border-border/20 bg-white p-6 transition-all hover:border-border/40">
+          <div className="rounded-xl border border-border/20 bg-white p-4 sm:p-6 transition-all hover:border-border/40">
             <p className="text-xs font-medium text-muted-foreground">Advanced</p>
-            <p className="mt-3 text-3xl font-semibold text-foreground">{advancedCount}</p>
+            <p className="mt-2 text-2xl sm:text-3xl font-semibold text-foreground">{advancedCount}</p>
           </div>
-          <div className="rounded-xl border border-border/20 bg-white p-6 transition-all hover:border-border/40">
+          <div className="rounded-xl border border-border/20 bg-white p-4 sm:p-6 transition-all hover:border-border/40">
             <p className="text-xs font-medium text-muted-foreground">Active Themes</p>
-            <p className="mt-3 text-3xl font-semibold text-foreground">{themesWithIdeas}</p>
+            <p className="mt-2 text-2xl sm:text-3xl font-semibold text-foreground">{themesWithIdeas}</p>
           </div>
         </div>
       )}

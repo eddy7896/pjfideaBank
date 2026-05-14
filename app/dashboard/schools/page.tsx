@@ -67,12 +67,12 @@ export default function SchoolsPage() {
     : null;
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+    <div className="mx-auto max-w-7xl px-2 sm:px-4 py-4 sm:py-8 lg:px-8">
       <div className="space-y-6">
         {/* Header */}
         <div>
-          <h1 className="text-3xl font-semibold tracking-tight">Schools Overview</h1>
-          <p className="text-sm text-muted-foreground mt-1">
+          <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight">Schools Overview</h1>
+          <p className="text-xs sm:text-sm text-muted-foreground mt-1">
             View all schools, teams, and projects across the platform
           </p>
         </div>
@@ -83,23 +83,23 @@ export default function SchoolsPage() {
             {schoolsList.map((school) => (
               <Card
                 key={school.name}
-                className="border-border/20 p-6 hover:shadow-md transition-all cursor-pointer"
+                className="border-border/20 p-3 sm:p-6 hover:shadow-md transition-all cursor-pointer"
                 onClick={() => setSelectedSchool(school.name)}
               >
-                <div className="flex items-start justify-between">
-                  <div className="flex items-start gap-4 flex-1">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-gradient-to-br from-blue-500 to-cyan-600 shadow-lg shadow-blue-500/25 flex-shrink-0">
-                      <SchoolIcon className="h-6 w-6 text-white" />
+                <div className="flex items-start justify-between gap-2 sm:gap-4">
+                  <div className="flex items-start gap-2 sm:gap-4 flex-1 min-w-0">
+                    <div className="flex h-10 sm:h-12 w-10 sm:w-12 items-center justify-center rounded-lg bg-gradient-to-br from-blue-500 to-cyan-600 shadow-lg shadow-blue-500/25 flex-shrink-0">
+                      <SchoolIcon className="h-5 sm:h-6 w-5 sm:w-6 text-white" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h2 className="text-lg font-semibold text-foreground">{school.name}</h2>
-                      <div className="flex items-center gap-4 mt-2 text-sm text-muted-foreground">
+                      <h2 className="text-base sm:text-lg font-semibold text-foreground truncate">{school.name}</h2>
+                      <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4 mt-1 sm:mt-2 text-xs sm:text-sm text-muted-foreground">
                         <span className="flex items-center gap-1">
-                          <Users className="h-4 w-4" />
+                          <Users className="h-3 sm:h-4 w-3 sm:w-4" />
                           {school.teamsCount} {school.teamsCount === 1 ? "team" : "teams"}
                         </span>
                         <span className="flex items-center gap-1">
-                          <FileText className="h-4 w-4" />
+                          <FileText className="h-3 sm:h-4 w-3 sm:w-4" />
                           {school.projectsCount} {school.projectsCount === 1 ? "project" : "projects"}
                         </span>
                       </div>

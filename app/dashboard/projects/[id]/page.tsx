@@ -98,41 +98,41 @@ export default function ProjectDetailPage({
         Back
       </button>
 
-      <div className="grid gap-6 lg:grid-cols-3">
+      <div className="grid gap-4 sm:gap-6 lg:grid-cols-3">
         {/* Main Content */}
-        <div className="lg:col-span-2 space-y-6">
+        <div className="lg:col-span-2 space-y-4 sm:space-y-6">
           {/* Header */}
           <div>
-            <div className="flex items-start justify-between gap-4">
-              <div>
-                <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
+            <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4">
+              <div className="min-w-0">
+                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight break-words">
                   {idea.title}
                 </h1>
-                <div className="mt-3 flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
+                <div className="mt-2 sm:mt-3 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 text-xs sm:text-sm text-muted-foreground">
                   <span className="flex items-center gap-1.5">
-                    <School className="h-4 w-4" />
-                    {idea.schoolName}
+                    <School className="h-3 sm:h-4 w-3 sm:w-4" />
+                    <span className="truncate">{idea.schoolName}</span>
                   </span>
-                  <span>·</span>
+                  <span className="hidden sm:inline">·</span>
                   <span className="flex items-center gap-1.5">
-                    <Users className="h-4 w-4" />
-                    {idea.studentTeam}
+                    <Users className="h-3 sm:h-4 w-3 sm:w-4" />
+                    <span className="truncate">{idea.studentTeam}</span>
                   </span>
-                  <span>·</span>
+                  <span className="hidden sm:inline">·</span>
                   <span className="flex items-center gap-1.5">
-                    <Calendar className="h-4 w-4" />
+                    <Calendar className="h-3 sm:h-4 w-3 sm:w-4" />
                     {idea.lastUpdated}
                   </span>
                 </div>
               </div>
-              <StatusBadge status={idea.status} className="flex-shrink-0" />
+              <StatusBadge status={idea.status} className="flex-shrink-0 self-start" />
             </div>
           </div>
 
           {/* DT Progress */}
-          <div className="rounded-xl border border-border/50 bg-card p-6">
-            <div className="mb-6 space-y-1">
-              <h2 className="text-base font-semibold">Design Thinking Progress</h2>
+          <div className="rounded-xl border border-border/50 bg-card p-4 sm:p-6">
+            <div className="mb-4 sm:mb-6 space-y-1">
+              <h2 className="text-sm sm:text-base font-semibold">Design Thinking Progress</h2>
               <p className="text-xs text-muted-foreground">
                 Stage {currentStageIndex + 1} of {DESIGN_THINKING_STAGES.length}
               </p>

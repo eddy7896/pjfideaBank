@@ -128,10 +128,10 @@ export default function CalendarPage() {
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
       <div className="space-y-8">
         <div>
-          <h1 className="text-3xl font-semibold tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight">
             {isAdmin ? "Theme Calendar Manager" : "Theme Calendar"}
           </h1>
-          <p className="text-sm text-muted-foreground mt-1">
+          <p className="text-xs sm:text-sm text-muted-foreground mt-1">
             {isAdmin ? "Set monthly themes and manage activities for schools" : "View upcoming activities and monthly themes"}
           </p>
         </div>

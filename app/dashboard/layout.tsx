@@ -17,6 +17,8 @@ import {
   Folder,
   Users as UsersIcon,
   BarChart3,
+  Menu,
+  X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -53,6 +55,7 @@ export default function DashboardLayout({
   const { loadIdeas } = useIdeaStore();
   const { loadActivities } = useActivityStore();
   const [mounted, setMounted] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -100,8 +103,28 @@ export default function DashboardLayout({
 
   return (
     <div className="flex min-h-screen bg-background">
+      {/* Mobile Header */}
+      <div className="fixed top-0 left-0 right-0 z-40 flex items-center justify-between px-4 py-3 bg-card border-b border-border md:hidden">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => setSidebarOpen(!sidebarOpen)}
+        >
+          {sidebarOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+        </Button>
+        <div className="flex-1 text-center">
+          <h1 className="text-sm font-semibold">Pi Jam</h1>
+        </div>
+        <div className="w-10" />
+      </div>
+
       {/* Sidebar Navigation */}
-      <aside className="fixed inset-y-0 left-0 z-50 flex w-64 flex-col border-r border-border bg-card shadow-sm transition-all">
+      <aside className={cn(
+        "fixed inset-y-0 left-0 z-50 flex w-64 flex-col border-r border-border bg-card shadow-sm transition-all",
+        "md:translate-x-0",
+        sidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
+      )}>
+        <div className="md:hidden pt-14" />
         {/* Logo Area */}
         <div className="flex h-24 shrink-0 items-center justify-center px-6 border-b border-border/40">
           <Image
@@ -255,8 +278,16 @@ export default function DashboardLayout({
         </div>
       </aside>
 
+      {/* Mobile Overlay */}
+      {sidebarOpen && (
+        <div
+          className="fixed inset-0 z-40 bg-black/50 md:hidden"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
       {/* Main Content Area */}
-      <main className="flex-1 pl-64">
+      <main className="flex-1 md:pl-64 pt-16 md:pt-0">
         {children}
       </main>
       <Toaster richColors position="top-right" />
