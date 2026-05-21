@@ -127,7 +127,7 @@ export default function LoginPage() {
           <Tabs defaultValue="teacher" className="rounded-xl border border-border/20 bg-white">
             <TabsList className="w-full justify-start rounded-none border-b border-border/20 p-0 bg-white">
               <TabsTrigger value="teacher" className="rounded-none flex-1 text-sm font-medium">
-                Teacher
+                School Admin / Teacher
               </TabsTrigger>
               <TabsTrigger value="student" className="rounded-none flex-1 text-sm font-medium">
                 Student
@@ -202,7 +202,7 @@ export default function LoginPage() {
               <div className="space-y-3 border-t border-border/20 pt-6">
                 <p className="text-xs font-medium text-muted-foreground">Demo accounts</p>
                 <div className="space-y-2">
-                  {DEMO_CREDENTIALS.map((cred) => (
+                  {DEMO_CREDENTIALS.filter((cred) => cred.user.role === "school").map((cred) => (
                     <button
                       key={cred.email}
                       onClick={() => fillCredentials(cred.email, cred.password)}

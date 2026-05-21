@@ -52,13 +52,21 @@ export default function LandingPage() {
               priority
             />
           </Link>
-          <Link
-            href="/login"
-            className="inline-flex h-9 items-center gap-2 rounded-lg bg-primary px-4 text-sm font-medium text-primary-foreground transition-all hover:bg-primary/90"
-          >
-            Sign In
-            <ArrowRight className="h-4 w-4" />
-          </Link>
+          <div className="flex items-center gap-3">
+            <Link
+              href="/pijam"
+              className="inline-flex h-9 items-center gap-2 rounded-lg border border-border bg-card px-4 text-sm font-medium text-foreground transition-all hover:bg-muted"
+            >
+              Staff Portal
+            </Link>
+            <Link
+              href="/login"
+              className="inline-flex h-9 items-center gap-2 rounded-lg bg-primary px-4 text-sm font-medium text-primary-foreground transition-all hover:bg-primary/90"
+            >
+              Sign In
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+          </div>
         </div>
       </header>
 
@@ -374,6 +382,12 @@ export default function LandingPage() {
               <ul className="space-y-2 text-sm">
                 <li><a href="https://thepijam.org" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary transition">Pi Jam Foundation</a></li>
                 <li><a href="#" className="text-muted-foreground hover:text-primary transition">Documentation</a></li>
+                <li>
+                  <Link href="/pijam" className="text-muted-foreground hover:text-primary transition inline-flex items-center gap-1.5">
+                    Staff Portal
+                    <span className="text-[10px] bg-primary/10 text-primary px-1.5 py-0.5 rounded font-bold">Internal</span>
+                  </Link>
+                </li>
               </ul>
             </div>
             <div>
