@@ -63,7 +63,7 @@ export const MOCK_USERS: User[] = [
   { role: "super-admin", displayName: "Super Admin", email: "admin@pijam.org" },
   { role: "school", schoolName: "Springfield High", displayName: "Springfield High", email: "school@springfield.edu" },
   { role: "school", schoolName: "Riverside Academy", displayName: "Riverside Academy", email: "school@riverside.edu" },
-  { role: "education-dept", displayName: "Education Department", email: "edu@education.gov" },
+  { role: "sed-department", displayName: "Education Department", email: "edu@education.gov" },
 ];
 
 export const DEMO_CREDENTIALS: DemoCredential[] = [

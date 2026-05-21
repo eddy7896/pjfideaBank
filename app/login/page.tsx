@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
@@ -23,7 +23,11 @@ import { DEMO_CREDENTIALS } from "@/lib/constants";
 export default function LoginPage() {
   const router = useRouter();
   const { login, loginStudent } = useAuthStore();
-  const { teams } = useTeamStore();
+  const { teams, loadTeams } = useTeamStore();
+
+  useEffect(() => {
+    loadTeams();
+  }, [loadTeams]);
 
   // Teacher login
   const [email, setEmail] = useState("");
@@ -38,36 +42,42 @@ export default function LoginPage() {
   const [studentError, setStudentError] = useState("");
   const [studentLoading, setStudentLoading] = useState(false);
 
-  const handleTeacherSubmit = (e: React.FormEvent) => {
+  const handleTeacherSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     setLoading(true);
 
-    setTimeout(() => {
-      const result = login(email, password);
+    try {
+      const result = await login(email, password);
       if (result.success) {
         router.push("/dashboard");
       } else {
         setError(result.error || "Login failed");
       }
+    } catch (err) {
+      setError("An unexpected error occurred during login.");
+    } finally {
       setLoading(false);
-    }, 400);
+    }
   };
 
-  const handleStudentSubmit = (e: React.FormEvent) => {
+  const handleStudentSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setStudentError("");
     setStudentLoading(true);
 
-    setTimeout(() => {
-      const result = loginStudent(teamId, pin);
+    try {
+      const result = await loginStudent(teamId, pin);
       if (result.success) {
         router.push("/dashboard");
       } else {
         setStudentError(result.error || "Login failed");
       }
+    } catch (err) {
+      setStudentError("An unexpected error occurred during login.");
+    } finally {
       setStudentLoading(false);
-    }, 400);
+    }
   };
 
   const fillCredentials = (credEmail: string, credPassword: string) => {

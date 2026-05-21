@@ -3,14 +3,12 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import type { User } from "@/types";
-import { DEMO_CREDENTIALS } from "@/lib/constants";
-import { useTeamStore } from "./use-team-store";
 
 interface AuthState {
   currentUser: User | null;
   isAuthenticated: boolean;
-  login: (email: string, password: string) => { success: boolean; error?: string };
-  loginStudent: (teamId: string, pin: string) => { success: boolean; error?: string };
+  login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
+  loginStudent: (teamId: string, pin: string) => Promise<{ success: boolean; error?: string }>;
   logout: () => void;
 }
 
@@ -19,30 +17,68 @@ export const useAuthStore = create<AuthState>()(
     (set) => ({
       currentUser: null,
       isAuthenticated: false,
-      login: (email, password) => {
-        const cred = DEMO_CREDENTIALS.find(
-          (c) => c.email === email && c.password === password
-        );
-        if (cred) {
-          set({ currentUser: cred.user, isAuthenticated: true });
-          return { success: true };
-        }
-        return { success: false, error: "Invalid email or password. Try one of the demo credentials below." };
-      },
-      loginStudent: (teamId, pin) => {
-        const team = useTeamStore.getState().loginStudent(teamId, pin);
-        if (team) {
-          const user: User = {
-            role: "student",
-            displayName: team.name,
-            email: "",
-            schoolName: team.schoolName,
-            teamId: team.id,
+      login: async (email, password) => {
+        try {
+          const res = await fetch("/api/auth/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, password }),
+          });
+          
+          const data = await res.json().catch(() => ({}));
+          
+          if (res.ok) {
+            if (data.success && data.user) {
+              set({ currentUser: data.user, isAuthenticated: true });
+              return { success: true };
+            }
+          }
+          
+          return {
+            success: false,
+            error: data.message || "Invalid credentials. If this is a newly registered account, make sure you enter the registered email.",
           };
-          set({ currentUser: user, isAuthenticated: true });
-          return { success: true };
+        } catch (error) {
+          return {
+            success: false,
+            error: "Failed to connect to authentication server. Please check your network.",
+          };
         }
-        return { success: false, error: "Invalid Team ID or PIN." };
+      },
+      loginStudent: async (teamId, pin) => {
+        try {
+          const res = await fetch("/api/auth/login-student", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ teamId, pin }),
+          });
+
+          const data = await res.json().catch(() => ({}));
+
+          if (res.ok) {
+            if (data.success && data.team) {
+              const user: User = {
+                role: "student",
+                displayName: data.team.name,
+                email: "",
+                schoolName: data.team.schoolName,
+                teamId: data.team.id,
+              };
+              set({ currentUser: user, isAuthenticated: true });
+              return { success: true };
+            }
+          }
+
+          return {
+            success: false,
+            error: data.message || "Invalid Team ID or PIN.",
+          };
+        } catch (error) {
+          return {
+            success: false,
+            error: "Failed to connect to authentication server. Please check your network.",
+          };
+        }
       },
       logout: () => {
         set({ currentUser: null, isAuthenticated: false });
@@ -53,3 +89,4 @@ export const useAuthStore = create<AuthState>()(
     }
   )
 );
+

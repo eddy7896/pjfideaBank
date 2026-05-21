@@ -33,14 +33,14 @@ import { cn } from "@/lib/utils";
 const roleIcons: Record<string, typeof ShieldCheck> = {
   "super-admin": ShieldCheck,
   school: School,
-  "education-dept": Building2,
+  "sed-department": Building2,
   student: UsersIcon,
 };
 
 const roleBadgeColors: Record<string, string> = {
   "super-admin": "bg-primary/10 text-primary border-primary/20",
   school: "bg-emerald-100 text-emerald-700 border-emerald-200",
-  "education-dept": "bg-accent/10 text-accent border-accent/20",
+  "sed-department": "bg-accent/10 text-accent border-accent/20",
   student: "bg-blue-100 text-blue-700 border-blue-200",
 };
 

@@ -45,7 +45,7 @@ export default function DashboardPage() {
 
   if (!currentUser) return null;
 
-  const visibleIdeas = ideas.filter(canViewIdea);
+  const visibleIdeas = ideas.filter((idea) => canViewIdea(idea));
   const totalIdeas = visibleIdeas.length;
   const schoolsCount = new Set(visibleIdeas.map((i) => i.schoolName)).size;
   const advancedCount = visibleIdeas.filter(
@@ -92,7 +92,7 @@ export default function DashboardPage() {
           <p className="mt-1 text-sm text-muted-foreground">
             {currentUser.role === "super-admin" && "Overview of all schools and projects"}
             {currentUser.role === "school" && `Managing ideas for ${currentUser.schoolName}`}
-            {currentUser.role === "education-dept" && "Reviewing advanced-stage projects"}
+            {currentUser.role === "sed-department" && "Reviewing advanced-stage projects"}
             {currentUser.role === "student" && `Team: ${currentUser.displayName}`}
           </p>
         </div>
@@ -238,7 +238,7 @@ export default function DashboardPage() {
 
                   // Hide non-visible stages for edu dept
                   if (
-                    currentUser.role === "education-dept" &&
+                    currentUser.role === "sed-department" &&
                     stage !== "Prototype" &&
                     stage !== "Test"
                   ) {
@@ -290,7 +290,7 @@ export default function DashboardPage() {
                           <p className="text-sm font-semibold">{school.name}</p>
                           <p className="text-xs text-muted-foreground">
                             {school.count} {school.count === 1 ? "project" : "projects"}
-                            {currentUser.role === "education-dept" && (
+                            {currentUser.role === "sed-department" && (
                               <> · {school.advancedCount} advanced</>
                             )}
                           </p>

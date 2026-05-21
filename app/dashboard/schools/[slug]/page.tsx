@@ -53,7 +53,7 @@ export default function SchoolDetailPage({
 
   // Filter based on role
   let schoolIdeas = ideas.filter((i) => i.schoolName === schoolName);
-  const isEduDept = currentUser.role === "education-dept";
+  const isEduDept = currentUser.role === "sed-department";
   if (isEduDept) {
     schoolIdeas = schoolIdeas.filter(
       (i) => i.status === "Prototype" || i.status === "Test"

@@ -1,9 +1,31 @@
-export type Role = "super-admin" | "school" | "education-dept" | "student";
+export type Role =
+  | "super-admin"
+  | "program-lead"
+  | "geography-lead"
+  | "teacher-trainer"
+  | "school"
+  | "student"
+  | "sed-department";
+
+export interface Geography {
+  id: string;
+  name: string;
+  code: string;
+  createdAt: string;
+}
+
+export interface SubGeography {
+  id: string;
+  name: string;
+  geographyId: string;
+  createdAt: string;
+}
 
 export interface School {
   id: string;
   name: string;
   location: string;
+  subGeographyId?: string;
   address: string;
   phone: string;
   website?: string;
@@ -19,6 +41,10 @@ export interface User {
   displayName: string;
   email: string;
   teamId?: string;
+  geographyId?: string;
+  subGeographyId?: string;
+  assignedLeadId?: string; // assigned GL/PL email
+  passwordHash?: string;
 }
 
 export interface TeamMember {

@@ -8,29 +8,43 @@ datasource db {
 }
 
 model School {
-  id            String   @id @default(cuid())
-  name          String   @unique
-  location      String
-  address       String
-  phone         String
-  website       String?
-  principalName String
-  udaiseCode    String   @unique
-  createdAt     DateTime @default(now())
-  createdBy     String?
+  id             String   @id @default(cuid())
+  name           String   @unique
+  location       String
+  subGeographyId String?
+  address        String
+  phone          String
+  website        String?
+  principalName  String
+  udaiseCode     String   @unique
+  createdAt      DateTime @default(now())
+  createdBy      String?
 
-  teams StudentTeam[]
-  ideas Idea[]
+  subGeography SubGeography? @relation(fields: [subGeographyId], references: [id])
+  teams        StudentTeam[]
+  ideas        Idea[]
+
+  @@index([subGeographyId])
 }
 
 model User {
-  id          Int      @id @default(autoincrement())
-  role        String
-  schoolName  String?
-  displayName String
-  email       String   @unique
-  teamId      String?
-  createdAt   DateTime @default(now())
+  id             Int           @id @default(autoincrement())
+  role           String
+  schoolName     String?
+  displayName    String
+  email          String        @unique
+  passwordHash   String?
+  teamId         String?
+  geographyId    String?
+  subGeographyId String?
+  assignedLeadId String?
+  createdAt      DateTime      @default(now())
+
+  geography    Geography?    @relation(fields: [geographyId], references: [id])
+  subGeography SubGeography? @relation(fields: [subGeographyId], references: [id])
+
+  @@index([geographyId])
+  @@index([subGeographyId])
 }
 
 model TeamMember {
@@ -140,4 +154,28 @@ model ActivityReport {
 
   @@index([schoolName])
   @@index([activityId])
+}
+
+model Geography {
+  id        String          @id @default(cuid())
+  name      String          @unique
+  code      String          @unique
+  createdAt DateTime        @default(now())
+  
+  subGeographies SubGeography[]
+  users          User[]
+}
+
+model SubGeography {
+  id          String    @id @default(cuid())
+  name        String
+  geographyId String
+  createdAt   DateTime  @default(now())
+
+  geography Geography @relation(fields: [geographyId], references: [id], onDelete: Cascade)
+  schools   School[]
+  users     User[]
+
+  @@unique([name, geographyId])
+  @@index([geographyId])
 }

@@ -12,6 +12,8 @@ import type {
   TestData,
 } from "@/types";
 
+import { useAuthStore } from "./use-auth-store";
+
 type StageDataType =
   | EmpathizeData
   | DefineData
@@ -41,7 +43,17 @@ export const useIdeaStore = create<IdeaState>((set, get) => ({
 
   loadIdeas: async () => {
     try {
-      const res = await fetch("/api/ideas");
+      const user = useAuthStore.getState().currentUser;
+      const headers: Record<string, string> = {};
+      if (user) {
+        if (user.role) headers['x-user-role'] = user.role;
+        if (user.schoolName) headers['x-user-school-name'] = user.schoolName;
+        if (user.teamId) headers['x-user-team-id'] = user.teamId;
+        if (user.geographyId) headers['x-user-geography-id'] = user.geographyId;
+        if (user.subGeographyId) headers['x-user-sub-geography-id'] = user.subGeographyId;
+      }
+
+      const res = await fetch("/api/ideas", { headers });
       if (res.ok) {
         const data = await res.json();
         set({ ideas: data, isLoaded: true });

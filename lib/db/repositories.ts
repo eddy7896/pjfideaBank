@@ -1,256 +1,425 @@
-import { eq } from 'drizzle-orm';
-import { getDb } from './index';
-import { schools, users, studentTeams, ideas, timelineEvents, themeActivities } from './schema';
-import type { User, StudentTeam, Idea, TimelineEvent, School, ThemeActivity } from '@/types';
+import { prisma } from '../prisma';
+import type { User, StudentTeam, Idea, TimelineEvent, School, ThemeActivity, Geography, SubGeography } from '@/types';
 
 // SCHOOLS
 export async function createSchool(school: Omit<School, 'id' | 'createdAt'>) {
-  const db = getDb();
   const id = `SCH-${Date.now()}`;
-  return await db.insert(schools).values({
-    id,
-    name: school.name,
-    location: school.location,
-    address: school.address,
-    phone: school.phone,
-    website: school.website,
-    principalName: school.principalName,
-    udaiseCode: school.udaiseCode,
-    createdBy: school.createdBy,
-  }).returning();
+  return await prisma.school.create({
+    data: {
+      id,
+      name: school.name,
+      location: school.location,
+      subGeographyId: school.subGeographyId,
+      address: school.address,
+      phone: school.phone,
+      website: school.website,
+      principalName: school.principalName,
+      udaiseCode: school.udaiseCode,
+      createdBy: school.createdBy,
+    }
+  });
 }
 
 export async function getSchoolByName(name: string) {
-  const db = getDb();
-  const result = await db.select().from(schools).where(eq(schools.name, name));
-  return result[0] || null;
+  return await prisma.school.findUnique({
+    where: { name }
+  });
 }
 
 export async function getSchoolByUdaise(udaiseCode: string) {
-  const db = getDb();
-  const result = await db.select().from(schools).where(eq(schools.udaiseCode, udaiseCode));
-  return result[0] || null;
+  return await prisma.school.findUnique({
+    where: { udaiseCode }
+  });
 }
 
 export async function getAllSchools() {
-  const db = getDb();
-  return await db.select().from(schools);
+  return await prisma.school.findMany();
 }
 
 // USERS
 export async function getUserByEmail(email: string) {
-  const db = getDb();
-  const result = await db.select().from(users).where(eq(users.email, email));
-  return result[0] || null;
+  return await prisma.user.findUnique({
+    where: { email }
+  });
 }
 
 export async function createUser(user: Omit<User, 'email'> & { email: string }) {
-  const db = getDb();
-  return await db.insert(users).values({
-    role: user.role,
-    schoolName: user.schoolName,
-    displayName: user.displayName,
-    email: user.email,
-    teamId: user.teamId,
-  }).returning();
+  return await prisma.user.create({
+    data: {
+      role: user.role,
+      schoolName: user.schoolName,
+      displayName: user.displayName,
+      email: user.email,
+      teamId: user.teamId,
+      geographyId: user.geographyId,
+      subGeographyId: user.subGeographyId,
+      assignedLeadId: user.assignedLeadId,
+      passwordHash: user.passwordHash,
+    }
+  });
 }
 
 export async function getAllUsers() {
-  const db = getDb();
-  return await db.select().from(users);
+  return await prisma.user.findMany();
 }
 
 // STUDENT TEAMS
 export async function createTeam(team: StudentTeam) {
-  const db = getDb();
-  return await db.insert(studentTeams).values({
-    id: team.id,
-    pin: team.pin,
-    name: team.name,
-    schoolName: team.schoolName,
-    members: JSON.stringify(team.members),
-  }).returning();
+  return await prisma.studentTeam.create({
+    data: {
+      id: team.id,
+      pin: team.pin,
+      name: team.name,
+      schoolName: team.schoolName,
+      members: team.members ? {
+        create: team.members.map((m: any) => ({
+          id: m.id || crypto.randomUUID(),
+          name: m.name,
+          grade: m.grade,
+          contactNumber: m.contactNumber,
+          gender: m.gender,
+        })),
+      } : undefined,
+    },
+    include: { members: true },
+  });
 }
 
 export async function getTeamById(id: string) {
-  const db = getDb();
-  const result = await db.select().from(studentTeams).where(eq(studentTeams.id, id));
-  if (result[0]) {
+  const result = await prisma.studentTeam.findUnique({
+    where: { id },
+    include: { members: true },
+  });
+  if (result) {
     return {
-      ...result[0],
-      members: result[0].members ? JSON.parse(result[0].members) : [],
-    } as StudentTeam;
+      ...result,
+      members: result.members || [],
+      createdAt: result.createdAt.toISOString(),
+    } as unknown as StudentTeam;
   }
   return null;
 }
 
 export async function getTeamsBySchool(schoolName: string) {
-  const db = getDb();
-  const results = await db.select().from(studentTeams).where(eq(studentTeams.schoolName, schoolName));
+  const results = await prisma.studentTeam.findMany({
+    where: { schoolName },
+    include: { members: true },
+  });
   return results.map((t: any) => ({
     ...t,
-    members: t.members ? JSON.parse(t.members) : [],
-  })) as StudentTeam[];
+    members: t.members || [],
+    createdAt: t.createdAt.toISOString(),
+  })) as unknown as StudentTeam[];
 }
 
 export async function getAllTeams() {
-  const db = getDb();
-  const results = await db.select().from(studentTeams);
+  const results = await prisma.studentTeam.findMany({
+    include: { members: true },
+  });
   return results.map((t: any) => ({
     ...t,
-    members: t.members ? JSON.parse(t.members) : [],
-  })) as StudentTeam[];
+    members: t.members || [],
+    createdAt: t.createdAt.toISOString(),
+  })) as unknown as StudentTeam[];
 }
 
 export async function deleteTeam(id: string) {
-  const db = getDb();
-  return await db.delete(studentTeams).where(eq(studentTeams.id, id));
+  return await prisma.studentTeam.delete({
+    where: { id }
+  });
 }
 
 // IDEAS
 export async function createIdea(idea: Idea) {
-  const db = getDb();
-  return await db.insert(ideas).values({
-    id: idea.id,
-    schoolName: idea.schoolName,
-    title: idea.title,
-    theme: idea.theme,
-    teamId: idea.teamId,
-    studentTeam: idea.studentTeam,
-    problemStatement: idea.problemStatement,
-    targetAudience: idea.targetAudience,
-    status: idea.status,
-    lastUpdated: idea.lastUpdated,
-    stageData: JSON.stringify(idea.stageData),
-  }).returning();
+  return await prisma.idea.create({
+    data: {
+      id: idea.id,
+      schoolName: idea.schoolName,
+      title: idea.title,
+      theme: idea.theme,
+      teamId: idea.teamId,
+      studentTeam: idea.studentTeam,
+      problemStatement: idea.problemStatement,
+      targetAudience: idea.targetAudience,
+      status: idea.status,
+      lastUpdated: idea.lastUpdated,
+      stageData: (idea.stageData as any) || {},
+    }
+  });
 }
 
 export async function getIdeaById(id: string) {
-  const db = getDb();
-  const result = await db.select().from(ideas).where(eq(ideas.id, id));
-  if (result[0]) {
+  const result = await prisma.idea.findUnique({
+    where: { id },
+    include: { timeline: true },
+  });
+  if (result) {
     return {
-      ...result[0],
-      stageData: result[0].stageData ? JSON.parse(result[0].stageData) : {},
-      timeline: [],
+      ...result,
+      stageData: result.stageData || {},
+      timeline: result.timeline.map((e: any) => ({
+        ...e,
+        timestamp: e.timestamp,
+      })),
+      createdAt: result.createdAt.toISOString(),
     } as unknown as Idea;
   }
   return null;
 }
 
 export async function getIdeasBySchool(schoolName: string) {
-  const db = getDb();
-  const results = await db.select().from(ideas).where(eq(ideas.schoolName, schoolName));
+  const results = await prisma.idea.findMany({
+    where: { schoolName },
+    include: { timeline: true },
+  });
   return results.map((i: any) => ({
     ...i,
-    stageData: i.stageData ? JSON.parse(i.stageData) : {},
-    timeline: [],
+    stageData: i.stageData || {},
+    timeline: i.timeline.map((e: any) => ({
+      ...e,
+      timestamp: e.timestamp,
+    })),
+    createdAt: i.createdAt.toISOString(),
   })) as unknown as Idea[];
 }
 
 export async function getIdeasByTeam(teamId: string) {
-  const db = getDb();
-  const results = await db.select().from(ideas).where(eq(ideas.teamId, teamId));
+  const results = await prisma.idea.findMany({
+    where: { teamId },
+    include: { timeline: true },
+  });
   return results.map((i: any) => ({
     ...i,
-    stageData: i.stageData ? JSON.parse(i.stageData) : {},
-    timeline: [],
+    stageData: i.stageData || {},
+    timeline: i.timeline.map((e: any) => ({
+      ...e,
+      timestamp: e.timestamp,
+    })),
+    createdAt: i.createdAt.toISOString(),
   })) as unknown as Idea[];
 }
 
 export async function getAllIdeas() {
-  const db = getDb();
-  const results = await db.select().from(ideas);
+  const results = await prisma.idea.findMany({
+    include: { timeline: true },
+  });
   return results.map((i: any) => ({
     ...i,
-    stageData: i.stageData ? JSON.parse(i.stageData) : {},
-    timeline: [],
+    stageData: i.stageData || {},
+    timeline: i.timeline.map((e: any) => ({
+      ...e,
+      timestamp: e.timestamp,
+    })),
+    createdAt: i.createdAt.toISOString(),
   })) as unknown as Idea[];
 }
 
 export async function updateIdeaStatus(id: string, status: string) {
-  const db = getDb();
-  return await db.update(ideas)
-    .set({ status, lastUpdated: new Date().toISOString().split('T')[0] })
-    .where(eq(ideas.id, id))
-    .returning();
+  return await prisma.idea.update({
+    where: { id },
+    data: {
+      status,
+      lastUpdated: new Date().toISOString().split('T')[0],
+    }
+  });
 }
 
 export async function updateIdeaStageData(id: string, stageData: any) {
   const idea = await getIdeaById(id);
   if (!idea) throw new Error('Idea not found');
 
-  const db = getDb();
+  const currentStageData = (idea.stageData as any) || {};
   const updated = {
-    ...idea.stageData,
+    ...currentStageData,
     ...stageData,
   };
 
-  return await db.update(ideas)
-    .set({ stageData: JSON.stringify(updated), lastUpdated: new Date().toISOString().split('T')[0] })
-    .where(eq(ideas.id, id))
-    .returning();
+  return await prisma.idea.update({
+    where: { id },
+    data: {
+      stageData: updated,
+      lastUpdated: new Date().toISOString().split('T')[0],
+    }
+  });
 }
 
 export async function deleteIdea(id: string) {
-  const db = getDb();
-  return await db.delete(ideas).where(eq(ideas.id, id));
+  return await prisma.idea.delete({
+    where: { id }
+  });
 }
 
 // TIMELINE EVENTS
 export async function createTimelineEvent(event: TimelineEvent) {
-  const db = getDb();
-  return await db.insert(timelineEvents).values({
-    id: event.id,
-    ideaId: (event as any).ideaId || '',
-    type: event.type,
-    stage: event.stage,
-    fromStage: event.fromStage,
-    toStage: event.toStage,
-    content: event.content,
-    author: event.author,
-    timestamp: event.timestamp,
-  }).returning();
+  return await prisma.timelineEvent.create({
+    data: {
+      id: event.id,
+      ideaId: (event as any).ideaId || '',
+      type: event.type,
+      stage: event.stage,
+      fromStage: event.fromStage,
+      toStage: event.toStage,
+      content: event.content,
+      author: event.author,
+      timestamp: event.timestamp,
+    }
+  });
 }
 
 export async function getTimelineByIdeaId(ideaId: string) {
-  const db = getDb();
-  return await db.select().from(timelineEvents).where(eq(timelineEvents.ideaId, ideaId));
+  return await prisma.timelineEvent.findMany({
+    where: { ideaId }
+  });
 }
 
 export async function deleteTimelineEvent(id: string) {
-  const db = getDb();
-  return await db.delete(timelineEvents).where(eq(timelineEvents.id, id));
+  return await prisma.timelineEvent.delete({
+    where: { id }
+  });
 }
 
 // THEME ACTIVITIES
 export async function createThemeActivity(activity: ThemeActivity) {
-  const db = getDb();
-  return await db.insert(themeActivities).values({
-    id: activity.id,
-    date: activity.date,
-    month: activity.month,
-    year: activity.year,
-    title: activity.title,
-    theme: activity.theme,
-    schoolName: activity.schoolName,
-    description: activity.description,
-  }).returning();
+  return await prisma.themeActivity.create({
+    data: {
+      id: activity.id,
+      date: activity.date,
+      month: activity.month,
+      year: activity.year,
+      title: activity.title,
+      theme: activity.theme,
+      schoolName: activity.schoolName,
+      description: activity.description,
+    }
+  });
 }
 
 export async function getThemeActivities(month?: number, year?: number) {
-  const db = getDb();
-  if (month !== undefined && year !== undefined) {
-    const results = await db.select().from(themeActivities)
-      .where(
-        month !== undefined ? eq(themeActivities.month, month) : undefined,
-      );
-    return results.filter((a: any) => a.year === year);
-  }
-  return await db.select().from(themeActivities);
+  return await prisma.themeActivity.findMany({
+    where: {
+      month: month !== undefined ? month : undefined,
+      year: year !== undefined ? year : undefined,
+    }
+  });
 }
 
 export async function deleteThemeActivity(id: string) {
-  const db = getDb();
-  return await db.delete(themeActivities).where(eq(themeActivities.id, id));
+  return await prisma.themeActivity.delete({
+    where: { id }
+  });
+}
+
+// GEOGRAPHIES
+export async function createGeography(geo: { name: string; code: string }) {
+  const id = `GEO-${Date.now()}`;
+  const result = await prisma.geography.create({
+    data: {
+      id,
+      name: geo.name,
+      code: geo.code,
+    }
+  });
+
+  // Trigger: Auto-generate an SED Login ID & credentials
+  const stateCodeLower = geo.code.toLowerCase();
+  const email = `sed.${stateCodeLower}@pijam.org`;
+  const displayName = `SED ${geo.name} Observer`;
+  
+  const existingUser = await getUserByEmail(email);
+  if (!existingUser) {
+    await createUser({
+      role: 'sed-department',
+      displayName,
+      email,
+      geographyId: id,
+    });
+  }
+
+  return {
+    ...result,
+    createdAt: result.createdAt.toISOString(),
+  } as unknown as Geography;
+}
+
+export async function createSubGeography(subGeo: { name: string; geographyId: string }) {
+  const id = `SUBGEO-${Date.now()}`;
+  const result = await prisma.subGeography.create({
+    data: {
+      id,
+      name: subGeo.name,
+      geographyId: subGeo.geographyId,
+    }
+  });
+  return {
+    ...result,
+    createdAt: result.createdAt.toISOString(),
+  } as unknown as SubGeography;
+}
+
+export async function getAllGeographies() {
+  const results = await prisma.geography.findMany();
+  return results.map((g: any) => ({
+    ...g,
+    createdAt: g.createdAt.toISOString(),
+  })) as unknown as Geography[];
+}
+
+export async function getSubGeographies(geographyId?: string) {
+  const results = await prisma.subGeography.findMany({
+    where: {
+      geographyId: geographyId || undefined,
+    }
+  });
+  return results.map((s: any) => ({
+    ...s,
+    createdAt: s.createdAt.toISOString(),
+  })) as unknown as SubGeography[];
+}
+
+export async function getGeographyById(id: string) {
+  const result = await prisma.geography.findUnique({
+    where: { id }
+  });
+  if (result) {
+    return {
+      ...result,
+      createdAt: result.createdAt.toISOString(),
+    } as unknown as Geography;
+  }
+  return null;
+}
+
+export async function getSubGeographyById(id: string) {
+  const result = await prisma.subGeography.findUnique({
+    where: { id }
+  });
+  if (result) {
+    return {
+      ...result,
+      createdAt: result.createdAt.toISOString(),
+    } as unknown as SubGeography;
+  }
+  return null;
+}
+
+// Student Team Auto-generator Trigger
+export async function autoGenerateStudentTeam(schoolName: string) {
+  const prefix = schoolName.slice(0, 3).toUpperCase().replace(/[^A-Z]/g, 'TM');
+  const randomSuffix = Math.floor(100 + Math.random() * 900);
+  const teamId = `TM-${prefix}${randomSuffix}`;
+  
+  // Generate secure 6-digit pin
+  const pin = Math.floor(100000 + Math.random() * 900000).toString();
+  
+  const team: StudentTeam = {
+    id: teamId,
+    pin,
+    name: `Team ${schoolName.split(' ')[0]} ${randomSuffix}`,
+    schoolName,
+    members: [],
+    createdAt: new Date().toISOString(),
+  };
+
+  await createTeam(team);
+  return team;
 }

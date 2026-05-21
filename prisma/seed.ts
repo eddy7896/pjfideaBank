@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client';
+import { hashPassword } from '../lib/auth-utils';
 
 const prisma = new PrismaClient();
 
@@ -64,14 +65,56 @@ async function main() {
     }),
   ]);
 
+  // Hash passwords for demo accounts
+  const adminHash = await hashPassword('admin123');
+  const springfieldHash = await hashPassword('school123');
+  const riversideHash = await hashPassword('school123');
+  const eduHash = await hashPassword('edu123');
+
   // Create users
   await prisma.user.create({
     data: {
       id: 1,
       role: 'super-admin',
-      displayName: 'Admin User',
-      email: 'admin@ideabank.edu',
+      displayName: 'Super Admin',
+      email: 'admin@pijam.org',
+      passwordHash: adminHash,
       schoolName: null,
+      teamId: null,
+    },
+  });
+
+  await prisma.user.create({
+    data: {
+      id: 2,
+      role: 'school',
+      schoolName: 'Springfield High',
+      displayName: 'Springfield High Admin',
+      email: 'school@springfield.edu',
+      passwordHash: springfieldHash,
+      teamId: null,
+    },
+  });
+
+  await prisma.user.create({
+    data: {
+      id: 3,
+      role: 'school',
+      schoolName: 'Riverside Academy',
+      displayName: 'Riverside Academy Admin',
+      email: 'school@riverside.edu',
+      passwordHash: riversideHash,
+      teamId: null,
+    },
+  });
+
+  await prisma.user.create({
+    data: {
+      id: 4,
+      role: 'sed-department',
+      displayName: 'Education Department Observer',
+      email: 'edu@education.gov',
+      passwordHash: eduHash,
       teamId: null,
     },
   });
