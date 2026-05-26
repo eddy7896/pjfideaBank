@@ -51,22 +51,24 @@ export default function DashboardLayout({
 }) {
   const router = useRouter();
   const pathname = usePathname();
-  const { currentUser, isAuthenticated, logout } = useAuthStore();
+  const { currentUser, isAuthenticated, logout, hydrate } = useAuthStore();
   const { loadTeams } = useTeamStore();
   const { loadIdeas } = useIdeaStore();
   const { loadActivities } = useActivityStore();
   const [mounted, setMounted] = useState(false);
+  const [hydrated, setHydrated] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
     setMounted(true);
-  }, []);
+    hydrate().finally(() => setHydrated(true));
+  }, [hydrate]);
 
   useEffect(() => {
-    if (mounted && !isAuthenticated) {
+    if (mounted && hydrated && !isAuthenticated) {
       router.replace("/login");
     }
-  }, [mounted, isAuthenticated, router]);
+  }, [mounted, hydrated, isAuthenticated, router]);
 
   useEffect(() => {
     if (mounted && isAuthenticated) {
@@ -87,7 +89,7 @@ export default function DashboardLayout({
     }
   }, [mounted, isAuthenticated, loadTeams, loadIdeas, loadActivities]);
 
-  if (!mounted || !isAuthenticated || !currentUser) {
+  if (!mounted || !hydrated || !isAuthenticated || !currentUser) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background">
         <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
@@ -97,8 +99,8 @@ export default function DashboardLayout({
 
   const RoleIcon = roleIcons[currentUser.role] || ShieldCheck;
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await logout();
     router.replace("/login");
   };
 
@@ -225,6 +227,18 @@ export default function DashboardLayout({
 
           {currentUser.role === "super-admin" && (
             <>
+              <Link
+                href="/dashboard/admin/users"
+                className={cn(
+                  "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold transition-all active:scale-[0.98]",
+                  pathname.startsWith("/dashboard/admin/users")
+                    ? "bg-primary text-primary-foreground shadow-md shadow-primary/20"
+                    : "text-muted-foreground hover:bg-primary/5 hover:text-primary"
+                )}
+              >
+                <ShieldCheck className="h-4 w-4" />
+                Admin · Users
+              </Link>
               <Link
                 href="/dashboard/activities"
                 className={cn(

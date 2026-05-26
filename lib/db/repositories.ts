@@ -44,10 +44,23 @@ export async function getUserByEmail(email: string) {
 }
 
 export async function createUser(user: Omit<User, 'email'> & { email: string }) {
+  // Dual-write schoolId FK alongside the legacy schoolName during the
+  // additive cutover (Phase 3.2). When the user has no schoolName the
+  // lookup is skipped.
+  let schoolId: string | null = null;
+  if (user.schoolName) {
+    const s = await prisma.school.findUnique({
+      where: { name: user.schoolName },
+      select: { id: true },
+    });
+    schoolId = s?.id ?? null;
+  }
+
   return await prisma.user.create({
     data: {
       role: user.role,
       schoolName: user.schoolName,
+      schoolId,
       displayName: user.displayName,
       email: user.email,
       teamId: user.teamId,

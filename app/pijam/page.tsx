@@ -44,7 +44,16 @@ export default function PijamPortalPage() {
   });
 
   const [onboardErrors, setOnboardErrors] = useState<Record<string, string>>({});
-  const [geographyLeads, setGeographyLeads] = useState<Array<{ email: string; displayName: string }>>([]);
+  const [geographyLeads, setGeographyLeads] = useState<
+    Array<{
+      id: number;
+      email: string;
+      displayName: string;
+      geographyName: string | null;
+      geographyCode: string | null;
+      subGeographies: { id: string; name: string }[];
+    }>
+  >([]);
 
   // District selector modal states
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -372,30 +381,21 @@ export default function PijamPortalPage() {
                       </span>
                     </button>
 
-                    {/* Geography Lead Card */}
-                    <button
-                      type="button"
-                      onClick={() => setOnboardData({ ...onboardData, role: "geography-lead" })}
-                      className={`relative flex flex-col items-center p-5 rounded-xl border-2 text-center transition-all duration-300 group ${
-                        onboardData.role === "geography-lead"
-                          ? "border-primary bg-primary/5 scale-[1.02] shadow-sm shadow-primary/5"
-                          : "border-border bg-slate-50/30 hover:border-primary/45 hover:scale-[1.01]"
-                      }`}
+                    {/* Geography Lead — admin-minted only */}
+                    <div
+                      className="relative flex flex-col items-center p-5 rounded-xl border-2 text-center border-dashed border-slate-200 bg-slate-50/30 opacity-60 cursor-not-allowed"
+                      title="Geography Lead accounts are created by a Super Admin. Contact your program lead to be invited."
                     >
-                      <div
-                        className={`p-2.5 rounded-full mb-3 transition-colors duration-300 ${
-                          onboardData.role === "geography-lead"
-                            ? "bg-primary text-white"
-                            : "bg-slate-200/80 text-slate-500 group-hover:bg-primary/10 group-hover:text-primary"
-                        }`}
-                      >
+                      <div className="p-2.5 rounded-full mb-3 bg-slate-200/80 text-slate-500">
                         <Map className="h-5 w-5" />
                       </div>
-                      <span className="font-bold text-slate-700 text-xs block">Geography Lead</span>
-                      <span className="text-[9px] text-slate-500 mt-1 block leading-normal font-medium">
-                        Oversee program operations and state roll-ups.
+                      <span className="font-bold text-slate-700 text-xs block">
+                        Geography Lead
                       </span>
-                    </button>
+                      <span className="text-[9px] text-slate-500 mt-1 block leading-normal font-medium">
+                        Created by Super Admin only. Contact your program lead.
+                      </span>
+                    </div>
                   </div>
                 </div>
               )}
@@ -554,15 +554,22 @@ export default function PijamPortalPage() {
                         <option value="" className="bg-card text-slate-400">
                           -- Choose Supervising Lead --
                         </option>
-                        {geographyLeads.map((lead) => (
-                          <option
-                            key={lead.email}
-                            value={lead.email}
-                            className="bg-card text-slate-800 font-semibold"
-                          >
-                            {lead.displayName} ({lead.email})
-                          </option>
-                        ))}
+                        {geographyLeads.map((lead) => {
+                          const scope = lead.subGeographies.length
+                            ? lead.subGeographies.map((s) => s.name).join(", ")
+                            : lead.geographyName
+                              ? `${lead.geographyName} (state-wide)`
+                              : "no scope";
+                          return (
+                            <option
+                              key={lead.email}
+                              value={lead.email}
+                              className="bg-card text-slate-800 font-semibold"
+                            >
+                              {lead.displayName} — {scope}
+                            </option>
+                          );
+                        })}
                       </select>
                       {onboardErrors.assignedLeadId && (
                         <p className="text-xs text-destructive">{onboardErrors.assignedLeadId}</p>

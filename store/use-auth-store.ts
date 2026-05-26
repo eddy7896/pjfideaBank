@@ -1,92 +1,75 @@
 "use client";
 
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { signIn, signOut, getSession } from "next-auth/react";
 import type { User } from "@/types";
 
 interface AuthState {
   currentUser: User | null;
   isAuthenticated: boolean;
+  hydrate: () => Promise<void>;
   login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
   loginStudent: (teamId: string, pin: string) => Promise<{ success: boolean; error?: string }>;
-  logout: () => void;
+  logout: () => Promise<void>;
 }
 
-export const useAuthStore = create<AuthState>()(
-  persist(
-    (set) => ({
-      currentUser: null,
-      isAuthenticated: false,
-      login: async (email, password) => {
-        try {
-          const res = await fetch("/api/auth/login", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ email, password }),
-          });
-          
-          const data = await res.json().catch(() => ({}));
-          
-          if (res.ok) {
-            if (data.success && data.user) {
-              set({ currentUser: data.user, isAuthenticated: true });
-              return { success: true };
-            }
-          }
-          
-          return {
-            success: false,
-            error: data.message || "Invalid credentials. If this is a newly registered account, make sure you enter the registered email.",
-          };
-        } catch (error) {
-          return {
-            success: false,
-            error: "Failed to connect to authentication server. Please check your network.",
-          };
-        }
-      },
-      loginStudent: async (teamId, pin) => {
-        try {
-          const res = await fetch("/api/auth/login-student", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ teamId, pin }),
-          });
+function sessionToUser(sessionUser: any): User | null {
+  if (!sessionUser) return null;
+  return {
+    role: sessionUser.role,
+    displayName: sessionUser.displayName ?? sessionUser.name ?? "",
+    email: sessionUser.email ?? "",
+    schoolName: sessionUser.schoolName ?? undefined,
+    teamId: sessionUser.teamId ?? undefined,
+    geographyId: sessionUser.geographyId ?? undefined,
+    subGeographyId: sessionUser.subGeographyId ?? undefined,
+  };
+}
 
-          const data = await res.json().catch(() => ({}));
+export const useAuthStore = create<AuthState>()((set) => ({
+  currentUser: null,
+  isAuthenticated: false,
 
-          if (res.ok) {
-            if (data.success && data.team) {
-              const user: User = {
-                role: "student",
-                displayName: data.team.name,
-                email: "",
-                schoolName: data.team.schoolName,
-                teamId: data.team.id,
-              };
-              set({ currentUser: user, isAuthenticated: true });
-              return { success: true };
-            }
-          }
+  hydrate: async () => {
+    const session = await getSession();
+    const u = sessionToUser(session?.user);
+    set({ currentUser: u, isAuthenticated: !!u });
+  },
 
-          return {
-            success: false,
-            error: data.message || "Invalid Team ID or PIN.",
-          };
-        } catch (error) {
-          return {
-            success: false,
-            error: "Failed to connect to authentication server. Please check your network.",
-          };
-        }
-      },
-      logout: () => {
-        set({ currentUser: null, isAuthenticated: false });
-      },
-    }),
-    {
-      name: "pijam-auth",
+  login: async (email, password) => {
+    const res = await signIn("user-credentials", {
+      email,
+      password,
+      redirect: false,
+    });
+    if (res?.error) {
+      return { success: false, error: "Invalid email or password." };
     }
-  )
-);
+    const session = await getSession();
+    const u = sessionToUser(session?.user);
+    if (!u) return { success: false, error: "Session not established." };
+    set({ currentUser: u, isAuthenticated: true });
+    return { success: true };
+  },
 
+  loginStudent: async (teamId, pin) => {
+    const res = await signIn("student-credentials", {
+      teamId,
+      pin,
+      redirect: false,
+    });
+    if (res?.error) {
+      return { success: false, error: "Invalid Team ID or PIN." };
+    }
+    const session = await getSession();
+    const u = sessionToUser(session?.user);
+    if (!u) return { success: false, error: "Session not established." };
+    set({ currentUser: u, isAuthenticated: true });
+    return { success: true };
+  },
+
+  logout: async () => {
+    await signOut({ redirect: false });
+    set({ currentUser: null, isAuthenticated: false });
+  },
+}));

@@ -1,24 +1,62 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { 
-  createSchool, 
-  getSchoolByName, 
-  getSchoolByUdaise, 
-  getUserByEmail, 
+import { z } from 'zod';
+import {
+  createSchool,
+  getSchoolByName,
+  getSchoolByUdaise,
+  getUserByEmail,
   createUser,
   createGeography,
   createSubGeography
 } from '@/lib/db/repositories';
 import { prisma } from '@/lib/prisma';
 import { hashPassword } from '@/lib/auth-utils';
+import { audit } from '@/lib/audit';
+import { rateLimit, ipFromRequest } from '@/lib/ratelimit';
 
+// Self-registration is restricted to school admins and teacher trainers.
+// `geography-lead` and `super-admin` accounts are minted by an existing
+// super-admin via `/api/admin/users` — never via the open onboard form.
+const OnboardSchema = z.object({
+  role: z.enum(['school', 'teacher-trainer']).default('school'),
+  schoolName: z.string().min(1).max(200).optional(),
+  location: z.string().min(1).max(200).optional(),
+  address: z.string().min(1).max(500).optional(),
+  phone: z.string().min(1).max(40).optional(),
+  website: z.string().url().max(500).optional().or(z.literal('')),
+  principalName: z.string().min(1).max(200).optional(),
+  udaiseCode: z.string().min(1).max(60).optional(),
+  teacherName: z.string().min(1).max(200),
+  teacherEmail: z.string().email().max(200),
+  teacherPassword: z.string().min(8).max(200),
+  assignedLeadId: z.string().max(200).optional(),
+});
 
 export async function POST(request: NextRequest) {
+  // Ratelimit: 5 onboard attempts / hour per IP. Without this, anyone
+  // could spam-create school + teacher accounts.
+  const ip = ipFromRequest(request);
+  const rl = rateLimit(`onboard:${ip}`, 5, 60 * 60 * 1000);
+  if (!rl.allowed) {
+    return NextResponse.json(
+      { message: 'Too many onboarding attempts, try again later' },
+      { status: 429 }
+    );
+  }
+
   try {
     const body = await request.json();
+    const parsed = OnboardSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json(
+        { message: 'Invalid payload', issues: parsed.error.flatten() },
+        { status: 400 }
+      );
+    }
     const {
-      role = 'school',
+      role,
       schoolName,
-      location, // "Pune, Maharashtra" or "Maharashtra"
+      location,
       address,
       phone,
       website,
@@ -28,15 +66,7 @@ export async function POST(request: NextRequest) {
       teacherEmail,
       teacherPassword,
       assignedLeadId,
-    } = body;
-
-    // Common credentials validation
-    if (!teacherName || !teacherEmail || !teacherPassword) {
-      return NextResponse.json(
-        { message: 'Missing required credentials fields' },
-        { status: 400 }
-      );
-    }
+    } = parsed.data;
 
     // Cryptographically hash the password before storing it
     const hashedPassword = await hashPassword(teacherPassword);
@@ -96,6 +126,19 @@ export async function POST(request: NextRequest) {
         );
       }
 
+      // Audit fix #18: schools without a sub-geography are invisible to
+      // geography-leads and SED department scoping rules. Force the
+      // onboard form to supply a district so every school is routable.
+      if (!subGeographyId) {
+        return NextResponse.json(
+          {
+            message:
+              'District (sub-geography) is required. Location must be supplied as "<District>, <State>".',
+          },
+          { status: 400 }
+        );
+      }
+
       // Check if school already exists
       const existingSchool = await getSchoolByName(schoolName);
       if (existingSchool) {
@@ -138,42 +181,66 @@ export async function POST(request: NextRequest) {
       });
 
 
+      await audit(request, null, {
+        action: 'onboard.school',
+        entityType: 'School',
+        entityId: school.id,
+        schoolName: schoolName!,
+        payload: { teacherEmail, udaiseCode, location },
+      });
+
       return NextResponse.json(
         { message: 'School onboarded successfully', school },
         { status: 201 }
       );
-    } 
-    
+    }
+
     if (role === 'teacher-trainer') {
+      // A teacher trainer must explicitly attach to an existing
+      // geography-lead account. The form picks one from
+      // `/api/auth/geography-leads`; verify the choice here.
+      if (!assignedLeadId) {
+        return NextResponse.json(
+          { message: 'Select your Geography Lead before submitting' },
+          { status: 400 }
+        );
+      }
+      const lead = await prisma.user.findFirst({
+        where: { email: assignedLeadId.toLowerCase(), role: 'geography-lead' },
+        select: { id: true, geographyId: true },
+      });
+      if (!lead) {
+        return NextResponse.json(
+          { message: 'Selected Geography Lead does not exist' },
+          { status: 400 }
+        );
+      }
+
+      // Inherit the lead's geography. The trainer's sub-geography is
+      // optional and comes from the location string if supplied.
       await createUser({
         role: 'teacher-trainer',
         displayName: teacherName,
         email: teacherEmail,
-        geographyId,
+        geographyId: lead.geographyId ?? geographyId,
         subGeographyId,
-        assignedLeadId,
+        assignedLeadId: assignedLeadId.toLowerCase(),
         passwordHash: hashedPassword,
       });
 
+      await audit(request, null, {
+        action: 'onboard.teacher-trainer',
+        entityType: 'User',
+        payload: {
+          teacherEmail,
+          assignedLeadId: assignedLeadId.toLowerCase(),
+          geographyId: lead.geographyId ?? geographyId,
+          subGeographyId,
+        },
+      });
 
       return NextResponse.json(
         { message: 'Teacher Trainer onboarded successfully' },
-        { status: 201 }
-      );
-    }
-
-    if (role === 'geography-lead') {
-      await createUser({
-        role: 'geography-lead',
-        displayName: teacherName,
-        email: teacherEmail,
-        geographyId,
-        passwordHash: hashedPassword,
-      });
-
-
-      return NextResponse.json(
-        { message: 'Geography Lead onboarded successfully' },
         { status: 201 }
       );
     }
