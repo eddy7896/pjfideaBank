@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { prisma } from '@/lib/prisma';
 
 export async function PATCH(
   request: NextRequest,
@@ -21,7 +19,5 @@ export async function PATCH(
   } catch (error) {
     console.error('Failed to update stage data:', error);
     return NextResponse.json({ error: 'Failed to update stage data' }, { status: 500 });
-  } finally {
-    await prisma.$disconnect();
   }
 }

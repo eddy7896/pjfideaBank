@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '@/lib/prisma';
 import { applyRoleScoping } from '@/lib/db/scoping';
-
-const prisma = new PrismaClient();
 
 export async function GET(request: NextRequest) {
   try {
@@ -31,8 +29,6 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error('Failed to fetch ideas:', error);
     return NextResponse.json({ error: 'Failed to fetch ideas' }, { status: 500 });
-  } finally {
-    await prisma.$disconnect();
   }
 }
 
@@ -59,7 +55,5 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Failed to create idea:', error);
     return NextResponse.json({ error: 'Failed to create idea' }, { status: 500 });
-  } finally {
-    await prisma.$disconnect();
   }
 }

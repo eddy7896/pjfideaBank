@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { prisma } from '@/lib/prisma';
 
 export async function GET(request: NextRequest) {
   try {
@@ -15,8 +13,6 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error('Failed to fetch activity reports:', error);
     return NextResponse.json({ error: 'Failed to fetch activity reports' }, { status: 500 });
-  } finally {
-    await prisma.$disconnect();
   }
 }
 
@@ -56,7 +52,5 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Failed to create activity report:', error);
     return NextResponse.json({ error: 'Failed to create activity report' }, { status: 500 });
-  } finally {
-    await prisma.$disconnect();
   }
 }

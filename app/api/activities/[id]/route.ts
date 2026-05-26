@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { prisma } from '@/lib/prisma';
 
 export async function DELETE(
   request: NextRequest,
@@ -18,7 +16,5 @@ export async function DELETE(
   } catch (error) {
     console.error('Failed to delete activity:', error);
     return NextResponse.json({ error: 'Failed to delete activity' }, { status: 500 });
-  } finally {
-    await prisma.$disconnect();
   }
 }
