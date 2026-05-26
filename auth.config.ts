@@ -48,6 +48,7 @@ declare module "@auth/core/jwt" {
  * `prisma`.
  */
 export default {
+  secret: process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET,
   session: { strategy: "jwt", maxAge: 60 * 60 * 8 },
   trustHost: true,
   pages: { signIn: "/login" },
