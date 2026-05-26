@@ -9,10 +9,22 @@ import {
   Users,
   Target,
   ChevronRight,
+  Pencil,
+  Trash2,
+  AlertTriangle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { StageGateModal } from "@/components/project/stage-gate-modal";
 import { ProjectTimeline } from "@/components/project/project-timeline";
@@ -31,10 +43,18 @@ export default function ProjectDetailPage({
 }) {
   const { id } = use(params);
   const router = useRouter();
-  const { ideas, updateStageData, advanceStage, addComment } = useIdeaStore();
-  const { canEditIdea, currentUser } = usePermissions();
+  const { ideas, updateStageData, advanceStage, addComment, updateIdea, deleteIdea, approveAdvance, rejectAdvance } = useIdeaStore();
+  const { canEditIdea, canApproveAdvance, hasPendingAdvance, currentUser } = usePermissions();
   const [isGateModalOpen, setIsGateModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isEditOpen, setIsEditOpen] = useState(false);
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const [editForm, setEditForm] = useState({
+    title: "",
+    theme: "",
+    problemStatement: "",
+    targetAudience: "",
+  });
 
   const idea = ideas.find((i) => i.id === id);
 
@@ -65,7 +85,11 @@ export default function ProjectDetailPage({
       if (nextStage) {
         const success = await advanceStage(idea.id, nextStage, formData);
         if (success) {
-          toast.success(`Moved to ${nextStage} stage`);
+          if (currentUser.role === "student") {
+            toast.success("Sent to teacher for review");
+          } else {
+            toast.success(`Moved to ${nextStage} stage`);
+          }
           setIsGateModalOpen(false);
           await useIdeaStore.getState().loadIdeas();
         } else {
@@ -77,9 +101,64 @@ export default function ProjectDetailPage({
     }
   };
 
-  const handleAddComment = (content: string) => {
-    addComment(idea.id, content, currentUser.displayName || "Anonymous");
+  const handleApprove = async () => {
+    const ok = await approveAdvance(idea.id);
+    if (ok) toast.success("Advance approved");
+    else toast.error("Failed to approve");
+  };
+
+  const handleReject = async () => {
+    const reason = window.prompt("Reason for rejection (optional)") ?? undefined;
+    const ok = await rejectAdvance(idea.id, reason);
+    if (ok) toast.success("Advance rejected");
+    else toast.error("Failed to reject");
+  };
+
+  const pending = hasPendingAdvance(idea);
+
+  const handleAddComment = async (content: string) => {
+    await addComment(idea.id, content);
     toast.success("Note added");
+  };
+
+  const canManage =
+    currentUser.role === "super-admin" ||
+    (currentUser.role === "school" && idea.schoolName === currentUser.schoolName);
+  const coreFieldsLocked = idea.status !== "Empathize";
+
+  const openEdit = () => {
+    setEditForm({
+      title: idea.title,
+      theme: idea.theme,
+      problemStatement: idea.problemStatement,
+      targetAudience: idea.targetAudience,
+    });
+    setIsEditOpen(true);
+  };
+
+  const handleEditSubmit = async () => {
+    const ok = await updateIdea(idea.id, {
+      title: editForm.title.trim(),
+      theme: editForm.theme.trim(),
+      problemStatement: editForm.problemStatement.trim(),
+      targetAudience: editForm.targetAudience.trim(),
+    });
+    if (ok) {
+      toast.success("Project updated");
+      setIsEditOpen(false);
+    } else {
+      toast.error("Failed to update project");
+    }
+  };
+
+  const handleDelete = async () => {
+    const ok = await deleteIdea(idea.id);
+    if (ok) {
+      toast.success("Project deleted");
+      router.push("/dashboard");
+    } else {
+      toast.error("Failed to delete project");
+    }
   };
 
   const daysInStage = Math.floor(
@@ -326,8 +405,46 @@ export default function ProjectDetailPage({
 
         {/* Sidebar */}
         <div className="space-y-6">
+          {/* Pending Review Card (school side) */}
+          {pending && canApproveAdvance(idea) && nextStage && (
+            <div className="rounded-xl border border-amber-200 bg-amber-50 p-5">
+              <h3 className="font-semibold text-amber-900 mb-2">Pending Review</h3>
+              <p className="text-xs text-amber-800 mb-4">
+                Student team requested advance from{" "}
+                <strong>{idea.status}</strong> to{" "}
+                <strong>{nextStage}</strong>.
+              </p>
+              <div className="flex gap-2">
+                <Button size="sm" className="flex-1" onClick={handleApprove}>
+                  Approve
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="flex-1"
+                  onClick={handleReject}
+                >
+                  Reject
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {/* Pending Review Notice (student side) */}
+          {pending && currentUser.role === "student" && (
+            <div className="rounded-xl border border-amber-200 bg-amber-50 p-5">
+              <h3 className="font-semibold text-amber-900 mb-2">
+                Awaiting Teacher Review
+              </h3>
+              <p className="text-xs text-amber-800">
+                Your advance request has been sent. The teacher will approve or
+                reject it.
+              </p>
+            </div>
+          )}
+
           {/* Stage Action Card */}
-          {canEdit && nextStage && (
+          {canEdit && nextStage && !pending && (
             <div className="rounded-xl border border-primary/20 bg-card p-5">
               <h3 className="font-semibold mb-2">Next Step</h3>
               <p className="text-xs text-muted-foreground mb-4">
@@ -339,11 +456,45 @@ export default function ProjectDetailPage({
                 size="sm"
               >
                 <ChevronRight className="h-4 w-4 mr-1" />
-                Move to {nextStage}
+                {currentUser.role === "student"
+                  ? `Request review for ${nextStage}`
+                  : `Move to ${nextStage}`}
               </Button>
               {!hasStageData && (
                 <p className="text-xs text-amber-600 mt-3 bg-amber-50 p-2 rounded">
                   Complete documentation to advance
+                </p>
+              )}
+            </div>
+          )}
+
+          {/* Manage Card */}
+          {canManage && (
+            <div className="rounded-xl border border-border/50 bg-card p-5 space-y-3">
+              <h3 className="font-semibold">Manage</h3>
+              <Button
+                variant="outline"
+                size="sm"
+                className="w-full justify-start gap-2"
+                onClick={openEdit}
+                disabled={coreFieldsLocked}
+                title={coreFieldsLocked ? "Core fields locked after Empathize" : undefined}
+              >
+                <Pencil className="h-4 w-4" />
+                Edit details
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                className="w-full justify-start gap-2 text-destructive hover:text-destructive"
+                onClick={() => setIsDeleteOpen(true)}
+              >
+                <Trash2 className="h-4 w-4" />
+                Delete project
+              </Button>
+              {coreFieldsLocked && (
+                <p className="text-xs text-muted-foreground">
+                  Core fields are locked once the project leaves Empathize.
                 </p>
               )}
             </div>
@@ -378,6 +529,86 @@ export default function ProjectDetailPage({
         onSubmit={handleGateSubmit}
         isLoading={isSubmitting}
       />
+
+      {/* Edit Idea Modal */}
+      <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
+        <DialogContent className="max-w-xl">
+          <DialogHeader>
+            <DialogTitle>Edit Project Details</DialogTitle>
+            <DialogDescription>
+              Only editable while the project is in the Empathize stage.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 mt-4">
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium">Title</label>
+              <Input
+                value={editForm.title}
+                onChange={(e) => setEditForm({ ...editForm, title: e.target.value })}
+              />
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium">Theme</label>
+              <Input
+                value={editForm.theme}
+                onChange={(e) => setEditForm({ ...editForm, theme: e.target.value })}
+              />
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium">Problem Statement</label>
+              <Textarea
+                rows={4}
+                value={editForm.problemStatement}
+                onChange={(e) =>
+                  setEditForm({ ...editForm, problemStatement: e.target.value })
+                }
+              />
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium">Target Audience</label>
+              <Input
+                value={editForm.targetAudience}
+                onChange={(e) =>
+                  setEditForm({ ...editForm, targetAudience: e.target.value })
+                }
+              />
+            </div>
+            <div className="flex justify-end gap-2 pt-2">
+              <Button variant="outline" onClick={() => setIsEditOpen(false)}>
+                Cancel
+              </Button>
+              <Button onClick={handleEditSubmit}>Save</Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Confirm */}
+      <Dialog open={isDeleteOpen} onOpenChange={setIsDeleteOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <div className="flex items-start gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-destructive/10">
+                <AlertTriangle className="h-5 w-5 text-destructive" />
+              </div>
+              <div>
+                <DialogTitle>Delete Project</DialogTitle>
+                <DialogDescription>
+                  This deletes the idea and its timeline events. Cannot be undone.
+                </DialogDescription>
+              </div>
+            </div>
+          </DialogHeader>
+          <div className="flex justify-end gap-2 pt-2">
+            <Button variant="outline" onClick={() => setIsDeleteOpen(false)}>
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={handleDelete}>
+              Delete
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

@@ -21,8 +21,11 @@ model School {
   createdBy      String?
 
   subGeography SubGeography? @relation(fields: [subGeographyId], references: [id])
-  teams        StudentTeam[]
-  ideas        Idea[]
+  teams         StudentTeam[]
+  ideas         Idea[]
+  schoolUsers   User[]        @relation("UserSchool")
+  teamsById     StudentTeam[] @relation("StudentTeamSchoolById")
+  ideasById     Idea[]        @relation("IdeaSchoolById")
 
   @@index([subGeographyId])
 }
@@ -31,6 +34,7 @@ model User {
   id             Int           @id @default(autoincrement())
   role           String
   schoolName     String?
+  schoolId       String?
   displayName    String
   email          String        @unique
   passwordHash   String?
@@ -42,9 +46,11 @@ model User {
 
   geography    Geography?    @relation(fields: [geographyId], references: [id])
   subGeography SubGeography? @relation(fields: [subGeographyId], references: [id])
+  school       School?       @relation("UserSchool", fields: [schoolId], references: [id], onDelete: SetNull)
 
   @@index([geographyId])
   @@index([subGeographyId])
+  @@index([schoolId])
 }
 
 model TeamMember {
@@ -59,22 +65,27 @@ model TeamMember {
 }
 
 model StudentTeam {
-  id         String   @id
+  id         String   @id @default(cuid())
   pin        String
   name       String
   schoolName String
+  schoolId   String?
   createdAt  DateTime @default(now())
 
-  members TeamMember[]
-  ideas   Idea[]
-  school  School     @relation(fields: [schoolName], references: [name])
+  members    TeamMember[]
+  ideas      Idea[]
+  school     School       @relation(fields: [schoolName], references: [name])
+  schoolById School?      @relation("StudentTeamSchoolById", fields: [schoolId], references: [id], onDelete: Cascade)
 
+  @@unique([schoolName, pin])
   @@index([schoolName])
+  @@index([schoolId])
 }
 
 model Idea {
-  id               String   @id
+  id               String   @id @default(cuid())
   schoolName       String
+  schoolId         String?
   title            String
   theme            String
   teamId           String?
@@ -82,20 +93,22 @@ model Idea {
   problemStatement String
   targetAudience   String
   status           String
-  lastUpdated      String
+  lastUpdated      DateTime @default(now()) @updatedAt
   stageData        Json?
   createdAt        DateTime @default(now())
 
-  school   School       @relation(fields: [schoolName], references: [name])
-  team     StudentTeam? @relation(fields: [teamId], references: [id])
-  timeline TimelineEvent[]
+  school     School       @relation(fields: [schoolName], references: [name])
+  schoolById School?      @relation("IdeaSchoolById", fields: [schoolId], references: [id], onDelete: Cascade)
+  team       StudentTeam? @relation(fields: [teamId], references: [id], onDelete: SetNull)
+  timeline   TimelineEvent[]
 
   @@index([schoolName])
+  @@index([schoolId])
   @@index([teamId])
 }
 
 model TimelineEvent {
-  id        String   @id
+  id        String   @id @default(cuid())
   ideaId    String
   type      String
   stage     String?
@@ -103,11 +116,30 @@ model TimelineEvent {
   toStage   String?
   content   String?
   author    String?
-  timestamp String
+  timestamp DateTime @default(now())
 
   idea Idea @relation(fields: [ideaId], references: [id], onDelete: Cascade)
 
   @@index([ideaId])
+  @@index([timestamp])
+}
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  actorId    String?
+  actorRole  String?
+  actorEmail String?
+  action     String
+  entityType String
+  entityId   String?
+  schoolName String?
+  ip         String?
+  payload    Json?
+  createdAt  DateTime @default(now())
+
+  @@index([entityType, entityId])
+  @@index([actorId])
+  @@index([createdAt])
 }
 
 model ThemeActivity {

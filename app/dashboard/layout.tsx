@@ -51,22 +51,24 @@ export default function DashboardLayout({
 }) {
   const router = useRouter();
   const pathname = usePathname();
-  const { currentUser, isAuthenticated, logout } = useAuthStore();
+  const { currentUser, isAuthenticated, logout, hydrate } = useAuthStore();
   const { loadTeams } = useTeamStore();
   const { loadIdeas } = useIdeaStore();
   const { loadActivities } = useActivityStore();
   const [mounted, setMounted] = useState(false);
+  const [hydrated, setHydrated] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
     setMounted(true);
-  }, []);
+    hydrate().finally(() => setHydrated(true));
+  }, [hydrate]);
 
   useEffect(() => {
-    if (mounted && !isAuthenticated) {
+    if (mounted && hydrated && !isAuthenticated) {
       router.replace("/login");
     }
-  }, [mounted, isAuthenticated, router]);
+  }, [mounted, hydrated, isAuthenticated, router]);
 
   useEffect(() => {
     if (mounted && isAuthenticated) {
@@ -87,7 +89,7 @@ export default function DashboardLayout({
     }
   }, [mounted, isAuthenticated, loadTeams, loadIdeas, loadActivities]);
 
-  if (!mounted || !isAuthenticated || !currentUser) {
+  if (!mounted || !hydrated || !isAuthenticated || !currentUser) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background">
         <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
@@ -97,8 +99,8 @@ export default function DashboardLayout({
 
   const RoleIcon = roleIcons[currentUser.role] || ShieldCheck;
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await logout();
     router.replace("/login");
   };
 

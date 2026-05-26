@@ -24,6 +24,34 @@ export function usePermissions() {
     return false;
   };
 
+  // Students must route every stage move through school approval. Schools
+  // and super-admins move immediately.
+  const canAdvanceImmediately = (idea: Idea): boolean => {
+    if (!currentUser) return false;
+    if (currentUser.role === "super-admin") return true;
+    if (currentUser.role === "school") return idea.schoolName === currentUser.schoolName;
+    return false;
+  };
+
+  // Only the school side may resolve a student's pending request.
+  const canApproveAdvance = (idea: Idea): boolean => canAdvanceImmediately(idea);
+
+  // Whether a pending advance request currently sits on this idea (no
+  // resolution after it).
+  const hasPendingAdvance = (idea: Idea): boolean => {
+    const sorted = [...idea.timeline].sort((a, b) =>
+      String(a.timestamp).localeCompare(String(b.timestamp))
+    );
+    let pending = false;
+    for (const ev of sorted) {
+      if (ev.type === "advance_requested") pending = true;
+      else if (ev.type === "advance_approved" || ev.type === "advance_rejected")
+        pending = false;
+      else if (ev.type === "stage_change") pending = false;
+    }
+    return pending;
+  };
+
   const canDragIdea = (idea: Idea): boolean => canEditIdea(idea);
 
   // Geographic scoping check for viewing details
@@ -76,6 +104,9 @@ export function usePermissions() {
     canViewIdea,
     canEditIdea,
     canDragIdea,
+    canAdvanceImmediately,
+    canApproveAdvance,
+    hasPendingAdvance,
     isReadOnly,
   };
 }
