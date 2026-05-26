@@ -1,5 +1,11 @@
 import { NextResponse } from "next/server";
-import { auth } from "@/auth";
+import NextAuth from "next-auth";
+import authConfig from "@/auth.config";
+
+// Edge-runtime middleware. Uses the edge-safe `auth.config.ts` (no
+// providers, no Node `crypto`) so the bundle stays under the edge limit
+// and doesn't crash on cold start.
+const { auth } = NextAuth(authConfig);
 
 const PROTECTED_PATHS = ["/dashboard"];
 const PROTECTED_API = [
@@ -9,9 +15,7 @@ const PROTECTED_API = [
   "/api/activity-reports",
 ];
 
-const PUBLIC_AUTH_API = [
-  "/api/auth", // next-auth routes + legacy login endpoints
-];
+const PUBLIC_AUTH_API = ["/api/auth"];
 
 export default auth((req) => {
   const { pathname } = req.nextUrl;

@@ -1,50 +1,18 @@
-import NextAuth, { type DefaultSession } from "next-auth";
+import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
+import authConfig from "@/auth.config";
 import { prisma } from "@/lib/prisma";
 import { verifyPassword } from "@/lib/auth-utils";
 import { rateLimit, ipFromRequest } from "@/lib/ratelimit";
 import type { Role } from "@/types";
 
-declare module "next-auth" {
-  interface Session {
-    user: {
-      id: string;
-      role: Role;
-      displayName: string;
-      schoolName?: string | null;
-      teamId?: string | null;
-      geographyId?: string | null;
-      subGeographyId?: string | null;
-    } & DefaultSession["user"];
-  }
-
-  interface User {
-    id: string;
-    role: Role;
-    displayName: string;
-    schoolName?: string | null;
-    teamId?: string | null;
-    geographyId?: string | null;
-    subGeographyId?: string | null;
-  }
-}
-
-declare module "@auth/core/jwt" {
-  interface JWT {
-    uid: string;
-    role: Role;
-    displayName: string;
-    schoolName?: string | null;
-    teamId?: string | null;
-    geographyId?: string | null;
-    subGeographyId?: string | null;
-  }
-}
-
+/**
+ * Full NextAuth instance, Node runtime only. Providers use scrypt + Prisma
+ * which cannot run on the Edge runtime that `middleware.ts` executes in,
+ * so providers must live here, not in `auth.config.ts`.
+ */
 export const { handlers, signIn, signOut, auth } = NextAuth({
-  session: { strategy: "jwt", maxAge: 60 * 60 * 8 },
-  trustHost: true,
-  pages: { signIn: "/login" },
+  ...authConfig,
   providers: [
     Credentials({
       id: "user-credentials",
@@ -58,7 +26,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         const password = String(creds?.password ?? "");
         if (!email || !password) return null;
 
-        // 10 attempts / 15 min per (IP + email)
         const ip = ipFromRequest(request as Request);
         const gate = rateLimit(`login:user:${ip}:${email}`, 10, 15 * 60 * 1000);
         if (!gate.allowed) return null;
@@ -93,8 +60,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         const pin = String(creds?.pin ?? "").trim();
         if (!teamId || !pin) return null;
 
-        // 5 attempts / 15 min per (IP + teamId) — tighter than user login
-        // because PINs are 6 digits and trivially brute-forceable otherwise.
         const ip = ipFromRequest(request as Request);
         const gate = rateLimit(`login:student:${ip}:${teamId}`, 5, 15 * 60 * 1000);
         if (!gate.allowed) return null;
@@ -102,9 +67,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         const team = await prisma.studentTeam.findUnique({ where: { id: teamId } });
         if (!team) return null;
 
-        // PIN may already be a scrypt hash (post-migration) or legacy plaintext
-        // during transition. Try hashed compare first, fall back to constant-time
-        // plaintext equality for legacy rows.
         let ok = false;
         if (team.pin.includes(":")) {
           ok = await verifyPassword(pin, team.pin);
@@ -124,28 +86,4 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       },
     }),
   ],
-  callbacks: {
-    async jwt({ token, user }) {
-      if (user) {
-        token.uid = user.id;
-        token.role = user.role;
-        token.displayName = user.displayName;
-        token.schoolName = user.schoolName ?? null;
-        token.teamId = user.teamId ?? null;
-        token.geographyId = user.geographyId ?? null;
-        token.subGeographyId = user.subGeographyId ?? null;
-      }
-      return token;
-    },
-    async session({ session, token }) {
-      session.user.id = token.uid;
-      session.user.role = token.role;
-      session.user.displayName = token.displayName;
-      session.user.schoolName = token.schoolName ?? null;
-      session.user.teamId = token.teamId ?? null;
-      session.user.geographyId = token.geographyId ?? null;
-      session.user.subGeographyId = token.subGeographyId ?? null;
-      return session;
-    },
-  },
 });
