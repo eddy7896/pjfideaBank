@@ -59,7 +59,7 @@ model TeamMember {
 }
 
 model StudentTeam {
-  id         String   @id
+  id         String   @id @default(cuid())
   pin        String
   name       String
   schoolName String
@@ -69,11 +69,12 @@ model StudentTeam {
   ideas   Idea[]
   school  School     @relation(fields: [schoolName], references: [name])
 
+  @@unique([schoolName, pin])
   @@index([schoolName])
 }
 
 model Idea {
-  id               String   @id
+  id               String   @id @default(cuid())
   schoolName       String
   title            String
   theme            String
@@ -82,12 +83,12 @@ model Idea {
   problemStatement String
   targetAudience   String
   status           String
-  lastUpdated      String
+  lastUpdated      DateTime @default(now()) @updatedAt
   stageData        Json?
   createdAt        DateTime @default(now())
 
   school   School       @relation(fields: [schoolName], references: [name])
-  team     StudentTeam? @relation(fields: [teamId], references: [id])
+  team     StudentTeam? @relation(fields: [teamId], references: [id], onDelete: SetNull)
   timeline TimelineEvent[]
 
   @@index([schoolName])
@@ -95,7 +96,7 @@ model Idea {
 }
 
 model TimelineEvent {
-  id        String   @id
+  id        String   @id @default(cuid())
   ideaId    String
   type      String
   stage     String?
@@ -103,11 +104,12 @@ model TimelineEvent {
   toStage   String?
   content   String?
   author    String?
-  timestamp String
+  timestamp DateTime @default(now())
 
   idea Idea @relation(fields: [ideaId], references: [id], onDelete: Cascade)
 
   @@index([ideaId])
+  @@index([timestamp])
 }
 
 model ThemeActivity {

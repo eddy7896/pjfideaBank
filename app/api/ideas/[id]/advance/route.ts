@@ -66,8 +66,7 @@ export async function PATCH(
     }
 
     const currentStageData = (idea.stageData as Record<string, any>) || {};
-    const nowIso = new Date().toISOString();
-    const today = nowIso.split('T')[0];
+    const now = new Date();
     const author = user.displayName;
 
     // Persist stage advance + form documentation + 2 timeline events atomically.
@@ -76,7 +75,6 @@ export async function PATCH(
         where: { id },
         data: {
           status: toStage,
-          lastUpdated: today,
           stageData: {
             ...currentStageData,
             [fromStage]: submittedData,
@@ -86,26 +84,24 @@ export async function PATCH(
 
       await tx.timelineEvent.create({
         data: {
-          id: crypto.randomUUID(),
           ideaId: id,
           type: 'form_submitted',
           stage: fromStage,
           content: `${fromStage} documentation submitted`,
           author,
-          timestamp: nowIso,
+          timestamp: now,
         },
       });
 
       await tx.timelineEvent.create({
         data: {
-          id: crypto.randomUUID(),
           ideaId: id,
           type: 'stage_change',
           fromStage,
           toStage,
           content: `Moved to ${toStage}`,
           author,
-          timestamp: nowIso,
+          timestamp: now,
         },
       });
 

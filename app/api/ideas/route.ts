@@ -70,8 +70,7 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    const todayIso = new Date().toISOString();
-    const today = todayIso.split('T')[0];
+    const now = new Date();
 
     // Seed Empathize stage with the submit-form fields so users do not have
     // to retype the problem statement when they hit the Empathize gate.
@@ -96,19 +95,17 @@ export async function POST(request: NextRequest) {
           problemStatement: data.problemStatement,
           targetAudience: data.targetAudience,
           status: 'Empathize',
-          lastUpdated: today,
           stageData,
         },
       });
 
       await tx.timelineEvent.create({
         data: {
-          id: crypto.randomUUID(),
           ideaId: created.id,
           type: 'created',
           content: 'Project created',
           author: user.displayName,
-          timestamp: todayIso,
+          timestamp: now,
         },
       });
 

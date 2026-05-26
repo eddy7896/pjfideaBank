@@ -87,7 +87,6 @@ export async function POST(
 
     const event = await prisma.timelineEvent.create({
       data: {
-        id: crypto.randomUUID(),
         ideaId: id,
         type: parsed.data.type,
         stage: parsed.data.stage,
@@ -95,7 +94,6 @@ export async function POST(
         toStage: parsed.data.toStage,
         content: parsed.data.content,
         author: user.displayName,
-        timestamp: new Date().toISOString(),
       },
     });
 

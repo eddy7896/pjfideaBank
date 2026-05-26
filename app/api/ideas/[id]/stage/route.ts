@@ -71,10 +71,7 @@ export async function PATCH(
 
     const updated = await prisma.idea.update({
       where: { id },
-      data: {
-        stageData: merged,
-        lastUpdated: new Date().toISOString().split('T')[0],
-      },
+      data: { stageData: merged },
       include: { timeline: true },
     });
 
