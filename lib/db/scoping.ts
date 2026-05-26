@@ -14,7 +14,13 @@ export function applyIdeaScoping(user: SessionUser, baseWhere: any = {}) {
       break;
 
     case "geography-lead":
-      where.school = { subGeography: { geographyId: user.geographyId } };
+      // If the GL was assigned specific districts, scope to those;
+      // otherwise fall back to state-wide visibility.
+      if (user.subGeographyIds && user.subGeographyIds.length > 0) {
+        where.school = { subGeographyId: { in: user.subGeographyIds } };
+      } else {
+        where.school = { subGeography: { geographyId: user.geographyId } };
+      }
       break;
 
     case "sed-department":
@@ -57,6 +63,13 @@ export function applyTeamScoping(user: SessionUser, baseWhere: any = {}) {
       break;
 
     case "geography-lead":
+      if (user.subGeographyIds && user.subGeographyIds.length > 0) {
+        where.school = { subGeographyId: { in: user.subGeographyIds } };
+      } else {
+        where.school = { subGeography: { geographyId: user.geographyId } };
+      }
+      break;
+
     case "sed-department":
       where.school = { subGeography: { geographyId: user.geographyId } };
       break;

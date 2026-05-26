@@ -13,6 +13,7 @@ const PROTECTED_API = [
   "/api/teams",
   "/api/activities",
   "/api/activity-reports",
+  "/api/admin",
 ];
 
 const PUBLIC_AUTH_API = ["/api/auth"];
@@ -49,5 +50,6 @@ export const config = {
     "/api/teams/:path*",
     "/api/activities/:path*",
     "/api/activity-reports/:path*",
+    "/api/admin/:path*",
   ],
 };

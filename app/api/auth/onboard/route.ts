@@ -14,8 +14,11 @@ import { hashPassword } from '@/lib/auth-utils';
 import { audit } from '@/lib/audit';
 import { rateLimit, ipFromRequest } from '@/lib/ratelimit';
 
+// Self-registration is restricted to school admins and teacher trainers.
+// `geography-lead` and `super-admin` accounts are minted by an existing
+// super-admin via `/api/admin/users` — never via the open onboard form.
 const OnboardSchema = z.object({
-  role: z.enum(['school', 'teacher-trainer', 'geography-lead']).default('school'),
+  role: z.enum(['school', 'teacher-trainer']).default('school'),
   schoolName: z.string().min(1).max(200).optional(),
   location: z.string().min(1).max(200).optional(),
   address: z.string().min(1).max(500).optional(),
@@ -193,45 +196,51 @@ export async function POST(request: NextRequest) {
     }
 
     if (role === 'teacher-trainer') {
+      // A teacher trainer must explicitly attach to an existing
+      // geography-lead account. The form picks one from
+      // `/api/auth/geography-leads`; verify the choice here.
+      if (!assignedLeadId) {
+        return NextResponse.json(
+          { message: 'Select your Geography Lead before submitting' },
+          { status: 400 }
+        );
+      }
+      const lead = await prisma.user.findFirst({
+        where: { email: assignedLeadId.toLowerCase(), role: 'geography-lead' },
+        select: { id: true, geographyId: true },
+      });
+      if (!lead) {
+        return NextResponse.json(
+          { message: 'Selected Geography Lead does not exist' },
+          { status: 400 }
+        );
+      }
+
+      // Inherit the lead's geography. The trainer's sub-geography is
+      // optional and comes from the location string if supplied.
       await createUser({
         role: 'teacher-trainer',
         displayName: teacherName,
         email: teacherEmail,
-        geographyId,
+        geographyId: lead.geographyId ?? geographyId,
         subGeographyId,
-        assignedLeadId,
+        assignedLeadId: assignedLeadId.toLowerCase(),
         passwordHash: hashedPassword,
       });
 
       await audit(request, null, {
         action: 'onboard.teacher-trainer',
         entityType: 'User',
-        payload: { teacherEmail, geographyId, subGeographyId },
+        payload: {
+          teacherEmail,
+          assignedLeadId: assignedLeadId.toLowerCase(),
+          geographyId: lead.geographyId ?? geographyId,
+          subGeographyId,
+        },
       });
 
       return NextResponse.json(
         { message: 'Teacher Trainer onboarded successfully' },
-        { status: 201 }
-      );
-    }
-
-    if (role === 'geography-lead') {
-      await createUser({
-        role: 'geography-lead',
-        displayName: teacherName,
-        email: teacherEmail,
-        geographyId,
-        passwordHash: hashedPassword,
-      });
-
-      await audit(request, null, {
-        action: 'onboard.geography-lead',
-        entityType: 'User',
-        payload: { teacherEmail, geographyId },
-      });
-
-      return NextResponse.json(
-        { message: 'Geography Lead onboarded successfully' },
         { status: 201 }
       );
     }

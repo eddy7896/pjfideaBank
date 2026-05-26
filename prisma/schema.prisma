@@ -43,14 +43,35 @@ model User {
   subGeographyId String?
   assignedLeadId String?
   createdAt      DateTime      @default(now())
+  createdById    Int?
 
-  geography    Geography?    @relation(fields: [geographyId], references: [id])
-  subGeography SubGeography? @relation(fields: [subGeographyId], references: [id])
-  school       School?       @relation("UserSchool", fields: [schoolId], references: [id], onDelete: SetNull)
+  geography           Geography?         @relation(fields: [geographyId], references: [id])
+  subGeography        SubGeography?      @relation(fields: [subGeographyId], references: [id])
+  school              School?            @relation("UserSchool", fields: [schoolId], references: [id], onDelete: SetNull)
+  assignedSubGeos     UserSubGeography[]
+  createdBy           User?              @relation("UserCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+  createdUsers        User[]             @relation("UserCreatedBy")
 
   @@index([geographyId])
   @@index([subGeographyId])
   @@index([schoolId])
+  @@index([role])
+}
+
+// Many-to-many join so a geography-lead can be assigned to several
+// districts within their state. Coexists with `User.subGeographyId` for
+// the legacy single-district case; new geography-lead assignments use
+// this join exclusively.
+model UserSubGeography {
+  userId         Int
+  subGeographyId String
+  createdAt      DateTime @default(now())
+
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subGeography SubGeography @relation(fields: [subGeographyId], references: [id], onDelete: Cascade)
+
+  @@id([userId, subGeographyId])
+  @@index([subGeographyId])
 }
 
 model TeamMember {
@@ -204,9 +225,10 @@ model SubGeography {
   geographyId String
   createdAt   DateTime  @default(now())
 
-  geography Geography @relation(fields: [geographyId], references: [id], onDelete: Cascade)
-  schools   School[]
-  users     User[]
+  geography      Geography          @relation(fields: [geographyId], references: [id], onDelete: Cascade)
+  schools        School[]
+  users          User[]
+  assignedLeads  UserSubGeography[]
 
   @@unique([name, geographyId])
   @@index([geographyId])

@@ -11,6 +11,7 @@ declare module "next-auth" {
       teamId?: string | null;
       geographyId?: string | null;
       subGeographyId?: string | null;
+      subGeographyIds?: string[];
     } & import("next-auth").DefaultSession["user"];
   }
 
@@ -22,6 +23,7 @@ declare module "next-auth" {
     teamId?: string | null;
     geographyId?: string | null;
     subGeographyId?: string | null;
+    subGeographyIds?: string[];
   }
 }
 
@@ -34,6 +36,7 @@ declare module "@auth/core/jwt" {
     teamId?: string | null;
     geographyId?: string | null;
     subGeographyId?: string | null;
+    subGeographyIds?: string[];
   }
 }
 
@@ -59,6 +62,7 @@ export default {
         token.teamId = user.teamId ?? null;
         token.geographyId = user.geographyId ?? null;
         token.subGeographyId = user.subGeographyId ?? null;
+        token.subGeographyIds = user.subGeographyIds ?? [];
       }
       return token;
     },
@@ -70,6 +74,7 @@ export default {
       session.user.teamId = token.teamId ?? null;
       session.user.geographyId = token.geographyId ?? null;
       session.user.subGeographyId = token.subGeographyId ?? null;
+      session.user.subGeographyIds = token.subGeographyIds ?? [];
       return session;
     },
   },

@@ -10,6 +10,7 @@ export type SessionUser = {
   teamId?: string | null;
   geographyId?: string | null;
   subGeographyId?: string | null;
+  subGeographyIds?: string[];
 };
 
 export async function getSessionUser(): Promise<SessionUser | null> {
@@ -23,6 +24,7 @@ export async function getSessionUser(): Promise<SessionUser | null> {
     teamId: session.user.teamId,
     geographyId: session.user.geographyId,
     subGeographyId: session.user.subGeographyId,
+    subGeographyIds: session.user.subGeographyIds ?? [],
   };
 }
 

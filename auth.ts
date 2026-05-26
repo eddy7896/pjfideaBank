@@ -30,7 +30,12 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         const gate = rateLimit(`login:user:${ip}:${email}`, 10, 15 * 60 * 1000);
         if (!gate.allowed) return null;
 
-        const user = await prisma.user.findUnique({ where: { email } });
+        const user = await prisma.user.findUnique({
+          where: { email },
+          include: {
+            assignedSubGeos: { select: { subGeographyId: true } },
+          },
+        });
         if (!user || !user.passwordHash) return null;
 
         const ok = await verifyPassword(password, user.passwordHash);
@@ -45,6 +50,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           teamId: user.teamId,
           geographyId: user.geographyId,
           subGeographyId: user.subGeographyId,
+          subGeographyIds: user.assignedSubGeos.map((j) => j.subGeographyId),
         };
       },
     }),
