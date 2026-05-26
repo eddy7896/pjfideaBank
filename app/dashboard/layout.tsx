@@ -228,6 +228,18 @@ export default function DashboardLayout({
           {currentUser.role === "super-admin" && (
             <>
               <Link
+                href="/dashboard/admin/users"
+                className={cn(
+                  "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold transition-all active:scale-[0.98]",
+                  pathname.startsWith("/dashboard/admin/users")
+                    ? "bg-primary text-primary-foreground shadow-md shadow-primary/20"
+                    : "text-muted-foreground hover:bg-primary/5 hover:text-primary"
+                )}
+              >
+                <ShieldCheck className="h-4 w-4" />
+                Admin · Users
+              </Link>
+              <Link
                 href="/dashboard/activities"
                 className={cn(
                   "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold transition-all active:scale-[0.98]",
