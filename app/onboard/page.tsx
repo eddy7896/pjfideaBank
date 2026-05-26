@@ -795,3 +795,4 @@ export default function OnboardPage() {
       </AnimatePresence>
     </div>
   );
+}
