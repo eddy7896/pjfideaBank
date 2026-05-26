@@ -96,6 +96,19 @@ export async function POST(request: NextRequest) {
         );
       }
 
+      // Audit fix #18: schools without a sub-geography are invisible to
+      // geography-leads and SED department scoping rules. Force the
+      // onboard form to supply a district so every school is routable.
+      if (!subGeographyId) {
+        return NextResponse.json(
+          {
+            message:
+              'District (sub-geography) is required. Location must be supplied as "<District>, <State>".',
+          },
+          { status: 400 }
+        );
+      }
+
       // Check if school already exists
       const existingSchool = await getSchoolByName(schoolName);
       if (existingSchool) {

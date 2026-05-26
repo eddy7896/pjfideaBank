@@ -124,7 +124,15 @@ export interface TestData {
 
 export interface TimelineEvent {
   id: string;
-  type: "created" | "stage_change" | "form_submitted" | "comment" | "test_failed";
+  type:
+    | "created"
+    | "stage_change"
+    | "form_submitted"
+    | "comment"
+    | "test_failed"
+    | "advance_requested"
+    | "advance_approved"
+    | "advance_rejected";
   stage?: DesignThinkingStatus;
   fromStage?: DesignThinkingStatus;
   toStage?: DesignThinkingStatus;

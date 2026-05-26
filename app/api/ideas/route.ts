@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { prisma } from '@/lib/prisma';
 import { applyIdeaScoping } from '@/lib/db/scoping';
 import { requireSession } from '@/lib/auth/session';
+import { hashPassword } from '@/lib/auth-utils';
 
 const CreateSchema = z.object({
   id: z.string().min(1),
@@ -58,9 +59,13 @@ export async function POST(request: NextRequest) {
 
     // If a teamId is supplied, verify it belongs to this school. Block
     // cross-school team assignment.
-    if (data.teamId) {
+    let teamId = data.teamId ?? null;
+    let studentTeamName = data.studentTeam ?? '';
+    let autoTeamPlaintextPin: string | null = null;
+
+    if (teamId) {
       const team = await prisma.studentTeam.findUnique({
-        where: { id: data.teamId },
+        where: { id: teamId },
       });
       if (!team || team.schoolName !== user.schoolName) {
         return NextResponse.json(
@@ -68,6 +73,7 @@ export async function POST(request: NextRequest) {
           { status: 400 }
         );
       }
+      studentTeamName = team.name;
     }
 
     const now = new Date();
@@ -91,6 +97,30 @@ export async function POST(request: NextRequest) {
     });
 
     const idea = await prisma.$transaction(async (tx) => {
+      // RBAC.md §2.5: when a school creates an idea without specifying a
+      // team, auto-provision a student team so the kids have a login.
+      if (!teamId) {
+        const slug = user.schoolName!.slice(0, 3).toUpperCase().replace(/[^A-Z]/g, 'T');
+        const suffix = Math.floor(100 + Math.random() * 900);
+        const generatedTeamId = `TM-${slug}${suffix}`;
+        const teamName = `${data.title} Team`;
+        const pinPlain = String(Math.floor(100000 + Math.random() * 900000));
+        const pinHash = await hashPassword(pinPlain);
+
+        const created = await tx.studentTeam.create({
+          data: {
+            id: generatedTeamId,
+            pin: pinHash,
+            name: teamName,
+            schoolName: user.schoolName!,
+            schoolId: school?.id ?? null,
+          },
+        });
+        teamId = created.id;
+        studentTeamName = created.name;
+        autoTeamPlaintextPin = pinPlain;
+      }
+
       const created = await tx.idea.create({
         data: {
           id: data.id,
@@ -98,8 +128,8 @@ export async function POST(request: NextRequest) {
           schoolId: school?.id ?? null,
           title: data.title,
           theme: data.theme,
-          teamId: data.teamId ?? null,
-          studentTeam: data.studentTeam ?? '',
+          teamId,
+          studentTeam: studentTeamName,
           problemStatement: data.problemStatement,
           targetAudience: data.targetAudience,
           status: 'Empathize',
@@ -111,7 +141,9 @@ export async function POST(request: NextRequest) {
         data: {
           ideaId: created.id,
           type: 'created',
-          content: 'Project created',
+          content: autoTeamPlaintextPin
+            ? `Project created. Team ${teamId} auto-generated.`
+            : 'Project created',
           author: user.displayName,
           timestamp: now,
         },
@@ -123,7 +155,12 @@ export async function POST(request: NextRequest) {
       });
     });
 
-    return NextResponse.json(idea, { status: 201 });
+    // Hand the auto-generated PIN back to the caller exactly once. Never
+    // persisted in cleartext.
+    return NextResponse.json(
+      { ...(idea ?? {}), autoTeam: autoTeamPlaintextPin ? { id: teamId, pin: autoTeamPlaintextPin, name: studentTeamName } : undefined },
+      { status: 201 }
+    );
   } catch (error) {
     console.error('Failed to create idea:', error);
     return NextResponse.json({ error: 'Failed to create idea' }, { status: 500 });

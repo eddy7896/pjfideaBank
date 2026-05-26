@@ -32,6 +32,10 @@ interface IdeaState {
   updateStageData: (id: string, stage: DesignThinkingStatus, data: StageDataType) => Promise<void>;
   addComment: (id: string, content: string) => Promise<void>;
   advanceStage: (id: string, toStage: DesignThinkingStatus, formData: StageDataType) => Promise<boolean>;
+  updateIdea: (id: string, patch: Partial<Pick<Idea, "title" | "theme" | "problemStatement" | "targetAudience" | "teamId">>) => Promise<boolean>;
+  deleteIdea: (id: string) => Promise<boolean>;
+  approveAdvance: (id: string) => Promise<boolean>;
+  rejectAdvance: (id: string, reason?: string) => Promise<boolean>;
 }
 
 export const useIdeaStore = create<IdeaState>((set, get) => ({
@@ -170,6 +174,43 @@ export const useIdeaStore = create<IdeaState>((set, get) => ({
     }
   },
 
+  updateIdea: async (id, patch) => {
+    try {
+      const res = await fetch(`/api/ideas/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify(patch),
+      });
+      if (res.ok) {
+        const updated = (await res.json()) as Idea;
+        set((state) => ({
+          ideas: state.ideas.map((i) => (i.id === id ? updated : i)),
+        }));
+        return true;
+      }
+    } catch (error) {
+      console.error("Failed to update idea:", error);
+    }
+    return false;
+  },
+
+  deleteIdea: async (id) => {
+    try {
+      const res = await fetch(`/api/ideas/${id}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+      if (res.ok) {
+        set((state) => ({ ideas: state.ideas.filter((i) => i.id !== id) }));
+        return true;
+      }
+    } catch (error) {
+      console.error("Failed to delete idea:", error);
+    }
+    return false;
+  },
+
   advanceStage: async (id, toStage, formData) => {
     try {
       const res = await fetch(`/api/ideas/${id}/advance`, {
@@ -190,6 +231,43 @@ export const useIdeaStore = create<IdeaState>((set, get) => ({
       console.error("Failed to advance stage:", error);
     }
 
+    return false;
+  },
+
+  approveAdvance: async (id) => {
+    try {
+      const res = await fetch(`/api/ideas/${id}/approve-advance`, {
+        method: "POST",
+        credentials: "include",
+      });
+      if (res.ok) {
+        const updated = (await res.json()) as Idea;
+        set((state) => ({
+          ideas: state.ideas.map((i) => (i.id === id ? updated : i)),
+        }));
+        return true;
+      }
+    } catch (error) {
+      console.error("Failed to approve advance:", error);
+    }
+    return false;
+  },
+
+  rejectAdvance: async (id, reason) => {
+    try {
+      const res = await fetch(`/api/ideas/${id}/reject-advance`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ reason }),
+      });
+      if (res.ok) {
+        await get().loadIdeas();
+        return true;
+      }
+    } catch (error) {
+      console.error("Failed to reject advance:", error);
+    }
     return false;
   },
 }));

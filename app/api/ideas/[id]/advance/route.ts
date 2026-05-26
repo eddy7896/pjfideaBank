@@ -6,14 +6,24 @@ import { requireSession } from '@/lib/auth/session';
 const DT_STAGES = ['Empathize', 'Define', 'Ideate', 'Prototype', 'Test'] as const;
 
 const BodySchema = z.object({
-  // Client historically called this `toStage` while the previous server
-  // expected `nextStage`. Accept both, prefer `toStage`.
   toStage: z.enum(DT_STAGES).optional(),
   nextStage: z.enum(DT_STAGES).optional(),
   formData: z.record(z.string(), z.unknown()).optional(),
   stageData: z.record(z.string(), z.unknown()).optional(),
 });
 
+/**
+ * Stage advance handler with split-role semantics:
+ *
+ * - super-admin and school owners advance immediately. The status moves
+ *   in the same transaction that writes the form_submitted + stage_change
+ *   timeline events.
+ *
+ * - student owners cannot self-advance. Their submission records the
+ *   form documentation under `stageData[fromStage]` and emits an
+ *   `advance_requested` event. A school admin must call
+ *   POST /api/ideas/:id/approve-advance to apply the transition.
+ */
 export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -47,11 +57,12 @@ export async function PATCH(
       return NextResponse.json({ error: 'Idea not found' }, { status: 404 });
     }
 
-    const canEdit =
+    const canAdvance =
       user.role === 'super-admin' ||
-      (user.role === 'school' && idea.schoolName === user.schoolName) ||
-      (user.role === 'student' && idea.teamId === user.teamId);
-    if (!canEdit) {
+      (user.role === 'school' && idea.schoolName === user.schoolName);
+    const isStudentOwner =
+      user.role === 'student' && idea.teamId === user.teamId;
+    if (!canAdvance && !isStudentOwner) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
@@ -69,9 +80,58 @@ export async function PATCH(
     const now = new Date();
     const author = user.displayName;
 
-    // Persist stage advance + form documentation + 2 timeline events atomically.
+    if (isStudentOwner) {
+      // Student path: persist the stage doc + queue an advance_requested
+      // event. Status does not move.
+      const updated = await prisma.$transaction(async (tx) => {
+        await tx.idea.update({
+          where: { id },
+          data: {
+            stageData: {
+              ...currentStageData,
+              [fromStage]: submittedData,
+            },
+          },
+        });
+
+        await tx.timelineEvent.create({
+          data: {
+            ideaId: id,
+            type: 'form_submitted',
+            stage: fromStage,
+            content: `${fromStage} documentation submitted`,
+            author,
+            timestamp: now,
+          },
+        });
+
+        await tx.timelineEvent.create({
+          data: {
+            ideaId: id,
+            type: 'advance_requested',
+            fromStage,
+            toStage,
+            content: `Requested advance to ${toStage}`,
+            author,
+            timestamp: now,
+          },
+        });
+
+        return tx.idea.findUnique({
+          where: { id },
+          include: { timeline: true },
+        });
+      });
+
+      return NextResponse.json({
+        ...updated,
+        pendingApproval: { fromStage, toStage },
+      });
+    }
+
+    // School/super-admin path: apply transition immediately.
     const updated = await prisma.$transaction(async (tx) => {
-      const idea2 = await tx.idea.update({
+      await tx.idea.update({
         where: { id },
         data: {
           status: toStage,
@@ -106,7 +166,7 @@ export async function PATCH(
       });
 
       return tx.idea.findUnique({
-        where: { id: idea2.id },
+        where: { id },
         include: { timeline: true },
       });
     });
