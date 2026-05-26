@@ -30,8 +30,7 @@ interface IdeaState {
   getIdeasBySchool: (schoolName: string) => Idea[];
   getAdvancedIdeas: () => Idea[];
   updateStageData: (id: string, stage: DesignThinkingStatus, data: StageDataType) => Promise<void>;
-  addTimelineEvent: (id: string, event: Omit<TimelineEvent, "id">) => void;
-  addComment: (id: string, content: string, author: string) => void;
+  addComment: (id: string, content: string) => Promise<void>;
   advanceStage: (id: string, toStage: DesignThinkingStatus, formData: StageDataType) => Promise<boolean>;
 }
 
@@ -60,25 +59,20 @@ export const useIdeaStore = create<IdeaState>((set, get) => ({
       status: "Empathize",
       lastUpdated: now.toISOString().split("T")[0],
       stageData: {},
-      timeline: [
-        {
-          id: crypto.randomUUID(),
-          type: "created",
-          timestamp: now.toISOString(),
-          content: "Project created",
-        },
-      ],
+      timeline: [],
     };
 
     try {
       const res = await fetch("/api/ideas", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify(newIdea),
       });
 
       if (res.ok) {
-        set((state) => ({ ideas: [newIdea, ...state.ideas] }));
+        const created = (await res.json()) as Idea;
+        set((state) => ({ ideas: [created, ...state.ideas] }));
       }
     } catch (error) {
       console.error("Failed to create idea:", error);
@@ -90,6 +84,7 @@ export const useIdeaStore = create<IdeaState>((set, get) => ({
       const res = await fetch(`/api/ideas/${id}/status`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({ status: newStatus }),
       });
 
@@ -136,22 +131,14 @@ export const useIdeaStore = create<IdeaState>((set, get) => ({
       const res = await fetch(`/api/ideas/${id}/stage`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ [stage]: data }),
+        credentials: "include",
+        body: JSON.stringify({ stage, data }),
       });
 
       if (res.ok) {
+        const updated = (await res.json()) as Idea;
         set((state) => ({
-          ideas: state.ideas.map((idea) =>
-            idea.id === id
-              ? {
-                  ...idea,
-                  stageData: {
-                    ...idea.stageData,
-                    [stage]: data,
-                  },
-                }
-              : idea
-          ),
+          ideas: state.ideas.map((idea) => (idea.id === id ? updated : idea)),
         }));
       }
     } catch (error) {
@@ -159,83 +146,44 @@ export const useIdeaStore = create<IdeaState>((set, get) => ({
     }
   },
 
-  addTimelineEvent: (id, event) => {
-    set((state) => ({
-      ideas: state.ideas.map((idea) =>
-        idea.id === id
-          ? {
-              ...idea,
-              timeline: [
-                {
-                  ...event,
-                  id: crypto.randomUUID(),
-                },
-                ...idea.timeline,
-              ],
-            }
-          : idea
-      ),
-    }));
-  },
+  addComment: async (id, content) => {
+    try {
+      const res = await fetch(`/api/ideas/${id}/timeline`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ type: "comment", content }),
+      });
 
-  addComment: (id, content, author) => {
-    get().addTimelineEvent(id, {
-      type: "comment",
-      content,
-      author,
-      timestamp: new Date().toISOString(),
-    });
+      if (res.ok) {
+        const event = (await res.json()) as TimelineEvent;
+        set((state) => ({
+          ideas: state.ideas.map((idea) =>
+            idea.id === id
+              ? { ...idea, timeline: [event, ...idea.timeline] }
+              : idea
+          ),
+        }));
+      }
+    } catch (error) {
+      console.error("Failed to add comment:", error);
+    }
   },
 
   advanceStage: async (id, toStage, formData) => {
-    const idea = get().ideas.find((i) => i.id === id);
-    if (!idea) return false;
-
-    const currentStage = idea.status;
-    const now = new Date();
-
     try {
       const res = await fetch(`/api/ideas/${id}/advance`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({ toStage, formData }),
       });
 
       if (res.ok) {
+        const updated = (await res.json()) as Idea;
         set((state) => ({
-          ideas: state.ideas.map((i) =>
-            i.id === id
-              ? {
-                  ...i,
-                  status: toStage,
-                  lastUpdated: now.toISOString().split("T")[0],
-                  stageData: {
-                    ...i.stageData,
-                    [currentStage]: formData,
-                  },
-                  timeline: [
-                    {
-                      id: crypto.randomUUID(),
-                      type: "form_submitted",
-                      stage: currentStage,
-                      timestamp: now.toISOString(),
-                      content: `${currentStage} documentation submitted`,
-                    },
-                    {
-                      id: crypto.randomUUID(),
-                      type: "stage_change",
-                      fromStage: currentStage,
-                      toStage: toStage,
-                      timestamp: now.toISOString(),
-                      content: `Moved to ${toStage}`,
-                    },
-                    ...i.timeline,
-                  ],
-                }
-              : i
-          ),
+          ideas: state.ideas.map((i) => (i.id === id ? updated : i)),
         }));
-
         return true;
       }
     } catch (error) {

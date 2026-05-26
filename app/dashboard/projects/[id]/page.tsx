@@ -77,8 +77,8 @@ export default function ProjectDetailPage({
     }
   };
 
-  const handleAddComment = (content: string) => {
-    addComment(idea.id, content, currentUser.displayName || "Anonymous");
+  const handleAddComment = async (content: string) => {
+    await addComment(idea.id, content);
     toast.success("Note added");
   };
 
