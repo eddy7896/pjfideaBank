@@ -19,6 +19,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuthStore } from "@/store/use-auth-store";
 import { useTeamStore } from "@/store/use-team-store";
 import { DEMO_CREDENTIALS } from "@/lib/constants";
+import { AnimatedBackground } from "@/components/landing/animated-background";
+import { motion } from "framer-motion";
+
 
 export default function LoginPage() {
   const router = useRouter();
@@ -93,100 +96,130 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-screen flex-col bg-white">
-      {/* Top bar */}
-      <div className="border-b border-border/20 bg-white">
+    <div className="flex min-h-screen flex-col bg-background relative overflow-hidden">
+      <AnimatedBackground />
+
+      {/* Top bar / Navbar */}
+      <header className="sticky top-0 z-50 border-b border-border/40 bg-background/95 backdrop-blur-sm">
         <div className="mx-auto flex h-16 max-w-7xl items-center px-4 sm:px-6 lg:px-8">
-          <Link href="/" className="transition-opacity hover:opacity-70">
+          <Link href="/" className="transition-opacity hover:opacity-75">
             <Image
               src="/pijam logo.jpeg"
-              alt="Pijam"
-              width={120}
-              height={48}
-              className="h-8 w-auto"
+              alt="Pi Jam Logo"
+              width={150}
+              height={60}
+              className="rounded-lg"
               priority
             />
           </Link>
         </div>
-      </div>
+      </header>
 
       {/* Login Content */}
-      <div className="flex flex-1 items-center justify-center px-4 py-16">
-        <div className="w-full max-w-md space-y-10">
+      <div className="flex flex-1 items-center justify-center px-4 py-16 relative z-10">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="w-full max-w-md space-y-8"
+        >
           {/* Header */}
           <div className="text-center space-y-2">
-            <h1 className="text-3xl font-semibold tracking-tight text-foreground">
-              Sign in
+            <h1 className="text-3xl font-heading font-bold tracking-tight text-foreground">
+              Sign In
             </h1>
-            <p className="text-base text-muted-foreground">
+            <p className="text-sm text-muted-foreground">
               Access the Idea Bank dashboard
             </p>
           </div>
 
           {/* Tabs */}
-          <Tabs defaultValue="teacher" className="rounded-xl border border-border/20 bg-white">
-            <TabsList className="w-full justify-start rounded-none border-b border-border/20 p-0 bg-white">
-              <TabsTrigger value="teacher" className="rounded-none flex-1 text-sm font-medium">
+          <Tabs
+            defaultValue="teacher"
+            className="rounded-2xl border border-border/40 bg-card/85 backdrop-blur-md shadow-2xl transition-all duration-300 hover:border-primary/20 overflow-hidden"
+          >
+            <TabsList className="w-full justify-start rounded-none border-b border-border/30 p-0 bg-muted/40">
+              <TabsTrigger
+                value="teacher"
+                className="rounded-none flex-1 text-sm font-semibold py-3 data-[state=active]:bg-card data-[state=active]:text-primary transition-all"
+              >
                 School Admin / Teacher
               </TabsTrigger>
-              <TabsTrigger value="student" className="rounded-none flex-1 text-sm font-medium">
+              <TabsTrigger
+                value="student"
+                className="rounded-none flex-1 text-sm font-semibold py-3 data-[state=active]:bg-card data-[state=active]:text-primary transition-all"
+              >
                 Student
               </TabsTrigger>
             </TabsList>
 
             {/* Teacher Login */}
-            <TabsContent value="teacher" className="p-6 space-y-4">
+            <TabsContent value="teacher" className="p-6 space-y-4 outline-none">
               <form onSubmit={handleTeacherSubmit} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="email" className="text-sm font-medium">
+                  <Label htmlFor="email" className="text-sm font-semibold text-slate-700">
                     Email
                   </Label>
                   <div className="relative">
-                    <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                    <Mail className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400 pointer-events-none" />
                     <Input
                       id="email"
                       type="email"
                       placeholder="Enter your email"
                       value={email}
-                      onChange={(e) => { setEmail(e.target.value); setError(""); }}
-                      className="pl-9"
+                      onChange={(e) => {
+                        setEmail(e.target.value);
+                        setError("");
+                      }}
+                      className="pl-10 bg-card/50 backdrop-blur-sm border-slate-200 focus-visible:ring-primary rounded-xl transition-all duration-200 text-slate-800 placeholder-slate-400"
                       required
                     />
                   </div>
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="password" className="text-sm font-medium">
+                  <Label htmlFor="password" className="text-sm font-semibold text-slate-700">
                     Password
                   </Label>
                   <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                    <Lock className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400 pointer-events-none" />
                     <Input
                       id="password"
                       type={showPassword ? "text" : "password"}
                       placeholder="Enter your password"
                       value={password}
-                      onChange={(e) => { setPassword(e.target.value); setError(""); }}
-                      className="pl-9 pr-10"
+                      onChange={(e) => {
+                        setPassword(e.target.value);
+                        setError("");
+                      }}
+                      className="pl-10 pr-10 bg-card/50 backdrop-blur-sm border-slate-200 focus-visible:ring-primary rounded-xl transition-all duration-200 text-slate-800 placeholder-slate-400"
                       required
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                      className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700"
                     >
-                      {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      {showPassword ? <EyeOff className="h-4.5 w-4.5" /> : <Eye className="h-4.5 w-4.5" />}
                     </button>
                   </div>
                 </div>
 
                 {error && (
-                  <div className="rounded-lg border border-destructive/30 bg-destructive/5 px-3 py-2 text-sm text-destructive">
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="rounded-xl border border-destructive/30 bg-destructive/5 px-3 py-2.5 text-xs text-destructive font-medium"
+                  >
                     {error}
-                  </div>
+                  </motion.div>
                 )}
 
-                <Button type="submit" className="w-full gap-2" size="lg" disabled={loading}>
+                <Button
+                  type="submit"
+                  className="w-full gap-2 bg-primary hover:bg-primary/95 text-white font-bold rounded-xl shadow-lg transition-transform active:scale-[0.98] py-6 text-sm"
+                  disabled={loading}
+                >
                   {loading ? (
                     <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
                   ) : (
@@ -200,19 +233,21 @@ export default function LoginPage() {
 
               {/* Demo Teacher Credentials */}
               <div className="space-y-3 border-t border-border/20 pt-6">
-                <p className="text-xs font-medium text-muted-foreground">Demo accounts</p>
+                <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+                  Demo Accounts
+                </p>
                 <div className="space-y-2">
-                  {DEMO_CREDENTIALS.filter((cred) => cred.user.role === "school").map((cred) => (
+                  {DEMO_CREDENTIALS.map((cred) => (
                     <button
                       key={cred.email}
                       onClick={() => fillCredentials(cred.email, cred.password)}
-                      className={`flex items-start gap-3 rounded-lg border border-border/20 p-3 text-left transition-all hover:border-border/40 hover:bg-muted/30 ${
-                        email === cred.email ? "border-primary/50 bg-primary/5" : ""
+                      className={`w-full flex items-start gap-3 rounded-xl border p-3 text-left transition-all hover:border-primary/30 hover:bg-primary/5 active:scale-[0.98] ${
+                        email === cred.email ? "border-primary bg-primary/5 shadow-sm" : "border-border bg-slate-50/30"
                       }`}
                     >
                       <div className="min-w-0 flex-1">
-                        <p className="text-sm font-medium text-foreground">{cred.label}</p>
-                        <p className="mt-0.5 text-xs text-muted-foreground">
+                        <p className="text-sm font-bold text-slate-800">{cred.label}</p>
+                        <p className="mt-0.5 text-xs text-slate-500 font-medium">
                           {cred.email}
                         </p>
                       </div>
@@ -223,39 +258,45 @@ export default function LoginPage() {
             </TabsContent>
 
             {/* Student Login */}
-            <TabsContent value="student" className="p-6 space-y-4">
+            <TabsContent value="student" className="p-6 space-y-4 outline-none">
               <form onSubmit={handleStudentSubmit} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="teamId" className="text-sm font-medium">
+                  <Label htmlFor="teamId" className="text-sm font-semibold text-slate-700">
                     Team ID
                   </Label>
                   <div className="relative">
-                    <Users className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                    <Users className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400 pointer-events-none" />
                     <Input
                       id="teamId"
                       type="text"
                       placeholder="e.g., TM-ABC123"
                       value={teamId}
-                      onChange={(e) => { setTeamId(e.target.value.toUpperCase()); setStudentError(""); }}
-                      className="pl-9"
+                      onChange={(e) => {
+                        setTeamId(e.target.value.toUpperCase());
+                        setStudentError("");
+                      }}
+                      className="pl-10 bg-card/50 backdrop-blur-sm border-slate-200 focus-visible:ring-primary rounded-xl transition-all duration-200 text-slate-800 placeholder-slate-400"
                       required
                     />
                   </div>
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="pin" className="text-sm font-medium">
+                  <Label htmlFor="pin" className="text-sm font-semibold text-slate-700">
                     6-Digit PIN
                   </Label>
                   <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                    <Lock className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400 pointer-events-none" />
                     <Input
                       id="pin"
                       type="password"
                       placeholder="000000"
                       value={pin}
-                      onChange={(e) => { setPin(e.target.value); setStudentError(""); }}
-                      className="pl-9 text-center tracking-widest"
+                      onChange={(e) => {
+                        setPin(e.target.value);
+                        setStudentError("");
+                      }}
+                      className="pl-10 text-center tracking-widest bg-card/50 backdrop-blur-sm border-slate-200 focus-visible:ring-primary rounded-xl transition-all duration-200 text-slate-800 placeholder-slate-400 font-semibold"
                       maxLength={6}
                       required
                     />
@@ -263,12 +304,20 @@ export default function LoginPage() {
                 </div>
 
                 {studentError && (
-                  <div className="rounded-lg border border-destructive/30 bg-destructive/5 px-3 py-2 text-sm text-destructive">
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="rounded-xl border border-destructive/30 bg-destructive/5 px-3 py-2.5 text-xs text-destructive font-medium"
+                  >
                     {studentError}
-                  </div>
+                  </motion.div>
                 )}
 
-                <Button type="submit" className="w-full gap-2" size="lg" disabled={studentLoading}>
+                <Button
+                  type="submit"
+                  className="w-full gap-2 bg-primary hover:bg-primary/95 text-white font-bold rounded-xl shadow-lg transition-transform active:scale-[0.98] py-6 text-sm"
+                  disabled={studentLoading}
+                >
                   {studentLoading ? (
                     <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
                   ) : (
@@ -283,19 +332,21 @@ export default function LoginPage() {
               {/* Demo Student Credentials */}
               {teams.length > 0 && (
                 <div className="space-y-3 border-t border-border/20 pt-6">
-                  <p className="text-xs font-medium text-muted-foreground">Demo teams</p>
+                  <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+                    Demo Teams
+                  </p>
                   <div className="space-y-2">
                     {teams.slice(0, 2).map((team) => (
                       <button
                         key={team.id}
                         onClick={() => fillStudentCredentials(team.id, team.pin)}
-                        className={`flex items-start gap-3 rounded-lg border border-border/20 p-3 text-left transition-all hover:border-border/40 hover:bg-muted/30 ${
-                          teamId === team.id ? "border-primary/50 bg-primary/5" : ""
+                        className={`w-full flex items-start gap-3 rounded-xl border p-3 text-left transition-all hover:border-primary/30 hover:bg-primary/5 active:scale-[0.98] ${
+                          teamId === team.id ? "border-primary bg-primary/5 shadow-sm" : "border-border bg-slate-50/30"
                         }`}
                       >
                         <div className="min-w-0 flex-1">
-                          <p className="text-sm font-medium text-foreground">{team.name}</p>
-                          <p className="mt-0.5 text-xs text-muted-foreground">
+                          <p className="text-sm font-bold text-slate-800">{team.name}</p>
+                          <p className="mt-0.5 text-xs text-slate-500 font-medium">
                             {team.id} • PIN: {team.pin}
                           </p>
                         </div>
@@ -308,16 +359,17 @@ export default function LoginPage() {
           </Tabs>
 
           {/* Footer */}
-          <div className="border-t border-border/20 p-6 text-center text-sm text-muted-foreground space-y-2">
+          <div className="text-center text-sm text-slate-500 space-y-2 pt-2">
             <p>
               Don't have a school account?{" "}
-              <Link href="/onboard" className="text-primary hover:text-primary/80 font-medium">
+              <Link href="/onboard" className="text-primary hover:text-primary/80 font-bold hover:underline">
                 Register your school
               </Link>
             </p>
           </div>
-        </div>
+        </motion.div>
       </div>
     </div>
   );
 }
+

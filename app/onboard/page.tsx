@@ -11,6 +11,8 @@ import { toast } from "sonner";
 import Link from "next/link";
 import { INDIAN_STATES_DISTRICTS } from "@/lib/indian-states-districts";
 import { motion, AnimatePresence } from "framer-motion";
+import { AnimatedBackground } from "@/components/landing/animated-background";
+
 
 export default function OnboardPage() {
   const router = useRouter();
@@ -183,36 +185,44 @@ export default function OnboardPage() {
   const isConfirmDisabled = !selectedState || !selectedDistrict;
 
   return (
-    <div className="flex min-h-screen flex-col bg-white">
-      {/* Top bar */}
-      <div className="border-b border-border/20 bg-white">
+    <div className="flex min-h-screen flex-col bg-background relative overflow-hidden">
+      <AnimatedBackground />
+
+      {/* Top bar / Navbar */}
+      <header className="sticky top-0 z-50 border-b border-border/40 bg-background/95 backdrop-blur-sm">
         <div className="mx-auto flex h-16 max-w-7xl items-center px-4 sm:px-6 lg:px-8">
           <Link href="/" className="transition-opacity hover:opacity-75">
             <Image
               src="/pijam logo.jpeg"
-              alt="Pijam Logo"
-              width={120}
-              height={48}
-              className="h-8 w-auto rounded-lg"
+              alt="Pi Jam Logo"
+              width={150}
+              height={60}
+              className="rounded-lg"
               priority
             />
           </Link>
         </div>
-      </div>
+      </header>
 
       {/* Content */}
-      <div className="flex flex-1 items-center justify-center px-4 py-12">
-        <div className="w-full max-w-xl space-y-8">
+      <div className="flex flex-1 items-center justify-center px-4 py-12 relative z-10">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="w-full max-w-xl space-y-8"
+        >
           {/* Stepper */}
           <div className="space-y-6">
             <div className="flex items-center justify-between">
               {steps.map((step, idx) => (
                 <div key={step.num} className="flex items-center flex-1">
-                  <div
-                    className={`flex h-10 w-10 items-center justify-center rounded-full border-2 font-semibold text-sm transition-all duration-300 ${
+                  <motion.div
+                    whileHover={{ scale: 1.05 }}
+                    className={`flex h-10 w-10 items-center justify-center rounded-full border-2 font-bold text-sm transition-all duration-300 ${
                       currentStep >= step.num
-                        ? "border-primary bg-primary text-white"
-                        : "border-border/40 text-muted-foreground"
+                        ? "border-primary bg-primary text-white shadow-md shadow-primary/20"
+                        : "border-border/60 bg-card text-muted-foreground"
                     }`}
                   >
                     {currentStep > step.num ? (
@@ -220,10 +230,10 @@ export default function OnboardPage() {
                     ) : (
                       step.num
                     )}
-                  </div>
+                  </motion.div>
                   {idx < steps.length - 1 && (
                     <div
-                      className={`flex-1 h-1 mx-2 transition-all duration-300 ${
+                      className={`flex-1 h-1 mx-2 transition-all duration-300 rounded-full ${
                         currentStep > step.num ? "bg-primary" : "bg-border/20"
                       }`}
                     />
@@ -232,14 +242,14 @@ export default function OnboardPage() {
               ))}
             </div>
             <div className="text-center">
-              <h2 className="text-lg font-bold text-foreground">
+              <h2 className="text-lg font-heading font-bold text-foreground">
                 {steps[currentStep - 1]?.title}
               </h2>
             </div>
           </div>
 
           {/* Form Card */}
-          <div className="rounded-2xl border border-border/20 bg-white p-8 shadow-sm">
+          <div className="rounded-2xl border border-border/40 bg-card/85 backdrop-blur-md shadow-2xl p-8 transition-all duration-300 hover:border-primary/20">
             <form
               onSubmit={
                 isFinalStep
@@ -259,7 +269,7 @@ export default function OnboardPage() {
                       School Name *
                     </Label>
                     <div className="relative">
-                      <Building2 className="absolute left-3 top-3 h-4.5 w-4.5 text-slate-400" />
+                      <Building2 className="absolute left-3.5 top-3 h-4.5 w-4.5 text-slate-450 pointer-events-none" />
                       <Input
                         id="schoolName"
                         placeholder="e.g., Springfield High School"
@@ -267,7 +277,7 @@ export default function OnboardPage() {
                         onChange={(e) =>
                           setFormData({ ...formData, schoolName: e.target.value })
                         }
-                        className={`pl-10 ${errors.schoolName ? "border-destructive focus-visible:ring-destructive" : ""}`}
+                        className={`pl-10 bg-card/50 backdrop-blur-sm border-slate-200 focus-visible:ring-primary rounded-xl transition-all duration-200 text-slate-800 placeholder-slate-400 ${errors.schoolName ? "border-destructive focus-visible:ring-destructive" : ""}`}
                       />
                     </div>
                     {errors.schoolName && (
@@ -287,7 +297,7 @@ export default function OnboardPage() {
                         setFormData({ ...formData, udaiseCode: e.target.value.replace(/[^\d]/g, "") })
                       }
                       maxLength={11}
-                      className={errors.udaiseCode ? "border-destructive focus-visible:ring-destructive" : ""}
+                      className={`bg-card/50 backdrop-blur-sm border-slate-200 focus-visible:ring-primary rounded-xl transition-all duration-200 text-slate-800 placeholder-slate-400 ${errors.udaiseCode ? "border-destructive focus-visible:ring-destructive" : ""}`}
                     />
                     {errors.udaiseCode && (
                       <p className="text-xs text-destructive">{errors.udaiseCode}</p>
@@ -311,9 +321,9 @@ export default function OnboardPage() {
                           }
                           setIsModalOpen(true);
                         }}
-                        className={`cursor-pointer pr-10 ${errors.location ? "border-destructive focus-visible:ring-destructive" : ""}`}
+                        className={`cursor-pointer pr-10 bg-card/50 backdrop-blur-sm border-slate-200 focus-visible:ring-primary rounded-xl transition-all duration-200 text-slate-800 placeholder-slate-400 ${errors.location ? "border-destructive focus-visible:ring-destructive" : ""}`}
                       />
-                      <MapPin className="absolute right-3 top-3 h-4.5 w-4.5 text-slate-400 pointer-events-none" />
+                      <MapPin className="absolute right-3.5 top-3 h-4.5 w-4.5 text-slate-450 pointer-events-none" />
                     </div>
                     {errors.location && (
                       <p className="text-xs text-destructive">{errors.location}</p>
@@ -336,7 +346,7 @@ export default function OnboardPage() {
                       onChange={(e) =>
                         setFormData({ ...formData, address: e.target.value })
                       }
-                      className={errors.address ? "border-destructive focus-visible:ring-destructive" : ""}
+                      className={`bg-card/50 backdrop-blur-sm border-slate-200 focus-visible:ring-primary rounded-xl transition-all duration-200 text-slate-800 placeholder-slate-400 ${errors.address ? "border-destructive focus-visible:ring-destructive" : ""}`}
                     />
                     {errors.address && (
                       <p className="text-xs text-destructive">{errors.address}</p>
@@ -348,7 +358,7 @@ export default function OnboardPage() {
                       School Phone Number *
                     </Label>
                     <div className="relative">
-                      <Phone className="absolute left-3 top-3 h-4.5 w-4.5 text-slate-400" />
+                      <Phone className="absolute left-3.5 top-3 h-4.5 w-4.5 text-slate-450 pointer-events-none" />
                       <Input
                         id="phone"
                         placeholder="e.g., 9876543210"
@@ -356,7 +366,7 @@ export default function OnboardPage() {
                         onChange={(e) =>
                           setFormData({ ...formData, phone: e.target.value.replace(/[^\d]/g, "") })
                         }
-                        className={`pl-10 ${errors.phone ? "border-destructive focus-visible:ring-destructive" : ""}`}
+                        className={`pl-10 bg-card/50 backdrop-blur-sm border-slate-200 focus-visible:ring-primary rounded-xl transition-all duration-200 text-slate-800 placeholder-slate-400 ${errors.phone ? "border-destructive focus-visible:ring-destructive" : ""}`}
                       />
                     </div>
                     {errors.phone && (
@@ -375,7 +385,7 @@ export default function OnboardPage() {
                       onChange={(e) =>
                         setFormData({ ...formData, principalName: e.target.value })
                       }
-                      className={errors.principalName ? "border-destructive focus-visible:ring-destructive" : ""}
+                      className={`bg-card/50 backdrop-blur-sm border-slate-200 focus-visible:ring-primary rounded-xl transition-all duration-200 text-slate-800 placeholder-slate-400 ${errors.principalName ? "border-destructive focus-visible:ring-destructive" : ""}`}
                     />
                     {errors.principalName && (
                       <p className="text-xs text-destructive">{errors.principalName}</p>
@@ -394,6 +404,7 @@ export default function OnboardPage() {
                       onChange={(e) =>
                         setFormData({ ...formData, website: e.target.value })
                       }
+                      className="bg-card/50 backdrop-blur-sm border-slate-200 focus-visible:ring-primary rounded-xl transition-all duration-200 text-slate-800 placeholder-slate-400"
                     />
                   </div>
                 </div>
@@ -407,7 +418,7 @@ export default function OnboardPage() {
                       Teacher Administrator Name *
                     </Label>
                     <div className="relative">
-                      <User className="absolute left-3 top-3 h-4.5 w-4.5 text-slate-400" />
+                      <User className="absolute left-3.5 top-3 h-4.5 w-4.5 text-slate-450 pointer-events-none" />
                       <Input
                         id="teacherName"
                         placeholder="e.g., Ms. Sarah Johnson"
@@ -415,7 +426,7 @@ export default function OnboardPage() {
                         onChange={(e) =>
                           setFormData({ ...formData, teacherName: e.target.value })
                         }
-                        className={`pl-10 ${errors.teacherName ? "border-destructive focus-visible:ring-destructive" : ""}`}
+                        className={`pl-10 bg-card/50 backdrop-blur-sm border-slate-200 focus-visible:ring-primary rounded-xl transition-all duration-200 text-slate-800 placeholder-slate-400 ${errors.teacherName ? "border-destructive focus-visible:ring-destructive" : ""}`}
                       />
                     </div>
                     {errors.teacherName && (
@@ -428,7 +439,7 @@ export default function OnboardPage() {
                       Email Address *
                     </Label>
                     <div className="relative">
-                      <Mail className="absolute left-3 top-3 h-4.5 w-4.5 text-slate-400" />
+                      <Mail className="absolute left-3.5 top-3 h-4.5 w-4.5 text-slate-450 pointer-events-none" />
                       <Input
                         id="teacherEmail"
                         type="email"
@@ -437,7 +448,7 @@ export default function OnboardPage() {
                         onChange={(e) =>
                           setFormData({ ...formData, teacherEmail: e.target.value })
                         }
-                        className={`pl-10 ${errors.teacherEmail ? "border-destructive focus-visible:ring-destructive" : ""}`}
+                        className={`pl-10 bg-card/50 backdrop-blur-sm border-slate-200 focus-visible:ring-primary rounded-xl transition-all duration-200 text-slate-800 placeholder-slate-400 ${errors.teacherEmail ? "border-destructive focus-visible:ring-destructive" : ""}`}
                       />
                     </div>
                     {errors.teacherEmail && (
@@ -458,7 +469,7 @@ export default function OnboardPage() {
                         onChange={(e) =>
                           setFormData({ ...formData, teacherPassword: e.target.value })
                         }
-                        className={errors.teacherPassword ? "border-destructive focus-visible:ring-destructive" : ""}
+                        className={`bg-card/50 backdrop-blur-sm border-slate-200 focus-visible:ring-primary rounded-xl transition-all duration-200 text-slate-800 placeholder-slate-400 ${errors.teacherPassword ? "border-destructive focus-visible:ring-destructive" : ""}`}
                       />
                     </div>
                     <div className="space-y-2">
@@ -473,12 +484,12 @@ export default function OnboardPage() {
                         onChange={(e) =>
                           setFormData({ ...formData, confirmPassword: e.target.value })
                         }
-                        className={errors.confirmPassword ? "border-destructive focus-visible:ring-destructive" : ""}
+                        className={`bg-card/50 backdrop-blur-sm border-slate-200 focus-visible:ring-primary rounded-xl transition-all duration-200 text-slate-800 placeholder-slate-400 ${errors.confirmPassword ? "border-destructive focus-visible:ring-destructive" : ""}`}
                       />
                     </div>
                     {(errors.teacherPassword || errors.confirmPassword) && (
                       <div className="col-span-2">
-                        <p className="text-xs text-destructive">
+                        <p className="text-xs text-destructive font-medium">
                           {errors.teacherPassword || errors.confirmPassword}
                         </p>
                       </div>
@@ -489,54 +500,54 @@ export default function OnboardPage() {
 
               {/* Step 4: Final Review & Confirmation */}
               {currentStep === 4 && (
-                <div className="space-y-4 text-sm">
-                  <div className="rounded-xl border border-primary/20 bg-slate-50/50 p-5 space-y-4">
+                <div className="space-y-4 text-sm text-slate-800">
+                  <div className="rounded-xl border border-primary/20 bg-primary/5 p-5 space-y-4 shadow-sm">
                     <div>
                       <h4 className="font-bold text-xs text-primary uppercase tracking-wider mb-2">School Information</h4>
                       <div className="grid grid-cols-2 gap-y-2 gap-x-4">
                         <div>
-                          <span className="text-muted-foreground block text-[11px]">School Name:</span>
-                          <span className="font-semibold text-slate-800">{formData.schoolName}</span>
+                          <span className="text-slate-500 block text-[11px]">School Name:</span>
+                          <span className="font-bold text-slate-800">{formData.schoolName}</span>
                         </div>
                         <div>
-                          <span className="text-muted-foreground block text-[11px]">UDAISE Code:</span>
-                          <span className="font-semibold text-slate-800">{formData.udaiseCode}</span>
+                          <span className="text-slate-500 block text-[11px]">UDAISE Code:</span>
+                          <span className="font-bold text-slate-800">{formData.udaiseCode}</span>
                         </div>
                         <div>
-                          <span className="text-muted-foreground block text-[11px]">Geography:</span>
+                          <span className="text-slate-500 block text-[11px]">Geography:</span>
                           <span className="font-semibold text-slate-800">{formData.location}</span>
                         </div>
                         <div>
-                          <span className="text-muted-foreground block text-[11px]">Phone:</span>
+                          <span className="text-slate-500 block text-[11px]">Phone:</span>
                           <span className="font-semibold text-slate-800">{formData.phone}</span>
                         </div>
-                        <div className="col-span-2">
-                          <span className="text-muted-foreground block text-[11px]">Address:</span>
-                          <span className="font-semibold text-slate-800">{formData.address}</span>
+                        <div className="col-span-2 border-t border-slate-200/40 pt-2">
+                          <span className="text-slate-500 block text-[11px]">Address:</span>
+                          <span className="font-medium text-slate-800">{formData.address}</span>
                         </div>
-                        <div>
-                          <span className="text-muted-foreground block text-[11px]">Principal:</span>
+                        <div className="border-t border-slate-200/40 pt-2">
+                          <span className="text-slate-500 block text-[11px]">Principal:</span>
                           <span className="font-semibold text-slate-800">{formData.principalName}</span>
                         </div>
                         {formData.website && (
-                          <div>
-                            <span className="text-muted-foreground block text-[11px]">Website:</span>
+                          <div className="border-t border-slate-200/40 pt-2">
+                            <span className="text-slate-500 block text-[11px]">Website:</span>
                             <span className="font-semibold text-slate-800">{formData.website}</span>
                           </div>
                         )}
                       </div>
                     </div>
                     
-                    <div className="border-t border-slate-200/60 pt-3">
+                    <div className="border-t border-slate-200/40 pt-3">
                       <h4 className="font-bold text-xs text-primary uppercase tracking-wider mb-2">Teacher Administrator</h4>
                       <div className="grid grid-cols-2 gap-y-2 gap-x-4">
                         <div>
-                          <span className="text-muted-foreground block text-[11px]">Teacher Name:</span>
-                          <span className="font-semibold text-slate-800">{formData.teacherName}</span>
+                          <span className="text-slate-500 block text-[11px]">Teacher Name:</span>
+                          <span className="font-bold text-slate-800">{formData.teacherName}</span>
                         </div>
                         <div>
-                          <span className="text-muted-foreground block text-[11px]">Email Address:</span>
-                          <span className="font-semibold text-slate-800">{formData.teacherEmail}</span>
+                          <span className="text-slate-500 block text-[11px]">Email Address:</span>
+                          <span className="font-bold text-slate-850 break-all">{formData.teacherEmail}</span>
                         </div>
                       </div>
                     </div>
@@ -551,7 +562,7 @@ export default function OnboardPage() {
                     type="button"
                     variant="outline"
                     onClick={handlePrev}
-                    className="flex-1 rounded-xl"
+                    className="flex-1 rounded-xl shadow-sm text-sm"
                   >
                     Back
                   </Button>
@@ -559,14 +570,14 @@ export default function OnboardPage() {
                 {currentStep < totalSteps ? (
                   <Button
                     type="submit"
-                    className="flex-1 bg-primary hover:bg-primary/95 text-white font-bold rounded-xl"
+                    className="flex-1 bg-primary hover:bg-primary/95 text-white font-bold rounded-xl shadow-lg transition-transform active:scale-[0.98] text-sm"
                   >
                     Next
                   </Button>
                 ) : (
                   <Button
                     type="submit"
-                    className="flex-1 bg-primary hover:bg-primary/95 text-white font-bold rounded-xl shadow-lg transition-transform active:scale-[0.98]"
+                    className="flex-1 bg-primary hover:bg-primary/95 text-white font-bold rounded-xl shadow-lg transition-transform active:scale-[0.98] text-sm"
                     disabled={isLoading}
                   >
                     {isLoading ? "Submitting..." : "Complete Registration"}
@@ -580,12 +591,12 @@ export default function OnboardPage() {
             Already have an account?{" "}
             <Link
               href="/login"
-              className="text-primary hover:text-primary/80 font-medium hover:underline"
+              className="text-primary hover:text-primary/80 font-bold hover:underline"
             >
               Sign in
             </Link>
           </p>
-        </div>
+        </motion.div>
       </div>
 
       {/* INDIAN GEOGRAPHY SELECTOR MODAL */}
@@ -605,7 +616,7 @@ export default function OnboardPage() {
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.95, opacity: 0, y: 20 }}
               transition={{ type: "spring", stiffness: 300, damping: 28 }}
-              className="relative w-full max-w-3xl bg-white dark:bg-slate-950 border border-slate-200/50 dark:border-slate-800/50 rounded-2xl shadow-2xl flex flex-col max-h-[85vh] overflow-hidden"
+              className="relative w-full max-w-3xl bg-white border border-slate-200/50 rounded-2xl shadow-2xl flex flex-col max-h-[85vh] overflow-hidden text-slate-800"
             >
               {/* Modal Header */}
               <div className="flex items-center justify-between px-6 py-4 border-b border-border/30 bg-card rounded-t-2xl">
@@ -639,7 +650,7 @@ export default function OnboardPage() {
                         placeholder="Search State/UT..."
                         value={searchState}
                         onChange={(e) => setSearchState(e.target.value)}
-                        className="pl-9 h-9 text-sm focus-visible:ring-1 focus-visible:ring-primary"
+                        className="pl-9 h-9 text-sm focus-visible:ring-1 focus-visible:ring-primary rounded-xl"
                       />
                     </div>
                   </div>
@@ -701,7 +712,7 @@ export default function OnboardPage() {
                         disabled={!selectedState}
                         value={searchDistrict}
                         onChange={(e) => setSearchDistrict(e.target.value)}
-                        className="pl-9 h-9 text-sm focus-visible:ring-1 focus-visible:ring-primary"
+                        className="pl-9 h-9 text-sm focus-visible:ring-1 focus-visible:ring-primary rounded-xl"
                       />
                     </div>
                   </div>
@@ -784,4 +795,3 @@ export default function OnboardPage() {
       </AnimatePresence>
     </div>
   );
-}

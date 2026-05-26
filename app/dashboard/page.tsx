@@ -109,30 +109,30 @@ export default function DashboardPage() {
       {/* Stats Cards - Hide for students */}
       {currentUser.role !== "student" && (
         <div className="mb-10 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4 lg:gap-6">
-          <div className="rounded-xl border border-border/20 bg-white p-4 sm:p-6 transition-all hover:border-border/40">
-            <p className="text-xs font-medium text-muted-foreground">
+          <div className="rounded-2xl border border-border/40 bg-card p-4 sm:p-6 shadow-sm hover:shadow-md hover:border-primary/20 transition-all duration-300">
+            <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
               {currentUser.role === "school" ? "My Ideas" : "Total Ideas"}
             </p>
-            <p className="mt-2 text-2xl sm:text-3xl font-semibold text-foreground">{totalIdeas}</p>
+            <p className="mt-2 text-2xl sm:text-3xl font-heading font-bold text-foreground">{totalIdeas}</p>
           </div>
-          <div className="rounded-xl border border-border/20 bg-white p-4 sm:p-6 transition-all hover:border-border/40">
-            <p className="text-xs font-medium text-muted-foreground">Schools</p>
-            <p className="mt-2 text-2xl sm:text-3xl font-semibold text-foreground">{schoolsCount}</p>
+          <div className="rounded-2xl border border-border/40 bg-card p-4 sm:p-6 shadow-sm hover:shadow-md hover:border-primary/20 transition-all duration-300">
+            <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Schools</p>
+            <p className="mt-2 text-2xl sm:text-3xl font-heading font-bold text-foreground">{schoolsCount}</p>
           </div>
-          <div className="rounded-xl border border-border/20 bg-white p-4 sm:p-6 transition-all hover:border-border/40">
-            <p className="text-xs font-medium text-muted-foreground">Advanced</p>
-            <p className="mt-2 text-2xl sm:text-3xl font-semibold text-foreground">{advancedCount}</p>
+          <div className="rounded-2xl border border-border/40 bg-card p-4 sm:p-6 shadow-sm hover:shadow-md hover:border-primary/20 transition-all duration-300">
+            <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Advanced</p>
+            <p className="mt-2 text-2xl sm:text-3xl font-heading font-bold text-foreground">{advancedCount}</p>
           </div>
-          <div className="rounded-xl border border-border/20 bg-white p-4 sm:p-6 transition-all hover:border-border/40">
-            <p className="text-xs font-medium text-muted-foreground">Active Themes</p>
-            <p className="mt-2 text-2xl sm:text-3xl font-semibold text-foreground">{themesWithIdeas}</p>
+          <div className="rounded-2xl border border-border/40 bg-card p-4 sm:p-6 shadow-sm hover:shadow-md hover:border-primary/20 transition-all duration-300">
+            <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Active Themes</p>
+            <p className="mt-2 text-2xl sm:text-3xl font-heading font-bold text-foreground">{themesWithIdeas}</p>
           </div>
         </div>
       )}
 
       {/* Yearly Thematic Calendar - Hide for students */}
       {currentUser.role !== "student" && (
-        <div className="mb-10 rounded-xl border border-border/20 bg-white p-6">
+        <div className="mb-10 rounded-2xl border border-border/40 bg-card p-6 shadow-sm">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-sm font-semibold text-foreground">Yearly Thematic Calendar</h2>
             {currentUser.role === "super-admin" && (
@@ -228,7 +228,7 @@ export default function DashboardPage() {
           {/* Left: Stage Distribution */}
           <div className="lg:col-span-2 space-y-6">
             {/* Stage chart */}
-            <div className="rounded-xl border border-border/20 bg-white p-6">
+            <div className="rounded-2xl border border-border/40 bg-card p-6 shadow-sm">
               <h2 className="text-sm font-semibold text-foreground mb-6">Design Thinking Pipeline</h2>
               <div className="space-y-3">
                 {DESIGN_THINKING_STAGES.map((stage) => {
@@ -273,7 +273,7 @@ export default function DashboardPage() {
 
             {/* School cards (Admin & Edu Dept) */}
             {currentUser.role !== "school" && (
-              <div className="rounded-xl border border-border/20 bg-white p-6">
+              <div className="rounded-2xl border border-border/40 bg-card p-6 shadow-sm">
                 <h2 className="text-sm font-semibold text-foreground mb-6">Schools</h2>
                 <div className="grid gap-3 sm:grid-cols-2">
                   {schoolIdeaCounts.map((school) => (
@@ -305,7 +305,7 @@ export default function DashboardPage() {
 
             {/* School's own projects (School role) */}
             {currentUser.role === "school" && (
-              <div className="rounded-xl border border-border/20 bg-white p-6 overflow-hidden">
+              <div className="rounded-2xl border border-border/40 bg-card p-6 overflow-hidden shadow-sm">
                 <div className="flex items-center justify-between mb-6">
                   <h2 className="text-sm font-semibold text-foreground">My Projects Kanban</h2>
                   <Link href="/dashboard/submit">
@@ -331,7 +331,7 @@ export default function DashboardPage() {
           {/* Right sidebar */}
           <div className="space-y-6">
           {/* Recent Activity */}
-          <div className="rounded-xl border border-border/20 bg-white p-6">
+          <div className="rounded-2xl border border-border/40 bg-card p-6 shadow-sm">
             <h2 className="mb-6 text-sm font-semibold text-foreground">Recent Activity</h2>
             {recentIdeas.length === 0 ? (
               <p className="text-xs text-muted-foreground">No recent activity.</p>
@@ -362,7 +362,7 @@ export default function DashboardPage() {
           </div>
 
           {/* Theme Distribution */}
-          <div className="rounded-xl border border-border/20 bg-white p-6">
+          <div className="rounded-2xl border border-border/40 bg-card p-6 shadow-sm">
             <h2 className="mb-6 text-sm font-semibold text-foreground">Ideas by Theme</h2>
             <div className="space-y-2">
               {themes.filter((tm) => {

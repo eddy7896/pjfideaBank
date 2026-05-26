@@ -105,16 +105,17 @@ export default function DashboardLayout({
   return (
     <div className="flex min-h-screen bg-background">
       {/* Mobile Header */}
-      <div className="fixed top-0 left-0 right-0 z-40 flex items-center justify-between px-4 py-3 bg-card border-b border-border md:hidden">
+      <div className="fixed top-0 left-0 right-0 z-40 flex items-center justify-between px-4 py-3 bg-background/95 backdrop-blur-sm border-b border-border/40 md:hidden">
         <Button
           variant="ghost"
           size="icon"
           onClick={() => setSidebarOpen(!sidebarOpen)}
+          className="hover:bg-primary/10 hover:text-primary transition-colors"
         >
           {sidebarOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
         </Button>
         <div className="flex-1 text-center">
-          <h1 className="text-sm font-semibold">Pi Jam</h1>
+          <h1 className="text-sm font-heading font-bold text-foreground">Pi Jam</h1>
         </div>
         <div className="w-10" />
       </div>
@@ -143,10 +144,10 @@ export default function DashboardLayout({
           <Link
             href="/dashboard"
             className={cn(
-              "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all",
+              "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold transition-all active:scale-[0.98]",
               pathname === "/dashboard"
-                ? "bg-primary text-primary-foreground shadow-sm"
-                : "text-muted-foreground hover:bg-accent/10 hover:text-foreground"
+                ? "bg-primary text-primary-foreground shadow-md shadow-primary/20"
+                : "text-muted-foreground hover:bg-primary/5 hover:text-primary"
             )}
           >
             <LayoutDashboard className="h-4 w-4" />
@@ -156,10 +157,10 @@ export default function DashboardLayout({
           <Link
             href="/dashboard/calendar"
             className={cn(
-              "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all",
+              "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold transition-all active:scale-[0.98]",
               pathname === "/dashboard/calendar"
-                ? "bg-primary text-primary-foreground shadow-sm"
-                : "text-muted-foreground hover:bg-accent/10 hover:text-foreground"
+                ? "bg-primary text-primary-foreground shadow-md shadow-primary/20"
+                : "text-muted-foreground hover:bg-primary/5 hover:text-primary"
             )}
           >
             <Calendar className="h-4 w-4" />
@@ -171,10 +172,10 @@ export default function DashboardLayout({
               <Link
                 href="/dashboard/activities"
                 className={cn(
-                  "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all",
+                  "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold transition-all active:scale-[0.98]",
                   pathname === "/dashboard/activities"
-                    ? "bg-primary text-primary-foreground shadow-sm"
-                    : "text-muted-foreground hover:bg-accent/10 hover:text-foreground"
+                    ? "bg-primary text-primary-foreground shadow-md shadow-primary/20"
+                    : "text-muted-foreground hover:bg-primary/5 hover:text-primary"
                 )}
               >
                 <FileText className="h-4 w-4" />
@@ -184,10 +185,10 @@ export default function DashboardLayout({
               <Link
                 href="/dashboard/teams"
                 className={cn(
-                  "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all",
+                  "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold transition-all active:scale-[0.98]",
                   pathname === "/dashboard/teams"
-                    ? "bg-primary text-primary-foreground shadow-sm"
-                    : "text-muted-foreground hover:bg-accent/10 hover:text-foreground"
+                    ? "bg-primary text-primary-foreground shadow-md shadow-primary/20"
+                    : "text-muted-foreground hover:bg-primary/5 hover:text-primary"
                 )}
               >
                 <UsersIcon className="h-4 w-4" />
@@ -197,10 +198,10 @@ export default function DashboardLayout({
               <Link
                 href="/dashboard/projects"
                 className={cn(
-                  "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all",
+                  "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold transition-all active:scale-[0.98]",
                   pathname.startsWith("/dashboard/projects")
-                    ? "bg-primary text-primary-foreground shadow-sm"
-                    : "text-muted-foreground hover:bg-accent/10 hover:text-foreground"
+                    ? "bg-primary text-primary-foreground shadow-md shadow-primary/20"
+                    : "text-muted-foreground hover:bg-primary/5 hover:text-primary"
                 )}
               >
                 <Folder className="h-4 w-4" />
@@ -210,10 +211,10 @@ export default function DashboardLayout({
               <Link
                 href="/dashboard/submit"
                 className={cn(
-                  "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all",
+                  "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold transition-all active:scale-[0.98]",
                   pathname === "/dashboard/submit"
-                    ? "bg-primary text-primary-foreground shadow-sm"
-                    : "text-muted-foreground hover:bg-accent/10 hover:text-foreground"
+                    ? "bg-primary text-primary-foreground shadow-md shadow-primary/20"
+                    : "text-muted-foreground hover:bg-primary/5 hover:text-primary"
                 )}
               >
                 <PlusCircle className="h-4 w-4" />
@@ -227,10 +228,10 @@ export default function DashboardLayout({
               <Link
                 href="/dashboard/activities"
                 className={cn(
-                  "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all",
+                  "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold transition-all active:scale-[0.98]",
                   pathname === "/dashboard/activities"
-                    ? "bg-primary text-primary-foreground shadow-sm"
-                    : "text-muted-foreground hover:bg-accent/10 hover:text-foreground"
+                    ? "bg-primary text-primary-foreground shadow-md shadow-primary/20"
+                    : "text-muted-foreground hover:bg-primary/5 hover:text-primary"
                 )}
               >
                 <FileText className="h-4 w-4" />
@@ -239,10 +240,10 @@ export default function DashboardLayout({
               <Link
                 href="/dashboard/schools"
                 className={cn(
-                  "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all",
+                  "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold transition-all active:scale-[0.98]",
                   pathname === "/dashboard/schools"
-                    ? "bg-primary text-primary-foreground shadow-sm"
-                    : "text-muted-foreground hover:bg-accent/10 hover:text-foreground"
+                    ? "bg-primary text-primary-foreground shadow-md shadow-primary/20"
+                    : "text-muted-foreground hover:bg-primary/5 hover:text-primary"
                 )}
               >
                 <School className="h-4 w-4" />
@@ -251,10 +252,10 @@ export default function DashboardLayout({
               <Link
                 href="/dashboard/analytics"
                 className={cn(
-                  "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all",
+                  "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold transition-all active:scale-[0.98]",
                   pathname === "/dashboard/analytics"
-                    ? "bg-primary text-primary-foreground shadow-sm"
-                    : "text-muted-foreground hover:bg-accent/10 hover:text-foreground"
+                    ? "bg-primary text-primary-foreground shadow-md shadow-primary/20"
+                    : "text-muted-foreground hover:bg-primary/5 hover:text-primary"
                 )}
               >
                 <BarChart3 className="h-4 w-4" />
@@ -266,10 +267,10 @@ export default function DashboardLayout({
           <Link
             href="/dashboard/settings"
             className={cn(
-              "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all",
+              "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold transition-all active:scale-[0.98]",
               pathname === "/dashboard/settings"
-                ? "bg-primary text-primary-foreground shadow-sm"
-                : "text-muted-foreground hover:bg-accent/10 hover:text-foreground"
+                ? "bg-primary text-primary-foreground shadow-md shadow-primary/20"
+                : "text-muted-foreground hover:bg-primary/5 hover:text-primary"
             )}
           >
             <Settings className="h-4 w-4" />

@@ -16,30 +16,20 @@ import {
   X,
   Map,
   ArrowRight,
-  Eye,
-  EyeOff,
   Sparkles,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { INDIAN_STATES_DISTRICTS } from "@/lib/indian-states-districts";
 import { motion, AnimatePresence } from "framer-motion";
-import { useAuthStore } from "@/store/use-auth-store";
+import { AnimatedBackground } from "@/components/landing/animated-background";
+
 
 export default function PijamPortalPage() {
   const router = useRouter();
-  const { login } = useAuthStore();
-  const [activeTab, setActiveTab] = useState<"login" | "onboard">("login");
   const [isLoading, setIsLoading] = useState(false);
-
-  // Login states
-  const [loginEmail, setLoginEmail] = useState("");
-  const [loginPassword, setLoginPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
-  const [loginError, setLoginError] = useState("");
 
   // Onboarding states
   const [onboardStep, setOnboardStep] = useState(1);
@@ -76,10 +66,8 @@ export default function PijamPortalPage() {
         console.error("Failed to fetch geography leads", error);
       }
     }
-    if (activeTab === "onboard") {
-      fetchLeads();
-    }
-  }, [activeTab]);
+    fetchLeads();
+  }, []);
 
   // Search text highlighter helper
   const highlightText = (text: string, search: string) => {
@@ -108,14 +96,14 @@ export default function PijamPortalPage() {
         { num: 1, title: "Choose Role" },
         { num: 2, title: "Trainer Details" },
         { num: 3, title: "Reporting Details" },
-        { num: 4, title: "Review" },
+        { num: 4, title: "Review Details" },
       ];
     } else {
       return [
         { num: 1, title: "Choose Role" },
         { num: 2, title: "Lead Details" },
         { num: 3, title: "Credentials" },
-        { num: 4, title: "Review" },
+        { num: 4, title: "Review Details" },
       ];
     }
   };
@@ -162,7 +150,7 @@ export default function PijamPortalPage() {
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(onboardData.teacherEmail))
           newErrors.teacherEmail = "Valid email required";
         if (onboardData.teacherPassword.length < 6)
-          newErrors.teacherPassword = "Password min 6 characters";
+          onboardData.teacherPassword = "Password min 6 characters";
         if (onboardData.teacherPassword !== onboardData.confirmPassword)
           newErrors.confirmPassword = "Passwords must match";
       }
@@ -182,26 +170,6 @@ export default function PijamPortalPage() {
   const handleOnboardPrev = () => {
     setOnboardStep(onboardStep - 1);
     setOnboardErrors({});
-  };
-
-  const handleLoginSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoginError("");
-    setIsLoading(true);
-
-    try {
-      const result = await login(loginEmail, loginPassword);
-      if (result.success) {
-        toast.success("Successfully logged in!");
-        router.push("/dashboard");
-      } else {
-        setLoginError(result.error || "Login failed. Please verify credentials.");
-      }
-    } catch (err) {
-      setLoginError("An unexpected error occurred during login.");
-    } finally {
-      setIsLoading(false);
-    }
   };
 
   const handleOnboardSubmit = async (e: React.FormEvent) => {
@@ -232,32 +200,15 @@ export default function PijamPortalPage() {
       toast.success(
         `${
           onboardData.role === "teacher-trainer" ? "Teacher Trainer" : "Geography Lead"
-        } onboarded successfully! Switch to Sign In to login.`
+        } onboarded successfully! Redirecting to login...`
       );
       
-      // Reset onboarding form and switch to login tab
-      setOnboardStep(1);
-      setOnboardData({
-        role: "teacher-trainer",
-        teacherName: "",
-        teacherEmail: "",
-        teacherPassword: "",
-        confirmPassword: "",
-        location: "",
-        assignedLeadId: "",
-      });
-      setActiveTab("login");
+      setTimeout(() => router.push("/login"), 1500);
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Onboarding failed");
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const fillDemoLogin = (email: string, pass: string) => {
-    setLoginEmail(email);
-    setLoginPassword(pass);
-    setLoginError("");
   };
 
   // Filter states for modal
@@ -304,518 +255,406 @@ export default function PijamPortalPage() {
       : !selectedState || !selectedDistrict;
 
   return (
-    <div className="flex min-h-screen flex-col bg-slate-900 text-white relative overflow-hidden">
-      {/* Dynamic Aesthetic Background */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,#4f46e5_0%,transparent_50%),radial-gradient(circle_at_80%_80%,#e11d48_0%,transparent_50%)] opacity-20 pointer-events-none" />
+    <div className="flex min-h-screen flex-col bg-background relative overflow-hidden">
+      <AnimatedBackground />
 
       {/* Top Navbar */}
-      <div className="border-b border-slate-800 bg-slate-900/80 backdrop-blur-md z-10">
+      <header className="sticky top-0 z-50 border-b border-border/40 bg-background/95 backdrop-blur-sm">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
           <Link href="/" className="transition-opacity hover:opacity-75">
             <Image
               src="/pijam logo.jpeg"
               alt="Pi Jam Logo"
-              width={120}
-              height={48}
-              className="h-8 w-auto rounded-lg brightness-95"
+              width={150}
+              height={60}
+              className="rounded-lg"
               priority
             />
           </Link>
-          <span className="text-xs font-semibold uppercase tracking-wider text-rose-500 bg-rose-500/10 px-3 py-1 rounded-full border border-rose-500/20 flex items-center gap-1.5 animate-pulse">
-            <Sparkles className="h-3.5 w-3.5" />
+          <span className="text-xs font-semibold uppercase tracking-wider text-primary bg-primary/10 px-3 py-1 rounded-full border border-primary/20 flex items-center gap-1.5 shadow-sm">
+            <Sparkles className="h-3.5 w-3.5 text-primary" />
             Internal Portal
           </span>
         </div>
-      </div>
+      </header>
 
       {/* Main Content Area */}
-      <div className="flex flex-1 items-center justify-center px-4 py-16 z-10">
-        <div className="w-full max-w-lg space-y-8">
+      <div className="flex flex-1 items-center justify-center px-4 py-12 relative z-10">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="w-full max-w-xl space-y-8"
+        >
           {/* Brand Header */}
           <div className="text-center space-y-2">
-            <h1 className="text-3xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 via-purple-400 to-rose-400">
-              Pi Jam Foundation Staff
+            <h1 className="text-3xl font-heading font-bold tracking-tight text-foreground">
+              Pi Jam Staff Onboarding
             </h1>
-            <p className="text-slate-400 text-sm">
-              Manage program geographies, support schools, and view region diagnostics.
+            <p className="text-sm text-muted-foreground">
+              Register as a Geography Lead or Teacher Trainer to manage program operations.
             </p>
           </div>
 
           {/* Interactive Card */}
-          <div className="rounded-2xl border border-slate-800 bg-slate-950/80 backdrop-blur-xl shadow-2xl p-8 relative">
-            <Tabs
-              value={activeTab}
-              onValueChange={(val) => {
-                setActiveTab(val as "login" | "onboard");
-                setOnboardStep(1);
-              }}
-              className="w-full space-y-6"
-            >
-              <TabsList className="grid grid-cols-2 bg-slate-900 p-1 rounded-xl">
-                <TabsTrigger
-                  value="login"
-                  className="rounded-lg text-sm font-semibold py-2.5 transition-all text-slate-400 data-[state=active]:bg-slate-850 data-[state=active]:text-white"
-                >
-                  Sign In
-                </TabsTrigger>
-                <TabsTrigger
-                  value="onboard"
-                  className="rounded-lg text-sm font-semibold py-2.5 transition-all text-slate-400 data-[state=active]:bg-slate-850 data-[state=active]:text-white"
-                >
-                  Join Team
-                </TabsTrigger>
-              </TabsList>
-
-              {/* TAB 1: STAFF LOGIN */}
-              <TabsContent value="login" className="space-y-5 animate-in fade-in-50 duration-200">
-                <form onSubmit={handleLoginSubmit} className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="email" className="text-sm font-medium text-slate-300">
-                      Work Email Address
-                    </Label>
-                    <div className="relative">
-                      <Mail className="absolute left-3 top-1/2 h-4.5 w-4.5 -translate-y-1/2 text-slate-500" />
-                      <Input
-                        id="email"
-                        type="email"
-                        placeholder="yourname@pijam.org"
-                        value={loginEmail}
-                        onChange={(e) => {
-                          setLoginEmail(e.target.value);
-                          setLoginError("");
-                        }}
-                        className="pl-10 bg-slate-900/60 border-slate-800 focus:border-indigo-500 text-white placeholder-slate-500 rounded-xl"
-                        required
+          <div className="rounded-2xl border border-border/40 bg-card/85 backdrop-blur-md shadow-2xl p-8 transition-all duration-300 hover:border-primary/20">
+            {/* Onboarding Wizard Stepper */}
+            <div className="space-y-4 mb-6">
+              <div className="flex items-center justify-between">
+                {steps.map((step, idx) => (
+                  <div key={step.num} className="flex items-center flex-1">
+                    <motion.div
+                      whileHover={{ scale: 1.05 }}
+                      className={`flex h-8 w-8 items-center justify-center rounded-full border-2 font-bold text-xs transition-all duration-300 ${
+                        onboardStep >= step.num
+                          ? "border-primary bg-primary text-white shadow-md shadow-primary/20"
+                          : "border-border/60 bg-card text-muted-foreground"
+                      }`}
+                    >
+                      {onboardStep > step.num ? <Check className="h-4 w-4" /> : step.num}
+                    </motion.div>
+                    {idx < steps.length - 1 && (
+                      <div
+                        className={`flex-1 h-0.5 mx-2 transition-all duration-300 rounded-full ${
+                          onboardStep > step.num ? "bg-primary" : "bg-border/20"
+                        }`}
                       />
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="pass" className="text-sm font-medium text-slate-300">
-                      Access Password
-                    </Label>
-                    <div className="relative">
-                      <Lock className="absolute left-3 top-1/2 h-4.5 w-4.5 -translate-y-1/2 text-slate-500" />
-                      <Input
-                        id="pass"
-                        type={showPassword ? "text" : "password"}
-                        placeholder="Enter password"
-                        value={loginPassword}
-                        onChange={(e) => {
-                          setLoginPassword(e.target.value);
-                          setLoginError("");
-                        }}
-                        className="pl-10 pr-10 bg-slate-900/60 border-slate-800 focus:border-indigo-500 text-white placeholder-slate-500 rounded-xl"
-                        required
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 transition-colors"
-                      >
-                        {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                      </button>
-                    </div>
-                  </div>
-
-                  {loginError && (
-                    <div className="rounded-xl border border-rose-500/20 bg-rose-500/5 px-4 py-2.5 text-xs text-rose-400">
-                      {loginError}
-                    </div>
-                  )}
-
-                  <Button
-                    type="submit"
-                    className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-bold h-11 rounded-xl shadow-lg shadow-indigo-500/10 flex items-center justify-center gap-2 transition-transform active:scale-[0.98]"
-                    disabled={isLoading}
-                  >
-                    {isLoading ? (
-                      <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
-                    ) : (
-                      <>
-                        Sign In Internal
-                        <ArrowRight className="h-4 w-4" />
-                      </>
                     )}
-                  </Button>
-                </form>
-
-                {/* Pi Jam Admin Seed Demo Accounts */}
-                <div className="border-t border-slate-800/80 pt-5 space-y-3">
-                  <p className="text-[11px] font-bold tracking-wider text-slate-500 uppercase">
-                    Demo Administrator Account
-                  </p>
-                  <button
-                    onClick={() => fillDemoLogin("admin@pijam.org", "admin123")}
-                    className="w-full flex items-center justify-between p-3.5 rounded-xl border border-slate-800 bg-slate-900/30 hover:bg-slate-900/60 text-left transition-all group"
-                  >
-                    <div className="min-w-0">
-                      <span className="font-bold text-xs text-slate-300 group-hover:text-white">
-                        Global Super Admin
-                      </span>
-                      <span className="block text-[10px] text-slate-500 mt-0.5">
-                        admin@pijam.org (Password: admin123)
-                      </span>
-                    </div>
-                    <ArrowRight className="h-4 w-4 text-slate-600 group-hover:text-indigo-400 group-hover:translate-x-0.5 transition-all" />
-                  </button>
-                </div>
-              </TabsContent>
-
-              {/* TAB 2: STAFF ONBOARDING */}
-              <TabsContent value="onboard" className="space-y-6 animate-in fade-in-50 duration-200">
-                {/* Onboarding Wizard Stepper */}
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    {steps.map((step, idx) => (
-                      <div key={step.num} className="flex items-center flex-1">
-                        <div
-                          className={`flex h-8 w-8 items-center justify-center rounded-full border-2 font-bold text-xs transition-all duration-300 ${
-                            onboardStep >= step.num
-                              ? "border-indigo-500 bg-indigo-500 text-white"
-                              : "border-slate-850 bg-slate-900 text-slate-500"
-                          }`}
-                        >
-                          {onboardStep > step.num ? <Check className="h-4.5 w-4.5" /> : step.num}
-                        </div>
-                        {idx < steps.length - 1 && (
-                          <div
-                            className={`flex-1 h-0.5 mx-2 transition-all duration-300 ${
-                              onboardStep > step.num ? "bg-indigo-500" : "bg-slate-850"
-                            }`}
-                          />
-                        )}
-                      </div>
-                    ))}
                   </div>
-                  <h3 className="text-center font-bold text-xs text-slate-300 tracking-wide uppercase">
-                    {steps[onboardStep - 1]?.title}
-                  </h3>
+                ))}
+              </div>
+              <h3 className="text-center font-bold text-xs text-slate-700 tracking-wide uppercase">
+                {steps[onboardStep - 1]?.title}
+              </h3>
+            </div>
+
+            <form
+              onSubmit={
+                onboardStep === totalOnboardSteps
+                  ? handleOnboardSubmit
+                  : (e) => {
+                      e.preventDefault();
+                      handleOnboardNext();
+                    }
+              }
+              className="space-y-5"
+            >
+              {/* Step 1: Choose Internal Role */}
+              {onboardStep === 1 && (
+                <div className="space-y-4">
+                  <p className="text-[11px] text-slate-450 text-center leading-relaxed font-medium">
+                    Register your access level to manage states or support trainers.
+                  </p>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    {/* Teacher Trainer Card */}
+                    <button
+                      type="button"
+                      onClick={() => setOnboardData({ ...onboardData, role: "teacher-trainer" })}
+                      className={`relative flex flex-col items-center p-5 rounded-xl border-2 text-center transition-all duration-300 group ${
+                        onboardData.role === "teacher-trainer"
+                          ? "border-primary bg-primary/5 scale-[1.02] shadow-sm shadow-primary/5"
+                          : "border-border bg-slate-50/30 hover:border-primary/45 hover:scale-[1.01]"
+                      }`}
+                    >
+                      <div
+                        className={`p-2.5 rounded-full mb-3 transition-colors duration-300 ${
+                          onboardData.role === "teacher-trainer"
+                            ? "bg-primary text-white"
+                            : "bg-slate-200/80 text-slate-500 group-hover:bg-primary/10 group-hover:text-primary"
+                        }`}
+                      >
+                        <BookOpen className="h-5 w-5" />
+                      </div>
+                      <span className="font-bold text-slate-700 text-xs block">Teacher Trainer</span>
+                      <span className="text-[9px] text-slate-500 mt-1 block leading-normal font-medium">
+                        Support school admins & review district details.
+                      </span>
+                    </button>
+
+                    {/* Geography Lead Card */}
+                    <button
+                      type="button"
+                      onClick={() => setOnboardData({ ...onboardData, role: "geography-lead" })}
+                      className={`relative flex flex-col items-center p-5 rounded-xl border-2 text-center transition-all duration-300 group ${
+                        onboardData.role === "geography-lead"
+                          ? "border-primary bg-primary/5 scale-[1.02] shadow-sm shadow-primary/5"
+                          : "border-border bg-slate-50/30 hover:border-primary/45 hover:scale-[1.01]"
+                      }`}
+                    >
+                      <div
+                        className={`p-2.5 rounded-full mb-3 transition-colors duration-300 ${
+                          onboardData.role === "geography-lead"
+                            ? "bg-primary text-white"
+                            : "bg-slate-200/80 text-slate-500 group-hover:bg-primary/10 group-hover:text-primary"
+                        }`}
+                      >
+                        <Map className="h-5 w-5" />
+                      </div>
+                      <span className="font-bold text-slate-700 text-xs block">Geography Lead</span>
+                      <span className="text-[9px] text-slate-500 mt-1 block leading-normal font-medium">
+                        Oversee program operations and state roll-ups.
+                      </span>
+                    </button>
+                  </div>
                 </div>
+              )}
 
-                <form
-                  onSubmit={
-                    onboardStep === totalOnboardSteps
-                      ? handleOnboardSubmit
-                      : (e) => {
-                          e.preventDefault();
-                          handleOnboardNext();
+              {/* Step 2: Basic Profile & Jurisdiction */}
+              {onboardStep === 2 && (
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="staffName" className="text-sm font-semibold text-slate-700">
+                      Full Name *
+                    </Label>
+                    <Input
+                      id="staffName"
+                      placeholder="e.g. Ms. Sarah Johnson"
+                      value={onboardData.teacherName}
+                      onChange={(e) =>
+                        setOnboardData({ ...onboardData, teacherName: e.target.value })
+                      }
+                      className={`bg-card/50 backdrop-blur-sm border-slate-200 text-slate-800 placeholder-slate-400 rounded-xl focus:border-primary ${
+                        onboardErrors.teacherName ? "border-destructive focus-visible:ring-destructive" : ""
+                      }`}
+                    />
+                    {onboardErrors.teacherName && (
+                      <p className="text-xs text-destructive">{onboardErrors.teacherName}</p>
+                    )}
+                  </div>
+
+                  {/* State & District triggers */}
+                  <div className="space-y-2">
+                    <Label className="text-sm font-semibold text-slate-700">
+                      {onboardData.role === "teacher-trainer"
+                        ? "Assigned District & State *"
+                        : "Designated Overseeing State *"}
+                    </Label>
+                    <div className="relative">
+                      <Input
+                        readOnly
+                        placeholder={
+                          onboardData.role === "geography-lead"
+                            ? "Click to select designated State"
+                            : "Click to select State & District"
                         }
-                  }
-                  className="space-y-5"
-                >
-                  {/* Step 1: Choose Internal Role */}
-                  {onboardStep === 1 && (
-                    <div className="space-y-4">
-                      <p className="text-[11px] text-slate-500 text-center leading-relaxed">
-                        Register your access level to manage states or support trainers.
-                      </p>
-
-                      <div className="grid grid-cols-2 gap-4">
-                        {/* Teacher Trainer Card */}
-                        <button
-                          type="button"
-                          onClick={() => setOnboardData({ ...onboardData, role: "teacher-trainer" })}
-                          className={`relative flex flex-col items-center p-5 rounded-xl border-2 text-center transition-all duration-300 group ${
-                            onboardData.role === "teacher-trainer"
-                              ? "border-indigo-500 bg-indigo-500/5 scale-[1.02]"
-                              : "border-slate-850 bg-slate-900/30 hover:border-indigo-500/40 hover:scale-[1.01]"
-                          }`}
-                        >
-                          <div
-                            className={`p-2.5 rounded-full mb-3 transition-colors duration-300 ${
-                              onboardData.role === "teacher-trainer"
-                                ? "bg-indigo-500 text-white"
-                                : "bg-slate-800 text-slate-400 group-hover:bg-indigo-500/10 group-hover:text-indigo-400"
-                            }`}
-                          >
-                            <BookOpen className="h-5 w-5" />
-                          </div>
-                          <span className="font-bold text-slate-200 text-xs block">Teacher Trainer</span>
-                          <span className="text-[9px] text-slate-500 mt-1 block leading-normal">
-                            Support school admins & review district details.
-                          </span>
-                        </button>
-
-                        {/* Geography Lead Card */}
-                        <button
-                          type="button"
-                          onClick={() => setOnboardData({ ...onboardData, role: "geography-lead" })}
-                          className={`relative flex flex-col items-center p-5 rounded-xl border-2 text-center transition-all duration-300 group ${
-                            onboardData.role === "geography-lead"
-                              ? "border-rose-500 bg-rose-500/5 scale-[1.02]"
-                              : "border-slate-850 bg-slate-900/30 hover:border-rose-500/40 hover:scale-[1.01]"
-                          }`}
-                        >
-                          <div
-                            className={`p-2.5 rounded-full mb-3 transition-colors duration-300 ${
-                              onboardData.role === "geography-lead"
-                                ? "bg-rose-500 text-white"
-                                : "bg-slate-800 text-slate-400 group-hover:bg-rose-500/10 group-hover:text-rose-500"
-                            }`}
-                          >
-                            <Map className="h-5 w-5" />
-                          </div>
-                          <span className="font-bold text-slate-200 text-xs block">Geography Lead</span>
-                          <span className="text-[9px] text-slate-500 mt-1 block leading-normal">
-                            Oversee program operations and state roll-ups.
-                          </span>
-                        </button>
-                      </div>
+                        value={onboardData.location}
+                        onClick={() => {
+                          if (onboardData.location) {
+                            if (onboardData.role === "geography-lead") {
+                              setSelectedState(onboardData.location);
+                              setSelectedDistrict("");
+                            } else {
+                              const [dist, st] = onboardData.location.split(", ");
+                              setSelectedState(st || "");
+                              setSelectedDistrict(dist || "");
+                            }
+                          }
+                          setIsModalOpen(true);
+                        }}
+                        className={`cursor-pointer bg-card/50 backdrop-blur-sm border-slate-200 text-slate-800 placeholder-slate-400 rounded-xl pr-10 focus:border-primary ${
+                          onboardErrors.location ? "border-destructive focus-visible:ring-destructive" : ""
+                        }`}
+                      />
+                      <MapPin className="absolute right-3.5 top-3 h-4.5 w-4.5 text-slate-450 pointer-events-none" />
                     </div>
-                  )}
+                    {onboardErrors.location && (
+                      <p className="text-xs text-destructive">{onboardErrors.location}</p>
+                    )}
+                  </div>
+                </div>
+              )}
 
-                  {/* Step 2: Basic Profile & Jurisdiction */}
-                  {onboardStep === 2 && (
-                    <div className="space-y-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="staffName" className="text-sm font-medium text-slate-300">
-                          Full Name *
-                        </Label>
-                        <Input
-                          id="staffName"
-                          placeholder="e.g. Ms. Sarah Johnson"
-                          value={onboardData.teacherName}
-                          onChange={(e) =>
-                            setOnboardData({ ...onboardData, teacherName: e.target.value })
-                          }
-                          className={`bg-slate-900/60 border-slate-800 text-white placeholder-slate-600 rounded-xl focus:border-indigo-500 ${
-                            onboardErrors.teacherName ? "border-rose-500" : ""
-                          }`}
-                        />
-                        {onboardErrors.teacherName && (
-                          <p className="text-xs text-rose-400">{onboardErrors.teacherName}</p>
-                        )}
-                      </div>
+              {/* Step 3: Credentials / Reporting Assignments */}
+              {onboardStep === 3 && (
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="staffEmail" className="text-sm font-semibold text-slate-700">
+                      Email Address *
+                    </Label>
+                    <Input
+                      id="staffEmail"
+                      type="email"
+                      placeholder={
+                        onboardData.role === "teacher-trainer" ? "trainer@pijam.org" : "lead@pijam.org"
+                      }
+                      value={onboardData.teacherEmail}
+                      onChange={(e) =>
+                        setOnboardData({ ...onboardData, teacherEmail: e.target.value })
+                      }
+                      className={`bg-card/50 backdrop-blur-sm border-slate-200 text-slate-800 placeholder-slate-400 rounded-xl focus:border-primary ${
+                        onboardErrors.teacherEmail ? "border-destructive focus-visible:ring-destructive" : ""
+                      }`}
+                    />
+                    {onboardErrors.teacherEmail && (
+                      <p className="text-xs text-destructive">{onboardErrors.teacherEmail}</p>
+                    )}
+                  </div>
 
-                      {/* State & District triggers */}
-                      <div className="space-y-2">
-                        <Label className="text-sm font-medium text-slate-300">
-                          {onboardData.role === "teacher-trainer"
-                            ? "Assigned District & State *"
-                            : "Designated Overseeing State *"}
-                        </Label>
-                        <div className="relative">
-                          <Input
-                            readOnly
-                            placeholder={
-                              onboardData.role === "geography-lead"
-                                ? "Click to select designated State"
-                                : "Click to select State & District"
-                            }
-                            value={onboardData.location}
-                            onClick={() => {
-                              if (onboardData.location) {
-                                if (onboardData.role === "geography-lead") {
-                                  setSelectedState(onboardData.location);
-                                  setSelectedDistrict("");
-                                } else {
-                                  const [dist, st] = onboardData.location.split(", ");
-                                  setSelectedState(st || "");
-                                  setSelectedDistrict(dist || "");
-                                }
-                              }
-                              setIsModalOpen(true);
-                            }}
-                            className={`cursor-pointer bg-slate-900/60 border-slate-800 text-white placeholder-slate-600 rounded-xl pr-10 focus:border-indigo-500 ${
-                              onboardErrors.location ? "border-rose-500" : ""
-                            }`}
-                          />
-                          <MapPin className="absolute right-3.5 top-3 h-4.5 w-4.5 text-slate-500 pointer-events-none" />
-                        </div>
-                        {onboardErrors.location && (
-                          <p className="text-xs text-rose-400">{onboardErrors.location}</p>
-                        )}
-                      </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="staffPass" className="text-sm font-semibold text-slate-700">
+                        Password *
+                      </Label>
+                      <Input
+                        id="staffPass"
+                        type="password"
+                        placeholder="Min 6 chars"
+                        value={onboardData.teacherPassword}
+                        onChange={(e) =>
+                          setOnboardData({ ...onboardData, teacherPassword: e.target.value })
+                        }
+                        className={`bg-card/50 backdrop-blur-sm border-slate-200 text-slate-850 placeholder-slate-400 rounded-xl focus:border-primary ${
+                          onboardErrors.teacherPassword ? "border-destructive focus-visible:ring-destructive" : ""
+                        }`}
+                      />
                     </div>
-                  )}
-
-                  {/* Step 3: Credentials / Reporting Assignments */}
-                  {onboardStep === 3 && (
-                    <div className="space-y-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="staffEmail" className="text-sm font-medium text-slate-300">
-                          Email Address *
-                        </Label>
-                        <Input
-                          id="staffEmail"
-                          type="email"
-                          placeholder={
-                            onboardData.role === "teacher-trainer" ? "trainer@pijam.org" : "lead@pijam.org"
-                          }
-                          value={onboardData.teacherEmail}
-                          onChange={(e) =>
-                            setOnboardData({ ...onboardData, teacherEmail: e.target.value })
-                          }
-                          className={`bg-slate-900/60 border-slate-800 text-white placeholder-slate-600 rounded-xl focus:border-indigo-500 ${
-                            onboardErrors.teacherEmail ? "border-rose-500" : ""
-                          }`}
-                        />
-                        {onboardErrors.teacherEmail && (
-                          <p className="text-xs text-rose-400">{onboardErrors.teacherEmail}</p>
-                        )}
+                    <div className="space-y-2">
+                      <Label htmlFor="staffConfirm" className="text-sm font-semibold text-slate-700">
+                        Confirm Password *
+                      </Label>
+                      <Input
+                        id="staffConfirm"
+                        type="password"
+                        placeholder="Confirm password"
+                        value={onboardData.confirmPassword}
+                        onChange={(e) =>
+                          setOnboardData({ ...onboardData, confirmPassword: e.target.value })
+                        }
+                        className={`bg-card/50 backdrop-blur-sm border-slate-200 text-slate-850 placeholder-slate-400 rounded-xl focus:border-primary ${
+                          onboardErrors.confirmPassword ? "border-destructive focus-visible:ring-destructive" : ""
+                        }`}
+                      />
+                    </div>
+                    {(onboardErrors.teacherPassword || onboardErrors.confirmPassword) && (
+                      <div className="col-span-2">
+                        <p className="text-xs text-destructive font-medium">
+                          {onboardErrors.teacherPassword || onboardErrors.confirmPassword}
+                        </p>
                       </div>
+                    )}
+                  </div>
 
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                          <Label htmlFor="staffPass" className="text-sm font-medium text-slate-300">
-                            Password *
-                          </Label>
-                          <Input
-                            id="staffPass"
-                            type="password"
-                            placeholder="Min 6 chars"
-                            value={onboardData.teacherPassword}
-                            onChange={(e) =>
-                              setOnboardData({ ...onboardData, teacherPassword: e.target.value })
-                            }
-                            className={`bg-slate-900/60 border-slate-800 text-white placeholder-slate-600 rounded-xl focus:border-indigo-500 ${
-                              onboardErrors.teacherPassword ? "border-rose-500" : ""
-                            }`}
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="staffConfirm" className="text-sm font-medium text-slate-300">
-                            Confirm Password *
-                          </Label>
-                          <Input
-                            id="staffConfirm"
-                            type="password"
-                            placeholder="Confirm password"
-                            value={onboardData.confirmPassword}
-                            onChange={(e) =>
-                              setOnboardData({ ...onboardData, confirmPassword: e.target.value })
-                            }
-                            className={`bg-slate-900/60 border-slate-800 text-white placeholder-slate-600 rounded-xl focus:border-indigo-500 ${
-                              onboardErrors.confirmPassword ? "border-rose-500" : ""
-                            }`}
-                          />
-                        </div>
-                        {(onboardErrors.teacherPassword || onboardErrors.confirmPassword) && (
-                          <div className="col-span-2">
-                            <p className="text-xs text-rose-400">
-                              {onboardErrors.teacherPassword || onboardErrors.confirmPassword}
-                            </p>
-                          </div>
-                        )}
-                      </div>
-
-                      {/* Supervisor dropdown (Only for Teacher Trainer) */}
-                      {onboardData.role === "teacher-trainer" && (
-                        <div className="space-y-2 pt-2">
-                          <Label htmlFor="reportingLead" className="text-sm font-medium text-slate-300">
-                            Assigned Geography Lead *
-                          </Label>
-                          <select
-                            id="reportingLead"
-                            value={onboardData.assignedLeadId}
-                            onChange={(e) =>
-                              setOnboardData({ ...onboardData, assignedLeadId: e.target.value })
-                            }
-                            className={`w-full p-3 rounded-xl border bg-slate-900/60 border-slate-800 text-slate-300 text-sm focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 ${
-                              onboardErrors.assignedLeadId ? "border-rose-500" : ""
-                            }`}
+                  {/* Supervisor dropdown (Only for Teacher Trainer) */}
+                  {onboardData.role === "teacher-trainer" && (
+                    <div className="space-y-2 pt-2">
+                      <Label htmlFor="reportingLead" className="text-sm font-semibold text-slate-700">
+                        Assigned Geography Lead *
+                      </Label>
+                      <select
+                        id="reportingLead"
+                        value={onboardData.assignedLeadId}
+                        onChange={(e) =>
+                          setOnboardData({ ...onboardData, assignedLeadId: e.target.value })
+                        }
+                        className={`w-full p-3 rounded-xl border bg-card/50 backdrop-blur-sm border-slate-200 text-slate-700 text-sm focus:ring-1 focus:ring-primary focus:border-primary ${
+                          onboardErrors.assignedLeadId ? "border-destructive focus:ring-destructive" : ""
+                        }`}
+                      >
+                        <option value="" className="bg-card text-slate-400">
+                          -- Choose Supervising Lead --
+                        </option>
+                        {geographyLeads.map((lead) => (
+                          <option
+                            key={lead.email}
+                            value={lead.email}
+                            className="bg-card text-slate-800 font-semibold"
                           >
-                            <option value="" className="bg-slate-950 text-slate-500">
-                              -- Choose Supervising Lead --
-                            </option>
-                            {geographyLeads.map((lead) => (
-                              <option
-                                key={lead.email}
-                                value={lead.email}
-                                className="bg-slate-950 text-slate-200"
-                              >
-                                {lead.displayName} ({lead.email})
-                              </option>
-                            ))}
-                          </select>
-                          {onboardErrors.assignedLeadId && (
-                            <p className="text-xs text-rose-400">{onboardErrors.assignedLeadId}</p>
-                          )}
-                        </div>
+                            {lead.displayName} ({lead.email})
+                          </option>
+                        ))}
+                      </select>
+                      {onboardErrors.assignedLeadId && (
+                        <p className="text-xs text-destructive">{onboardErrors.assignedLeadId}</p>
                       )}
                     </div>
                   )}
+                </div>
+              )}
 
-                  {/* Step 4: Final Profile Review */}
-                  {onboardStep === 4 && (
-                    <div className="space-y-4 text-slate-300 text-sm">
-                      <div className="rounded-xl border border-indigo-500/20 bg-indigo-500/5 p-5 space-y-4">
-                        <h4 className="font-bold text-xs text-indigo-400 uppercase tracking-wider">
-                          Review Access Level
-                        </h4>
-                        <div className="grid grid-cols-2 gap-y-3 gap-x-4">
-                          <div>
-                            <span className="text-slate-500 block text-[10px]">Access Role:</span>
-                            <span className="font-bold text-white uppercase text-xs">
-                              {onboardData.role === "teacher-trainer"
-                                ? "Teacher Trainer (TT)"
-                                : "Geography Lead (GL/PL)"}
-                            </span>
-                          </div>
-                          <div>
-                            <span className="text-slate-500 block text-[10px]">Full Name:</span>
-                            <span className="font-semibold text-white">{onboardData.teacherName}</span>
-                          </div>
-                          <div className="col-span-2 border-t border-slate-800/60 pt-2">
-                            <span className="text-slate-500 block text-[10px]">Work Email:</span>
-                            <span className="font-semibold text-white">{onboardData.teacherEmail}</span>
-                          </div>
-                          <div className="border-t border-slate-800/60 pt-2">
-                            <span className="text-slate-500 block text-[10px]">Jurisdiction:</span>
-                            <span className="font-semibold text-white">{onboardData.location}</span>
-                          </div>
-                          {onboardData.role === "teacher-trainer" && (
-                            <div className="border-t border-slate-800/60 pt-2">
-                              <span className="text-slate-500 block text-[10px]">Reports To:</span>
-                              <span className="font-semibold text-white break-all">
-                                {onboardData.assignedLeadId}
-                              </span>
-                            </div>
-                          )}
-                        </div>
+              {/* Step 4: Final Profile Review */}
+              {onboardStep === 4 && (
+                <div className="space-y-4 text-slate-800 text-sm">
+                  <div className="rounded-xl border border-primary/20 bg-primary/5 p-5 space-y-4 shadow-sm">
+                    <h4 className="font-bold text-xs text-primary uppercase tracking-wider">
+                      Review Access Level
+                    </h4>
+                    <div className="grid grid-cols-2 gap-y-3 gap-x-4 text-slate-700">
+                      <div>
+                        <span className="text-slate-500 block text-[10px]">Access Role:</span>
+                        <span className="font-bold text-slate-800 uppercase text-xs">
+                          {onboardData.role === "teacher-trainer"
+                            ? "Teacher Trainer (TT)"
+                            : "Geography Lead (GL)"}
+                        </span>
                       </div>
+                      <div>
+                        <span className="text-slate-500 block text-[10px]">Full Name:</span>
+                        <span className="font-semibold text-slate-800">{onboardData.teacherName}</span>
+                      </div>
+                      <div className="col-span-2 border-t border-slate-200/40 pt-2">
+                        <span className="text-slate-500 block text-[10px]">Work Email:</span>
+                        <span className="font-semibold text-slate-800">{onboardData.teacherEmail}</span>
+                      </div>
+                      <div className="border-t border-slate-200/40 pt-2">
+                        <span className="text-slate-500 block text-[10px]">Jurisdiction:</span>
+                        <span className="font-semibold text-slate-800">{onboardData.location}</span>
+                      </div>
+                      {onboardData.role === "teacher-trainer" && (
+                        <div className="border-t border-slate-200/40 pt-2">
+                          <span className="text-slate-500 block text-[10px]">Reports To:</span>
+                          <span className="font-semibold text-slate-800 break-all text-xs">
+                            {onboardData.assignedLeadId}
+                          </span>
+                        </div>
+                      )}
                     </div>
-                  )}
-
-                  {/* Wizard Footer Navigation */}
-                  <div className="flex gap-3 pt-4 border-t border-slate-850">
-                    {onboardStep > 1 && (
-                      <Button
-                        type="button"
-                        variant="outline"
-                        onClick={handleOnboardPrev}
-                        className="flex-1 bg-transparent border-slate-800 text-slate-300 hover:bg-slate-900 rounded-xl"
-                      >
-                        Back
-                      </Button>
-                    )}
-                    {onboardStep < totalOnboardSteps ? (
-                      <Button
-                        type="submit"
-                        className={
-                          onboardStep === 1
-                            ? "w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl"
-                            : "flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl"
-                        }
-                      >
-                        Next
-                      </Button>
-                    ) : (
-                      <Button
-                        type="submit"
-                        className="flex-1 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-bold rounded-xl shadow-lg transition-transform active:scale-[0.98]"
-                        disabled={isLoading}
-                      >
-                        {isLoading ? "Submitting..." : "Join Team"}
-                      </Button>
-                    )}
                   </div>
-                </form>
-              </TabsContent>
-            </Tabs>
+                </div>
+              )}
+
+              {/* Wizard Footer Navigation */}
+              <div className="flex gap-3 pt-4 border-t border-border/20">
+                {onboardStep > 1 && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={handleOnboardPrev}
+                    className="flex-1 rounded-xl shadow-sm text-sm"
+                  >
+                    Back
+                  </Button>
+                )}
+                {onboardStep < totalOnboardSteps ? (
+                  <Button
+                    type="submit"
+                    className="flex-1 bg-primary hover:bg-primary/95 text-white font-bold rounded-xl shadow-lg transition-transform active:scale-[0.98] text-sm"
+                  >
+                    Next
+                  </Button>
+                ) : (
+                  <Button
+                    type="submit"
+                    className="flex-1 bg-primary hover:bg-primary/95 text-white font-bold rounded-xl shadow-lg transition-transform active:scale-[0.98] text-sm"
+                    disabled={isLoading}
+                  >
+                    {isLoading ? "Submitting..." : "Join Team"}
+                  </Button>
+                )}
+              </div>
+            </form>
           </div>
-        </div>
+
+          <p className="text-xs text-muted-foreground text-center">
+            Already registered?{" "}
+            <Link
+              href="/login"
+              className="text-primary hover:text-primary/80 font-bold hover:underline"
+            >
+              Sign in to Platform
+            </Link>
+          </p>
+        </motion.div>
       </div>
 
       {/* INDIAN GEOGRAPHY / STATE & DISTRICT MODAL */}
@@ -825,7 +664,7 @@ export default function PijamPortalPage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 backdrop-blur-md p-4"
+            className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-md p-4"
             onClick={(e) => {
               if (e.target === e.currentTarget) setIsModalOpen(false);
             }}
@@ -835,16 +674,16 @@ export default function PijamPortalPage() {
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.95, opacity: 0, y: 20 }}
               transition={{ type: "spring", stiffness: 300, damping: 28 }}
-              className="relative w-full max-w-3xl bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl flex flex-col max-h-[85vh] overflow-hidden text-white"
+              className="relative w-full max-w-3xl bg-white border border-slate-200/50 rounded-2xl shadow-2xl flex flex-col max-h-[85vh] overflow-hidden text-slate-800"
             >
               {/* Modal Header */}
-              <div className="flex items-center justify-between px-6 py-4 border-b border-slate-800 bg-slate-950 rounded-t-2xl">
+              <div className="flex items-center justify-between px-6 py-4 border-b border-border/30 bg-card rounded-t-2xl">
                 <div>
-                  <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                    <Map className="h-5 w-5 text-indigo-400" />
+                  <h3 className="text-lg font-bold text-foreground flex items-center gap-2">
+                    <Map className="h-5 w-5 text-primary" />
                     {onboardData.role === "geography-lead" ? "Select Designated State" : "Select Region Geography"}
                   </h3>
-                  <p className="text-xs text-slate-500 mt-0.5">
+                  <p className="text-xs text-muted-foreground mt-0.5">
                     {onboardData.role === "geography-lead"
                       ? "Choose the state you will oversee as Geography Lead"
                       : "Choose the state and corresponding educational district"}
@@ -854,24 +693,24 @@ export default function PijamPortalPage() {
                   variant="ghost"
                   size="icon"
                   onClick={() => setIsModalOpen(false)}
-                  className="h-8 w-8 rounded-full text-slate-400 hover:bg-slate-850 hover:text-white"
+                  className="h-8 w-8 rounded-full"
                 >
                   <X className="h-4 w-4" />
                 </Button>
               </div>
 
               {/* Modal Body */}
-              <div className="flex-1 overflow-hidden grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-slate-800">
+              <div className="flex-1 overflow-hidden grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-border/20">
                 {/* Left Column: States List */}
                 <div className="flex flex-col h-[50vh] md:h-[60vh] overflow-hidden">
-                  <div className="p-4 border-b border-slate-800">
+                  <div className="p-4 border-b border-border/10">
                     <div className="relative">
-                      <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-500" />
+                      <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
                       <Input
                         placeholder="Search State/UT..."
                         value={searchState}
                         onChange={(e) => setSearchState(e.target.value)}
-                        className="pl-9 h-9 text-sm bg-slate-950 border-slate-850 text-white placeholder-slate-600 focus-visible:ring-1 focus-visible:ring-indigo-500"
+                        className="pl-9 h-9 text-sm focus-visible:ring-1 focus-visible:ring-primary rounded-xl"
                       />
                     </div>
                   </div>
@@ -887,32 +726,32 @@ export default function PijamPortalPage() {
                           }}
                           className={`w-full text-left px-4 py-2.5 rounded-lg text-sm transition-all duration-200 flex items-center justify-between group ${
                             selectedState === sd.state
-                              ? "bg-indigo-600/20 text-indigo-400 font-semibold"
-                              : "hover:bg-slate-850/50 text-slate-300 hover:text-white hover:translate-x-1"
+                              ? "bg-primary/10 text-primary font-semibold"
+                              : "hover:bg-accent/5 text-foreground hover:text-primary hover:translate-x-1"
                           }`}
                         >
                           <div className="flex items-center gap-2.5">
                             <Building2 className={`h-4 w-4 transition-colors duration-200 ${
-                              selectedState === sd.state ? "text-indigo-400" : "text-slate-600 group-hover:text-indigo-400"
+                              selectedState === sd.state ? "text-primary" : "text-muted-foreground/60 group-hover:text-primary"
                             }`} />
                             <span>{highlightText(sd.state, searchState)}</span>
                           </div>
                           <div className="flex items-center gap-2">
                             <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium transition-colors duration-200 ${
                               selectedState === sd.state
-                                ? "bg-indigo-500 text-white"
-                                : "bg-slate-850 text-slate-500 group-hover:bg-indigo-600/20 group-hover:text-indigo-400"
+                                ? "bg-primary text-white"
+                                : "bg-slate-100 text-muted-foreground group-hover:bg-primary/10 group-hover:text-primary"
                             }`}>
                               {sd.districts.length}
                             </span>
                             {selectedState === sd.state && (
-                              <Check className="h-4 w-4 text-indigo-400" />
+                              <Check className="h-4 w-4 text-primary" />
                             )}
                           </div>
                         </button>
                       ))
                     ) : (
-                      <div className="text-center py-8 text-sm text-slate-500">
+                      <div className="text-center py-8 text-sm text-muted-foreground">
                         No states found
                       </div>
                     )}
@@ -920,28 +759,28 @@ export default function PijamPortalPage() {
                 </div>
 
                 {/* Right Column: Districts List or State-Level details */}
-                <div className="flex flex-col h-[50vh] md:h-[60vh] overflow-hidden bg-slate-950/20">
+                <div className="flex flex-col h-[50vh] md:h-[60vh] overflow-hidden bg-slate-50/30">
                   {onboardData.role === "geography-lead" ? (
-                    <div className="flex flex-col items-center justify-center h-full p-8 text-center bg-rose-500/5">
-                      <div className="p-4 bg-rose-500/10 text-rose-500 rounded-full mb-4 border border-rose-500/20">
+                    <div className="flex flex-col items-center justify-center h-full p-8 text-center bg-primary/5">
+                      <div className="p-4 bg-primary/10 text-primary rounded-full mb-4 border border-primary/20">
                         <Map className="h-8 w-8 stroke-[1.5]" />
                       </div>
-                      <h4 className="font-bold text-white text-sm">State-Level Access</h4>
-                      <p className="text-xs text-slate-500 mt-2 max-w-xs leading-relaxed">
+                      <h4 className="font-bold text-slate-800 text-sm">State-Level Access</h4>
+                      <p className="text-xs text-muted-foreground mt-2 max-w-xs leading-relaxed font-medium">
                         As a Geography Lead, your authority spans the entire state of <strong>{selectedState || "your choice"}</strong>. You will automatically have reporting visibility over all educational districts inside this state.
                       </p>
                       {selectedState && (
-                        <div className="mt-6 px-4 py-2 bg-emerald-500/10 text-emerald-400 text-xs font-semibold rounded-full border border-emerald-500/20 flex items-center gap-1.5 animate-in fade-in zoom-in-95">
-                          <Check className="h-3.5 w-3.5 animate-bounce" />
+                        <div className="mt-6 px-4 py-2 bg-emerald-500/10 text-emerald-600 text-xs font-bold rounded-full border border-emerald-500/20 flex items-center gap-1.5 animate-in fade-in zoom-in-95 shadow-sm">
+                          <Check className="h-3.5 w-3.5" />
                           Selected State: {selectedState}
                         </div>
                       )}
                     </div>
                   ) : (
                     <>
-                      <div className="p-4 border-b border-slate-800">
+                      <div className="p-4 border-b border-border/10">
                         <div className="relative">
-                          <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-500" />
+                          <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
                           <Input
                             placeholder={
                               selectedState
@@ -951,7 +790,7 @@ export default function PijamPortalPage() {
                             disabled={!selectedState}
                             value={searchDistrict}
                             onChange={(e) => setSearchDistrict(e.target.value)}
-                            className="pl-9 h-9 text-sm bg-slate-950 border-slate-850 text-white placeholder-slate-600 focus-visible:ring-1 focus-visible:ring-indigo-500"
+                            className="pl-9 h-9 text-sm focus-visible:ring-1 focus-visible:ring-primary rounded-xl"
                           />
                         </div>
                       </div>
@@ -965,30 +804,30 @@ export default function PijamPortalPage() {
                                 onClick={() => setSelectedDistrict(dist)}
                                 className={`w-full text-left px-4 py-2.5 rounded-lg text-sm transition-all duration-200 flex items-center justify-between group ${
                                   selectedDistrict === dist
-                                    ? "bg-indigo-650 text-white font-semibold shadow-md shadow-indigo-650/20"
-                                    : "hover:bg-slate-850/50 text-slate-350 hover:text-white hover:translate-x-1"
+                                    ? "bg-primary text-primary-foreground font-semibold shadow-md shadow-primary/20"
+                                    : "hover:bg-accent/5 text-slate-700 hover:text-primary hover:translate-x-1"
                                 }`}
                               >
                                 <div className="flex items-center gap-2.5">
                                   <MapPin className={`h-4 w-4 transition-all duration-200 ${
-                                    selectedDistrict === dist ? "text-white scale-110" : "text-slate-600 group-hover:text-indigo-400 group-hover:scale-110"
+                                    selectedDistrict === dist ? "text-white scale-110" : "text-muted-foreground/60 group-hover:text-primary"
                                   }`} />
                                   <span>{highlightText(dist, searchDistrict)}</span>
                                 </div>
                                 {selectedDistrict === dist && (
-                                  <Check className="h-4 w-4 text-white animate-in zoom-in-50" />
+                                  <Check className="h-4 w-4 text-white" />
                                 )}
                               </button>
                             ))
                           ) : (
-                            <div className="text-center py-8 text-sm text-slate-500">
+                            <div className="text-center py-8 text-sm text-muted-foreground">
                               No districts found
                             </div>
                           )
                         ) : (
                           <div className="flex flex-col items-center justify-center h-full p-6 text-center">
-                            <MapPin className="h-10 w-10 text-slate-600/30 mb-2 stroke-[1.2] animate-bounce" />
-                            <p className="text-sm font-medium text-slate-500">
+                            <MapPin className="h-10 w-10 text-muted-foreground/30 mb-2 stroke-[1.2]" />
+                            <p className="text-sm font-medium text-muted-foreground">
                               Please select a state from the left column to view its educational districts.
                             </p>
                           </div>
@@ -1000,24 +839,24 @@ export default function PijamPortalPage() {
               </div>
 
               {/* Modal Footer */}
-              <div className="px-6 py-4 border-t border-slate-800 bg-slate-950 rounded-b-2xl flex flex-col sm:flex-row items-center justify-between gap-3">
-                <div className="text-sm text-slate-300">
+              <div className="px-6 py-4 border-t border-border/20 bg-card rounded-b-2xl flex flex-col sm:flex-row items-center justify-between gap-3">
+                <div className="text-sm text-slate-700">
                   {selectedState ? (
                     onboardData.role === "geography-lead" ? (
-                      <span className="font-semibold text-indigo-400 flex items-center gap-1.5">
-                        <Check className="h-4 w-4 text-indigo-400" />
+                      <span className="font-semibold text-primary flex items-center gap-1.5">
+                        <Check className="h-4 w-4 text-primary" />
                         Selected State: {selectedState}
                       </span>
                     ) : selectedDistrict ? (
-                      <span className="font-semibold text-indigo-400 flex items-center gap-1.5">
-                        <Check className="h-4 w-4 text-indigo-400" />
+                      <span className="font-semibold text-primary flex items-center gap-1.5">
+                        <Check className="h-4 w-4 text-primary" />
                         Selected: {selectedDistrict}, {selectedState}
                       </span>
                     ) : (
-                      <span className="text-slate-500 italic">Select a district from the right column</span>
+                      <span className="text-muted-foreground italic">Select a district from the right column</span>
                     )
                   ) : (
-                    <span className="text-slate-500 italic">No geography selected yet</span>
+                    <span className="text-muted-foreground italic">No geography selected yet</span>
                   )}
                 </div>
                 <div className="flex items-center gap-2 w-full sm:w-auto">
@@ -1025,7 +864,7 @@ export default function PijamPortalPage() {
                     variant="outline"
                     type="button"
                     onClick={() => setIsModalOpen(false)}
-                    className="flex-1 sm:flex-none h-9 text-sm bg-transparent border-slate-800 hover:bg-slate-850"
+                    className="flex-1 sm:flex-none h-9 text-sm"
                   >
                     Cancel
                   </Button>
@@ -1033,7 +872,7 @@ export default function PijamPortalPage() {
                     type="button"
                     onClick={handleConfirmGeography}
                     disabled={isConfirmDisabled}
-                    className="flex-1 sm:flex-none h-9 text-sm font-semibold bg-indigo-600 hover:bg-indigo-700 text-white transition-transform active:scale-[0.98]"
+                    className="flex-1 sm:flex-none h-9 text-sm font-semibold shadow-md shadow-primary/10 transition-transform active:scale-[0.98]"
                   >
                     Confirm Selection
                   </Button>
