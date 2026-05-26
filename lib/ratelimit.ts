@@ -37,10 +37,33 @@ export function rateLimit(
   };
 }
 
-export function ipFromRequest(req: Request): string {
-  const xff = req.headers.get("x-forwarded-for");
-  if (xff) return xff.split(",")[0].trim();
-  const real = req.headers.get("x-real-ip");
-  if (real) return real;
+export function ipFromRequest(req: any): string {
+  if (!req) return "unknown";
+
+  // Case 1: Standard Request / NextRequest (headers is a Headers object with a get method)
+  if (req.headers && typeof req.headers.get === "function") {
+    try {
+      const xff = req.headers.get("x-forwarded-for");
+      if (xff) return xff.split(",")[0].trim();
+      const real = req.headers.get("x-real-ip");
+      if (real) return real;
+    } catch (e) {
+      // Swallowed
+    }
+  }
+
+  // Case 2: Plain object (headers is a record of string keys)
+  if (req.headers && typeof req.headers === "object") {
+    const xff = req.headers["x-forwarded-for"] || req.headers["X-Forwarded-For"];
+    if (xff) return String(xff).split(",")[0].trim();
+    
+    const real = req.headers["x-real-ip"] || req.headers["X-Real-IP"];
+    if (real) return String(real);
+  }
+
+  // Case 3: Direct properties or socket remote addresses
+  if (req.ip) return req.ip;
+  if (req.socket?.remoteAddress) return req.socket.remoteAddress;
+
   return "unknown";
 }

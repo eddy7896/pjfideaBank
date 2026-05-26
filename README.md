@@ -29,6 +29,32 @@ The system delivers tangible educational and organizational outcomes:
 
 ## 🛠️ Key Features & Modules
 
+### 🎨 Unified Premium Design Language
+The application features a modern, state-of-the-art visual design built with HSL variable palettes, glassmorphism, and dynamic animations:
+*   **Dynamic Animated Backdrop**: Floating fluid gradient orbs and a subtle SVG grid pattern overlay (`AnimatedBackground`) that creates an immersive, responsive feel.
+*   **Acrylic Glass Containers**: Cards and panel overlays designed with glassy backdrops (`backdrop-blur-md bg-card/85 border-border/40 shadow-2xl`) for a high-end look and feel.
+*   **Interactive micro-animations**: Focus rings, hover states, scale animations (`active:scale-[0.98]`), and smooth transitions using Framer Motion.
+*   **Glassy sticky navbars**: Sticky headers (`bg-background/95 backdrop-blur-sm`) matching the landing page look.
+
+### 🚪 Unified Access & Logins (`/login`)
+A central sign-in interface utilizing interactive tab interfaces for diverse user segments:
+*   **School Admins & Teachers**: High-level email/password-based access, including direct selector buttons for active demo credentials.
+*   **Student Teams**: Simple, accessible, low-resource logins using a unique Team ID and a 6-digit numeric PIN.
+
+### 🏫 School Onboarding Wizard (`/onboard`)
+An elegant 4-step registration wizard allowing new schools to join the platform:
+1.  **School Basics**: School name and 11-digit UDAISE code capture.
+2.  **School Details**: Full address, principal contact, phone number, and optional website link.
+3.  **Teacher Credentials**: Setting up the supervisor administrator account.
+4.  **Review & Confirm**: Summary check of all entered metadata prior to final completion.
+*   *Features*: Interactive geography modal selector with an autocomplete search covering all Indian states and corresponding educational districts.
+
+### 🛡️ Staff Onboarding Portal (`/pijam`)
+An internal onboarding wizard designed for field officers and project heads:
+*   **Geography Leads**: Designated to oversee operations across entire states, with automatic visibility over all educational districts.
+*   **Teacher Trainers**: Assigned to specific districts, registering by selecting their Supervising Geography Lead.
+*   *Features*: Stepper indicator tracking chosen roles, reporting relationships, credentials, and full summary review logs.
+
 ### 📅 Thematic Calendar Creator
 *   **Monthly Focus Themes**: Each month is dedicated to a specific theme (e.g., *Sustainability* for Feb, *EdTech* for Mar, *Health* for Apr) to direct students' creative energies.
 *   **Visual Customization**: Admins can customize the theme name, description, representative icon, and aesthetic background gradient.
