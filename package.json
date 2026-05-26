@@ -10,7 +10,8 @@
     "lint": "eslint",
     "format": "prettier --write \"**/*.{ts,tsx}\"",
     "typecheck": "tsc --noEmit",
-    "db:seed": "tsx prisma/seed.ts"
+    "db:seed": "tsx prisma/seed.ts",
+    "db:hash-pins": "node --env-file=.env.local node_modules/tsx/dist/cli.mjs scripts/hash-student-pins.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.4.1",

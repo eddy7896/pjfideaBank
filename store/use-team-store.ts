@@ -2,7 +2,6 @@
 
 import { create } from "zustand";
 import type { StudentTeam, TeamMember } from "@/types";
-import { useAuthStore } from "./use-auth-store";
 
 interface TeamState {
   teams: StudentTeam[];
@@ -36,17 +35,7 @@ export const useTeamStore = create<TeamState>((set, get) => ({
 
   loadTeams: async () => {
     try {
-      const user = useAuthStore.getState().currentUser;
-      const headers: Record<string, string> = {};
-      if (user) {
-        if (user.role) headers['x-user-role'] = user.role;
-        if (user.schoolName) headers['x-user-school-name'] = user.schoolName;
-        if (user.teamId) headers['x-user-team-id'] = user.teamId;
-        if (user.geographyId) headers['x-user-geography-id'] = user.geographyId;
-        if (user.subGeographyId) headers['x-user-sub-geography-id'] = user.subGeographyId;
-      }
-
-      const res = await fetch("/api/teams", { headers });
+      const res = await fetch("/api/teams", { credentials: "include" });
       if (res.ok) {
         const data = await res.json();
         set({ teams: data, isLoaded: true });

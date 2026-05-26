@@ -1,31 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { applyRoleScoping } from '@/lib/db/scoping';
+import { applyTeamScoping } from '@/lib/db/scoping';
+import { requireSession } from '@/lib/auth/session';
+import { hashPassword } from '@/lib/auth-utils';
 
-export async function GET(request: NextRequest) {
+export async function GET(_request: NextRequest) {
+  const gate = await requireSession();
+  if ('error' in gate) return gate.error;
+
   try {
-    const role = request.headers.get('x-user-role');
-    const schoolName = request.headers.get('x-user-school-name') || undefined;
-    const teamId = request.headers.get('x-user-team-id') || undefined;
-    const geographyId = request.headers.get('x-user-geography-id') || undefined;
-    const subGeographyId = request.headers.get('x-user-sub-geography-id') || undefined;
-
-    let scopedWhere: any = {};
-    if (role) {
-      scopedWhere = applyRoleScoping({
-        role,
-        schoolName,
-        teamId,
-        geographyId,
-        subGeographyId
-      });
-      // Adapt "teamId" scoping constraint to "id" for the StudentTeam model
-      if (scopedWhere.teamId) {
-        scopedWhere.id = scopedWhere.teamId;
-        delete scopedWhere.teamId;
-      }
-    }
-
+    const scopedWhere = applyTeamScoping(gate.user);
     const teams = await prisma.studentTeam.findMany({
       where: scopedWhere,
       include: { members: true },
@@ -38,14 +22,30 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  const gate = await requireSession();
+  if ('error' in gate) return gate.error;
+  const { user } = gate;
+
+  if (user.role !== 'school' || !user.schoolName) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+  }
+
   try {
     const data = await request.json();
+
+    // Hash incoming PIN before persisting. Always store as scrypt hash.
+    const rawPin = String(data.pin ?? '').trim();
+    if (!/^\d{6}$/.test(rawPin)) {
+      return NextResponse.json({ error: 'Invalid PIN format' }, { status: 400 });
+    }
+    const pinHash = await hashPassword(rawPin);
+
     const team = await prisma.studentTeam.create({
       data: {
         id: data.id,
-        pin: data.pin,
+        pin: pinHash,
         name: data.name,
-        schoolName: data.schoolName,
+        schoolName: user.schoolName,
         members: data.members ? {
           create: data.members.map((m: any) => ({
             id: m.id,
@@ -58,7 +58,10 @@ export async function POST(request: NextRequest) {
       },
       include: { members: true },
     });
-    return NextResponse.json(team, { status: 201 });
+
+    // Return the *plaintext* PIN exactly once so the school admin can hand it
+    // off to students. It is never persisted in cleartext.
+    return NextResponse.json({ ...team, pin: rawPin }, { status: 201 });
   } catch (error) {
     console.error('Failed to create team:', error);
     return NextResponse.json({ error: 'Failed to create team' }, { status: 500 });

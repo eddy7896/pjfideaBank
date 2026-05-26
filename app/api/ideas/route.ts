@@ -1,26 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { applyRoleScoping } from '@/lib/db/scoping';
+import { applyIdeaScoping } from '@/lib/db/scoping';
+import { requireSession } from '@/lib/auth/session';
 
-export async function GET(request: NextRequest) {
+export async function GET(_request: NextRequest) {
+  const gate = await requireSession();
+  if ('error' in gate) return gate.error;
+
   try {
-    const role = request.headers.get('x-user-role');
-    const schoolName = request.headers.get('x-user-school-name') || undefined;
-    const teamId = request.headers.get('x-user-team-id') || undefined;
-    const geographyId = request.headers.get('x-user-geography-id') || undefined;
-    const subGeographyId = request.headers.get('x-user-sub-geography-id') || undefined;
-
-    let scopedWhere = {};
-    if (role) {
-      scopedWhere = applyRoleScoping({
-        role,
-        schoolName,
-        teamId,
-        geographyId,
-        subGeographyId
-      });
-    }
-
+    const scopedWhere = applyIdeaScoping(gate.user);
     const ideas = await prisma.idea.findMany({
       where: scopedWhere,
       include: { timeline: true },
@@ -33,12 +21,22 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  const gate = await requireSession();
+  if ('error' in gate) return gate.error;
+  const { user } = gate;
+
+  // Only schools may submit a new idea. Server enforces school binding —
+  // ignores any client-supplied schoolName.
+  if (user.role !== 'school' || !user.schoolName) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+  }
+
   try {
     const data = await request.json();
     const idea = await prisma.idea.create({
       data: {
         id: data.id,
-        schoolName: data.schoolName,
+        schoolName: user.schoolName,
         title: data.title,
         theme: data.theme,
         teamId: data.teamId,

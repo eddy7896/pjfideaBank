@@ -1,14 +1,32 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { requireSession } from '@/lib/auth/session';
 
 export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const gate = await requireSession();
+  if ('error' in gate) return gate.error;
+  const { user } = gate;
+
   try {
     const { id } = await params;
-    const { status } = await request.json();
+    const existing = await prisma.idea.findUnique({ where: { id } });
+    if (!existing) {
+      return NextResponse.json({ error: 'Idea not found' }, { status: 404 });
+    }
 
+    // Only the owning school, owning student team, or super-admin may mutate.
+    const canEdit =
+      user.role === 'super-admin' ||
+      (user.role === 'school' && existing.schoolName === user.schoolName) ||
+      (user.role === 'student' && existing.teamId === user.teamId);
+    if (!canEdit) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
+
+    const { status } = await request.json();
     const updated = await prisma.idea.update({
       where: { id },
       data: { status },

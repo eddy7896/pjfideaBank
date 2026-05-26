@@ -1,56 +1,79 @@
+import type { SessionUser } from "@/lib/auth/session";
+
 /**
- * Enforces vertical and horizontal data-isolation (multi-tenancy)
- * by applying role-based where constraints on queries.
+ * Build a Prisma where-clause that scopes Idea queries to the session user's
+ * tenancy. Reads identity from the verified session — never from request
+ * headers or query params.
  */
-export function applyRoleScoping(user: { role: string; schoolName?: string; teamId?: string; geographyId?: string; subGeographyId?: string }, baseWhere: any = {}) {
-  const where = { ...baseWhere };
+export function applyIdeaScoping(user: SessionUser, baseWhere: any = {}) {
+  const where: any = { ...baseWhere };
 
   switch (user.role) {
     case "super-admin":
     case "program-lead":
-      // Global: View everything
       break;
 
     case "geography-lead":
-      // Scoped to designated State (geographyId)
-      where.school = {
-        subGeography: {
-          geographyId: user.geographyId
-        }
-      };
+      where.school = { subGeography: { geographyId: user.geographyId } };
       break;
 
     case "sed-department":
-      // Scoped to designated State + read-only on advanced gates (Prototype & Test)
-      where.school = {
-        subGeography: {
-          geographyId: user.geographyId
-        }
-      };
-      where.status = {
-        in: ["Prototype", "Test"]
-      };
+      where.school = { subGeography: { geographyId: user.geographyId } };
+      where.status = { in: ["Prototype", "Test"] };
       break;
 
     case "teacher-trainer":
-      // Scoped to managed districts (subGeographyId)
-      where.school = {
-        subGeographyId: user.subGeographyId
-      };
+      where.school = { subGeographyId: user.subGeographyId };
       break;
 
     case "school":
-      // Scoped to own institution
       where.schoolName = user.schoolName;
       break;
 
     case "student":
-      // Scoped to own student team workspace
       where.teamId = user.teamId;
       break;
 
     default:
-      // Restrict access entirely
+      where.id = "DENIED_BY_SCOPING_RULE";
+      break;
+  }
+
+  return where;
+}
+
+/**
+ * Same shape as applyIdeaScoping but for the StudentTeam model.
+ * Team has no `school.subGeography` join in current schema — geo/sub-geo roles
+ * see all teams under schools matching their territory via the `schoolName`
+ * → School relation.
+ */
+export function applyTeamScoping(user: SessionUser, baseWhere: any = {}) {
+  const where: any = { ...baseWhere };
+
+  switch (user.role) {
+    case "super-admin":
+    case "program-lead":
+      break;
+
+    case "geography-lead":
+    case "sed-department":
+      where.school = { subGeography: { geographyId: user.geographyId } };
+      break;
+
+    case "teacher-trainer":
+      where.school = { subGeographyId: user.subGeographyId };
+      break;
+
+    case "school":
+      where.schoolName = user.schoolName;
+      break;
+
+    case "student":
+      where.id = user.teamId;
+      break;
+
+    default:
       where.id = "DENIED_BY_SCOPING_RULE";
       break;
   }
