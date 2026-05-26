@@ -40,12 +40,18 @@ export async function POST(request: NextRequest) {
     }
     const pinHash = await hashPassword(rawPin);
 
+    const school = await prisma.school.findUnique({
+      where: { name: user.schoolName },
+      select: { id: true },
+    });
+
     const team = await prisma.studentTeam.create({
       data: {
         id: data.id,
         pin: pinHash,
         name: data.name,
         schoolName: user.schoolName,
+        schoolId: school?.id ?? null,
         members: data.members ? {
           create: data.members.map((m: any) => ({
             id: m.id,

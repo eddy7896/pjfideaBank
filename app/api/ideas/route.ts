@@ -83,11 +83,19 @@ export async function POST(request: NextRequest) {
       },
     };
 
+    // Resolve School.id for dual-write so the new schoolId FK column stays
+    // populated alongside the legacy schoolName.
+    const school = await prisma.school.findUnique({
+      where: { name: user.schoolName },
+      select: { id: true },
+    });
+
     const idea = await prisma.$transaction(async (tx) => {
       const created = await tx.idea.create({
         data: {
           id: data.id,
           schoolName: user.schoolName!,
+          schoolId: school?.id ?? null,
           title: data.title,
           theme: data.theme,
           teamId: data.teamId ?? null,
