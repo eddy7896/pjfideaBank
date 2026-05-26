@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { applyTeamScoping } from '@/lib/db/scoping';
 import { requireSession } from '@/lib/auth/session';
 import { hashPassword } from '@/lib/auth-utils';
+import { audit } from '@/lib/audit';
 
 export async function GET(_request: NextRequest) {
   const gate = await requireSession();
@@ -63,6 +64,14 @@ export async function POST(request: NextRequest) {
         } : undefined,
       },
       include: { members: true },
+    });
+
+    await audit(request, user, {
+      action: 'team.create',
+      entityType: 'StudentTeam',
+      entityId: team.id,
+      schoolName: user.schoolName,
+      payload: { name: team.name, memberCount: (data.members ?? []).length },
     });
 
     // Return the *plaintext* PIN exactly once so the school admin can hand it

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { prisma } from '@/lib/prisma';
 import { requireSession } from '@/lib/auth/session';
+import { audit } from '@/lib/audit';
 
 const BodySchema = z.object({
   reason: z.string().max(1000).optional(),
@@ -72,6 +73,18 @@ export async function POST(
           ? `Advance rejected: ${parsed.data.reason}`
           : 'Advance rejected',
         author: user.displayName,
+      },
+    });
+
+    await audit(request, user, {
+      action: 'idea.advance_rejected',
+      entityType: 'Idea',
+      entityId: id,
+      schoolName: idea.schoolName,
+      payload: {
+        fromStage: latestRequest.fromStage,
+        toStage: latestRequest.toStage,
+        reason: parsed.data.reason,
       },
     });
 

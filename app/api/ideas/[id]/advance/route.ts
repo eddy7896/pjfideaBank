@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { prisma } from '@/lib/prisma';
 import { requireSession } from '@/lib/auth/session';
+import { audit } from '@/lib/audit';
 
 const DT_STAGES = ['Empathize', 'Define', 'Ideate', 'Prototype', 'Test'] as const;
 
@@ -123,6 +124,14 @@ export async function PATCH(
         });
       });
 
+      await audit(request, user, {
+        action: 'idea.advance_requested',
+        entityType: 'Idea',
+        entityId: id,
+        schoolName: idea.schoolName,
+        payload: { fromStage, toStage },
+      });
+
       return NextResponse.json({
         ...updated,
         pendingApproval: { fromStage, toStage },
@@ -169,6 +178,14 @@ export async function PATCH(
         where: { id },
         include: { timeline: true },
       });
+    });
+
+    await audit(request, user, {
+      action: 'idea.advance',
+      entityType: 'Idea',
+      entityId: id,
+      schoolName: idea.schoolName,
+      payload: { fromStage, toStage },
     });
 
     return NextResponse.json(updated);

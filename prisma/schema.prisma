@@ -124,6 +124,24 @@ model TimelineEvent {
   @@index([timestamp])
 }
 
+model AuditLog {
+  id         String   @id @default(cuid())
+  actorId    String?
+  actorRole  String?
+  actorEmail String?
+  action     String
+  entityType String
+  entityId   String?
+  schoolName String?
+  ip         String?
+  payload    Json?
+  createdAt  DateTime @default(now())
+
+  @@index([entityType, entityId])
+  @@index([actorId])
+  @@index([createdAt])
+}
+
 model ThemeActivity {
   id          String   @id
   date        Int

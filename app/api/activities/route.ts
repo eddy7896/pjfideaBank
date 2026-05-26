@@ -1,9 +1,37 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod';
 import { prisma } from '@/lib/prisma';
+import { requireSession } from '@/lib/auth/session';
+import { audit } from '@/lib/audit';
 
-export async function GET(request: NextRequest) {
+const CreateSchema = z.object({
+  id: z.string().optional(),
+  date: z.number().int().min(1).max(31),
+  month: z.number().int().min(0).max(11),
+  year: z.number().int().min(2020).max(2100),
+  title: z.string().min(1).max(200),
+  theme: z.string().min(1).max(200),
+  schoolName: z.string().optional().nullable(),
+  description: z.string().max(2000).optional(),
+});
+
+export async function GET(_request: NextRequest) {
+  const gate = await requireSession();
+  if ('error' in gate) return gate.error;
+  const { user } = gate;
+
   try {
-    const activities = await prisma.themeActivity.findMany();
+    // Activities are visible to all authenticated users but scoped:
+    // schools see their own activities + global (schoolName null);
+    // admins see everything.
+    const where =
+      user.role === 'super-admin' || user.role === 'program-lead'
+        ? {}
+        : user.schoolName
+          ? { OR: [{ schoolName: null }, { schoolName: user.schoolName }] }
+          : { schoolName: null };
+
+    const activities = await prisma.themeActivity.findMany({ where });
     return NextResponse.json(activities);
   } catch (error) {
     console.error('Failed to fetch activities:', error);
@@ -12,8 +40,33 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  const gate = await requireSession();
+  if ('error' in gate) return gate.error;
+  const { user } = gate;
+
+  // Only super-admin (global activities) and school admins (own school) may create.
+  if (user.role !== 'super-admin' && user.role !== 'school') {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+  }
+
   try {
-    const data = await request.json();
+    const raw = await request.json();
+    const parsed = CreateSchema.safeParse(raw);
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: 'Invalid payload', issues: parsed.error.flatten() },
+        { status: 400 }
+      );
+    }
+    const data = parsed.data;
+
+    // School admins can only schedule against their own school. super-admins
+    // may explicitly leave schoolName null (global) or set any school.
+    let schoolName = data.schoolName ?? null;
+    if (user.role === 'school') {
+      schoolName = user.schoolName ?? null;
+    }
+
     const activity = await prisma.themeActivity.create({
       data: {
         id: data.id || `act-${Date.now()}`,
@@ -22,10 +75,19 @@ export async function POST(request: NextRequest) {
         year: data.year,
         title: data.title,
         theme: data.theme,
-        schoolName: data.schoolName,
+        schoolName,
         description: data.description,
       },
     });
+
+    await audit(request, user, {
+      action: 'activity.create',
+      entityType: 'ThemeActivity',
+      entityId: activity.id,
+      schoolName,
+      payload: { title: data.title, theme: data.theme },
+    });
+
     return NextResponse.json(activity, { status: 201 });
   } catch (error) {
     console.error('Failed to create activity:', error);

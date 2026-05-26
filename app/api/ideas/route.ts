@@ -4,6 +4,8 @@ import { prisma } from '@/lib/prisma';
 import { applyIdeaScoping } from '@/lib/db/scoping';
 import { requireSession } from '@/lib/auth/session';
 import { hashPassword } from '@/lib/auth-utils';
+import { audit } from '@/lib/audit';
+import { rateLimit, ipFromRequest } from '@/lib/ratelimit';
 
 const CreateSchema = z.object({
   id: z.string().min(1),
@@ -44,6 +46,16 @@ export async function POST(request: NextRequest) {
 
   if (user.role !== 'school' || !user.schoolName) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+  }
+
+  // Per-school throttle: 30 idea submissions / hour.
+  const ip = ipFromRequest(request);
+  const rl = rateLimit(`ideas:create:${user.schoolName}:${ip}`, 30, 60 * 60 * 1000);
+  if (!rl.allowed) {
+    return NextResponse.json(
+      { error: 'Too many submissions, slow down' },
+      { status: 429 }
+    );
   }
 
   try {
@@ -153,6 +165,19 @@ export async function POST(request: NextRequest) {
         where: { id: created.id },
         include: { timeline: true },
       });
+    });
+
+    await audit(request, user, {
+      action: 'idea.create',
+      entityType: 'Idea',
+      entityId: idea?.id,
+      schoolName: user.schoolName,
+      payload: {
+        title: data.title,
+        theme: data.theme,
+        teamId,
+        autoTeamProvisioned: !!autoTeamPlaintextPin,
+      },
     });
 
     // Hand the auto-generated PIN back to the caller exactly once. Never

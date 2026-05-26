@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { requireSession } from '@/lib/auth/session';
+import { audit } from '@/lib/audit';
 
 const DT_STAGES = ['Empathize', 'Define', 'Ideate', 'Prototype', 'Test'] as const;
 
@@ -10,7 +11,7 @@ const DT_STAGES = ['Empathize', 'Define', 'Ideate', 'Prototype', 'Test'] as cons
  * `advance_rejected` event has been recorded with the same toStage.
  */
 export async function POST(
-  _request: NextRequest,
+  request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const gate = await requireSession();
@@ -110,6 +111,14 @@ export async function POST(
         where: { id },
         include: { timeline: true },
       });
+    });
+
+    await audit(request, user, {
+      action: 'idea.advance_approved',
+      entityType: 'Idea',
+      entityId: id,
+      schoolName: idea.schoolName,
+      payload: { fromStage, toStage },
     });
 
     return NextResponse.json(updated);

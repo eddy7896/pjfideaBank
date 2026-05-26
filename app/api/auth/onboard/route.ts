@@ -1,24 +1,59 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { 
-  createSchool, 
-  getSchoolByName, 
-  getSchoolByUdaise, 
-  getUserByEmail, 
+import { z } from 'zod';
+import {
+  createSchool,
+  getSchoolByName,
+  getSchoolByUdaise,
+  getUserByEmail,
   createUser,
   createGeography,
   createSubGeography
 } from '@/lib/db/repositories';
 import { prisma } from '@/lib/prisma';
 import { hashPassword } from '@/lib/auth-utils';
+import { audit } from '@/lib/audit';
+import { rateLimit, ipFromRequest } from '@/lib/ratelimit';
 
+const OnboardSchema = z.object({
+  role: z.enum(['school', 'teacher-trainer', 'geography-lead']).default('school'),
+  schoolName: z.string().min(1).max(200).optional(),
+  location: z.string().min(1).max(200).optional(),
+  address: z.string().min(1).max(500).optional(),
+  phone: z.string().min(1).max(40).optional(),
+  website: z.string().url().max(500).optional().or(z.literal('')),
+  principalName: z.string().min(1).max(200).optional(),
+  udaiseCode: z.string().min(1).max(60).optional(),
+  teacherName: z.string().min(1).max(200),
+  teacherEmail: z.string().email().max(200),
+  teacherPassword: z.string().min(8).max(200),
+  assignedLeadId: z.string().max(200).optional(),
+});
 
 export async function POST(request: NextRequest) {
+  // Ratelimit: 5 onboard attempts / hour per IP. Without this, anyone
+  // could spam-create school + teacher accounts.
+  const ip = ipFromRequest(request);
+  const rl = rateLimit(`onboard:${ip}`, 5, 60 * 60 * 1000);
+  if (!rl.allowed) {
+    return NextResponse.json(
+      { message: 'Too many onboarding attempts, try again later' },
+      { status: 429 }
+    );
+  }
+
   try {
     const body = await request.json();
+    const parsed = OnboardSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json(
+        { message: 'Invalid payload', issues: parsed.error.flatten() },
+        { status: 400 }
+      );
+    }
     const {
-      role = 'school',
+      role,
       schoolName,
-      location, // "Pune, Maharashtra" or "Maharashtra"
+      location,
       address,
       phone,
       website,
@@ -28,15 +63,7 @@ export async function POST(request: NextRequest) {
       teacherEmail,
       teacherPassword,
       assignedLeadId,
-    } = body;
-
-    // Common credentials validation
-    if (!teacherName || !teacherEmail || !teacherPassword) {
-      return NextResponse.json(
-        { message: 'Missing required credentials fields' },
-        { status: 400 }
-      );
-    }
+    } = parsed.data;
 
     // Cryptographically hash the password before storing it
     const hashedPassword = await hashPassword(teacherPassword);
@@ -151,12 +178,20 @@ export async function POST(request: NextRequest) {
       });
 
 
+      await audit(request, null, {
+        action: 'onboard.school',
+        entityType: 'School',
+        entityId: school.id,
+        schoolName: schoolName!,
+        payload: { teacherEmail, udaiseCode, location },
+      });
+
       return NextResponse.json(
         { message: 'School onboarded successfully', school },
         { status: 201 }
       );
-    } 
-    
+    }
+
     if (role === 'teacher-trainer') {
       await createUser({
         role: 'teacher-trainer',
@@ -168,6 +203,11 @@ export async function POST(request: NextRequest) {
         passwordHash: hashedPassword,
       });
 
+      await audit(request, null, {
+        action: 'onboard.teacher-trainer',
+        entityType: 'User',
+        payload: { teacherEmail, geographyId, subGeographyId },
+      });
 
       return NextResponse.json(
         { message: 'Teacher Trainer onboarded successfully' },
@@ -184,6 +224,11 @@ export async function POST(request: NextRequest) {
         passwordHash: hashedPassword,
       });
 
+      await audit(request, null, {
+        action: 'onboard.geography-lead',
+        entityType: 'User',
+        payload: { teacherEmail, geographyId },
+      });
 
       return NextResponse.json(
         { message: 'Geography Lead onboarded successfully' },

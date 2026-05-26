@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { prisma } from '@/lib/prisma';
 import { requireSession } from '@/lib/auth/session';
+import { audit } from '@/lib/audit';
 
 const PatchSchema = z.object({
   title: z.string().min(1).max(200).optional(),
@@ -77,6 +78,14 @@ export async function PATCH(
       include: { timeline: true },
     });
 
+    await audit(request, user, {
+      action: 'idea.update',
+      entityType: 'Idea',
+      entityId: id,
+      schoolName: existing.schoolName,
+      payload: parsed.data,
+    });
+
     return NextResponse.json(updated);
   } catch (error) {
     console.error('Failed to update idea:', error);
@@ -85,7 +94,7 @@ export async function PATCH(
 }
 
 export async function DELETE(
-  _request: NextRequest,
+  request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const gate = await requireSession();
@@ -108,6 +117,15 @@ export async function DELETE(
 
     // Timeline cascades via schema.prisma onDelete: Cascade.
     await prisma.idea.delete({ where: { id } });
+
+    await audit(request, user, {
+      action: 'idea.delete',
+      entityType: 'Idea',
+      entityId: id,
+      schoolName: existing.schoolName,
+      payload: { title: existing.title, status: existing.status },
+    });
+
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('Failed to delete idea:', error);

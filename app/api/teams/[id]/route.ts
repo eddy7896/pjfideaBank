@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { requireSession } from '@/lib/auth/session';
+import { audit } from '@/lib/audit';
 
 export async function DELETE(
-  _request: NextRequest,
+  request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const gate = await requireSession();
@@ -26,6 +27,15 @@ export async function DELETE(
     }
 
     await prisma.studentTeam.delete({ where: { id } });
+
+    await audit(request, user, {
+      action: 'team.delete',
+      entityType: 'StudentTeam',
+      entityId: id,
+      schoolName: existing.schoolName,
+      payload: { name: existing.name },
+    });
+
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('Failed to delete team:', error);
