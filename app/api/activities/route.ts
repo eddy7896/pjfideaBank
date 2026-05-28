@@ -67,12 +67,21 @@ export async function POST(request: NextRequest) {
       schoolName = user.schoolName ?? null;
     }
 
+    // Compute the authoritative `scheduledDate` alongside the legacy
+    // triplet. The frontend still sends month as 0-indexed (JS Date
+    // convention), so add 1 here when storing the 1-indexed legacy
+    // value AND when constructing scheduledDate. Existing legacy rows
+    // were already stored 1-indexed; new rows align with them.
+    const monthOneIndexed = data.month + 1;
+    const scheduledDate = new Date(Date.UTC(data.year, data.month, data.date));
+
     const activity = await prisma.themeActivity.create({
       data: {
         id: data.id || `act-${Date.now()}`,
         date: data.date,
-        month: data.month,
+        month: monthOneIndexed,
         year: data.year,
+        scheduledDate,
         title: data.title,
         theme: data.theme,
         schoolName,

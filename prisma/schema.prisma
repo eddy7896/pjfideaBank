@@ -182,18 +182,22 @@ model AuditLog {
 }
 
 model ThemeActivity {
-  id          String   @id
-  date        Int
-  month       Int
-  year        Int
-  title       String
-  theme       String
-  schoolName  String?
-  description String?
-  createdAt   DateTime @default(now())
+  id            String   @id
+  // Authoritative scheduled date. The triplet below is denormalized for
+  // UI back-compat and will be dropped in a follow-up.
+  scheduledDate DateTime?
+  date          Int
+  month         Int
+  year          Int
+  title         String
+  theme         String
+  schoolName    String?
+  description   String?
+  createdAt     DateTime @default(now())
 
   @@index([month])
   @@index([year])
+  @@index([scheduledDate])
 }
 
 model ActivityReport {
