@@ -21,11 +21,9 @@ model School {
   createdBy      String?
 
   subGeography SubGeography? @relation(fields: [subGeographyId], references: [id])
-  teams         StudentTeam[]
-  ideas         Idea[]
-  schoolUsers   User[]        @relation("UserSchool")
-  teamsById     StudentTeam[] @relation("StudentTeamSchoolById")
-  ideasById     Idea[]        @relation("IdeaSchoolById")
+  schoolUsers  User[]         @relation("UserSchool")
+  teams        StudentTeam[]  @relation("StudentTeamSchoolById")
+  ideas        Idea[]         @relation("IdeaSchoolById")
 
   @@index([subGeographyId])
 }
@@ -89,14 +87,16 @@ model StudentTeam {
   id         String   @id @default(cuid())
   pin        String
   name       String
+  // Denormalized snapshot of School.name kept for display + legacy queries.
+  // Authoritative FK is `schoolId`. There is no `@relation` here so renaming
+  // the school does not require cascading text updates.
   schoolName String
-  schoolId   String?
+  schoolId   String
   createdAt  DateTime @default(now())
 
-  members    TeamMember[]
-  ideas      Idea[]
-  school     School       @relation(fields: [schoolName], references: [name])
-  schoolById School?      @relation("StudentTeamSchoolById", fields: [schoolId], references: [id], onDelete: Cascade)
+  members TeamMember[]
+  ideas   Idea[]
+  school  School       @relation("StudentTeamSchoolById", fields: [schoolId], references: [id], onDelete: Cascade)
 
   @@unique([schoolName, pin])
   @@index([schoolName])
@@ -105,11 +105,13 @@ model StudentTeam {
 
 model Idea {
   id               String   @id @default(cuid())
+  // Denormalized snapshot of School.name. The authoritative FK is `schoolId`.
   schoolName       String
-  schoolId         String?
+  schoolId         String
   title            String
   theme            String
   teamId           String?
+  // Denormalized snapshot of team name. Kept for display when teamId is null.
   studentTeam      String
   problemStatement String
   targetAudience   String
@@ -118,10 +120,9 @@ model Idea {
   stageData        Json?
   createdAt        DateTime @default(now())
 
-  school     School       @relation(fields: [schoolName], references: [name])
-  schoolById School?      @relation("IdeaSchoolById", fields: [schoolId], references: [id], onDelete: Cascade)
-  team       StudentTeam? @relation(fields: [teamId], references: [id], onDelete: SetNull)
-  timeline   TimelineEvent[]
+  school   School       @relation("IdeaSchoolById", fields: [schoolId], references: [id], onDelete: Cascade)
+  team     StudentTeam? @relation(fields: [teamId], references: [id], onDelete: SetNull)
+  timeline TimelineEvent[]
 
   @@index([schoolName])
   @@index([schoolId])

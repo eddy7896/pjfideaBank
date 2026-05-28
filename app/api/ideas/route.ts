@@ -101,12 +101,18 @@ export async function POST(request: NextRequest) {
       },
     };
 
-    // Resolve School.id for dual-write so the new schoolId FK column stays
-    // populated alongside the legacy schoolName.
+    // School.id is the authoritative FK after Phase D. Resolve once and
+    // require it for both StudentTeam.create and Idea.create.
     const school = await prisma.school.findUnique({
       where: { name: user.schoolName },
       select: { id: true },
     });
+    if (!school) {
+      return NextResponse.json(
+        { error: 'School record missing — contact support' },
+        { status: 500 }
+      );
+    }
 
     const idea = await prisma.$transaction(async (tx) => {
       // RBAC.md §2.5: when a school creates an idea without specifying a
@@ -125,7 +131,7 @@ export async function POST(request: NextRequest) {
             pin: pinHash,
             name: teamName,
             schoolName: user.schoolName!,
-            schoolId: school?.id ?? null,
+            schoolId: school.id,
           },
         });
         teamId = created.id;
@@ -137,7 +143,7 @@ export async function POST(request: NextRequest) {
         data: {
           id: data.id,
           schoolName: user.schoolName!,
-          schoolId: school?.id ?? null,
+          schoolId: school.id,
           title: data.title,
           theme: data.theme,
           teamId,

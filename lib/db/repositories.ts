@@ -78,12 +78,21 @@ export async function getAllUsers() {
 
 // STUDENT TEAMS
 export async function createTeam(team: StudentTeam) {
+  const school = await prisma.school.findUnique({
+    where: { name: team.schoolName },
+    select: { id: true },
+  });
+  if (!school) {
+    throw new Error(`Cannot create team: school '${team.schoolName}' not found`);
+  }
+
   return await prisma.studentTeam.create({
     data: {
       id: team.id,
       pin: team.pin,
       name: team.name,
       schoolName: team.schoolName,
+      schoolId: school.id,
       members: team.members ? {
         create: team.members.map((m: any) => ({
           id: m.id || crypto.randomUUID(),
@@ -144,10 +153,19 @@ export async function deleteTeam(id: string) {
 
 // IDEAS
 export async function createIdea(idea: Idea) {
+  const school = await prisma.school.findUnique({
+    where: { name: idea.schoolName },
+    select: { id: true },
+  });
+  if (!school) {
+    throw new Error(`Cannot create idea: school '${idea.schoolName}' not found`);
+  }
+
   return await prisma.idea.create({
     data: {
       id: idea.id,
       schoolName: idea.schoolName,
+      schoolId: school.id,
       title: idea.title,
       theme: idea.theme,
       teamId: idea.teamId,

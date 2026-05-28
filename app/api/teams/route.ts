@@ -45,6 +45,12 @@ export async function POST(request: NextRequest) {
       where: { name: user.schoolName },
       select: { id: true },
     });
+    if (!school) {
+      return NextResponse.json(
+        { error: 'School record missing — contact support' },
+        { status: 500 }
+      );
+    }
 
     const team = await prisma.studentTeam.create({
       data: {
@@ -52,7 +58,7 @@ export async function POST(request: NextRequest) {
         pin: pinHash,
         name: data.name,
         schoolName: user.schoolName,
-        schoolId: school?.id ?? null,
+        schoolId: school.id,
         members: data.members ? {
           create: data.members.map((m: any) => ({
             id: m.id,
