@@ -7,6 +7,7 @@ import { audit } from '@/lib/audit';
 const PatchSchema = z
   .object({
     displayName: z.string().min(1).max(200).optional(),
+    role: z.enum(['super-admin', 'geography-lead']).optional(),
     geographyId: z.string().optional().nullable(),
     subGeographyIds: z.array(z.string()).max(100).optional(),
   })
@@ -72,16 +73,30 @@ export async function PATCH(
     }
   }
 
+  // Phase K: when a user's role changes away from geography-lead, drop
+  // any UserSubGeography assignments so a future role re-toggle does not
+  // resurrect stale scope.
+  const roleChangedAwayFromGL =
+    data.role !== undefined &&
+    data.role !== 'geography-lead' &&
+    target.role === 'geography-lead';
+
   await prisma.$transaction(async (tx) => {
     await tx.user.update({
       where: { id: numericId },
       data: {
         displayName: data.displayName ?? undefined,
-        geographyId: data.geographyId ?? undefined,
+        role: data.role ?? undefined,
+        geographyId:
+          data.role && data.role !== 'geography-lead'
+            ? null
+            : data.geographyId ?? undefined,
       },
     });
 
-    if (data.subGeographyIds !== undefined) {
+    if (roleChangedAwayFromGL) {
+      await tx.userSubGeography.deleteMany({ where: { userId: numericId } });
+    } else if (data.subGeographyIds !== undefined) {
       await tx.userSubGeography.deleteMany({ where: { userId: numericId } });
       if (data.subGeographyIds.length) {
         await tx.userSubGeography.createMany({
