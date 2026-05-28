@@ -17,7 +17,7 @@ import { StatusBadge } from "@/components/shared/status-badge";
 import { useAuthStore } from "@/store/use-auth-store";
 import { useIdeaStore } from "@/store/use-idea-store";
 import { useTeamStore } from "@/store/use-team-store";
-import { SCHOOLS } from "@/lib/constants";
+import { useSchoolStore } from "@/store/use-school-store";
 import { cn } from "@/lib/utils";
 
 export default function SchoolsPage() {
@@ -25,7 +25,12 @@ export default function SchoolsPage() {
   const { currentUser } = useAuthStore();
   const { ideas } = useIdeaStore();
   const { teams } = useTeamStore();
+  const { schools, isLoaded: schoolsLoaded, loadSchools } = useSchoolStore();
   const [selectedSchool, setSelectedSchool] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!schoolsLoaded) loadSchools();
+  }, [schoolsLoaded, loadSchools]);
 
   if (!currentUser || currentUser.role !== "super-admin") {
     return (
@@ -41,7 +46,8 @@ export default function SchoolsPage() {
     );
   }
 
-  const schoolsList = SCHOOLS.map((schoolName) => {
+  const schoolsList = schools.map((s) => {
+    const schoolName = s.name;
     const schoolTeams = teams.filter((t) => t.schoolName === schoolName);
     const schoolIdeas = ideas.filter((i) => i.schoolName === schoolName);
     const stageBreakdown = {

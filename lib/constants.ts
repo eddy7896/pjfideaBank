@@ -97,9 +97,4 @@ export const DEMO_CREDENTIALS: DemoCredential[] = [
   },
 ];
 
-export const SCHOOLS = [
-  "Springfield High",
-  "Riverside Academy",
-  "Oakwood School",
-  "Maplewood Institute",
-];
+// SCHOOLS constant removed — read from /api/schools via useSchoolStore.

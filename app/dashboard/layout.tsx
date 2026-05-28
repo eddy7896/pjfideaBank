@@ -28,6 +28,7 @@ import { useAuthStore } from "@/store/use-auth-store";
 import { useTeamStore } from "@/store/use-team-store";
 import { useIdeaStore } from "@/store/use-idea-store";
 import { useActivityStore } from "@/store/use-activity-store";
+import { useSchoolStore } from "@/store/use-school-store";
 import { cn } from "@/lib/utils";
 
 const roleIcons: Record<string, typeof ShieldCheck> = {
@@ -55,6 +56,7 @@ export default function DashboardLayout({
   const { loadTeams } = useTeamStore();
   const { loadIdeas } = useIdeaStore();
   const { loadActivities } = useActivityStore();
+  const { loadSchools } = useSchoolStore();
   const [mounted, setMounted] = useState(false);
   const [hydrated, setHydrated] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -84,10 +86,11 @@ export default function DashboardLayout({
         loadTeams();
         loadIdeas();
         loadActivities();
+        loadSchools();
       };
       seed();
     }
-  }, [mounted, isAuthenticated, loadTeams, loadIdeas, loadActivities]);
+  }, [mounted, isAuthenticated, loadTeams, loadIdeas, loadActivities, loadSchools]);
 
   if (!mounted || !hydrated || !isAuthenticated || !currentUser) {
     return (

@@ -17,12 +17,12 @@ import { StatusBadge } from "@/components/shared/status-badge";
 import {
   DESIGN_THINKING_STAGES,
   STATUS_COLORS,
-  SCHOOLS,
 } from "@/lib/constants";
 import { useIdeaStore } from "@/store/use-idea-store";
 import { useAuthStore } from "@/store/use-auth-store";
 import { useThemeStore } from "@/store/use-theme-store";
 import { useActivityStore } from "@/store/use-activity-store";
+import { useSchoolStore } from "@/store/use-school-store";
 import { usePermissions } from "@/lib/permissions";
 import { KanbanBoard } from "@/components/dashboard/kanban-board";
 import { ThemeCalendar } from "@/components/calendar/theme-calendar";
@@ -35,13 +35,13 @@ export default function DashboardPage() {
   const { ideas } = useIdeaStore();
   const { themes } = useThemeStore();
   const { activities, isLoaded, loadActivities } = useActivityStore();
+  const { schools, isLoaded: schoolsLoaded, loadSchools, slugFor } = useSchoolStore();
   const { canViewIdea } = usePermissions();
 
   useEffect(() => {
-    if (!isLoaded) {
-      loadActivities();
-    }
-  }, [isLoaded, loadActivities]);
+    if (!isLoaded) loadActivities();
+    if (!schoolsLoaded) loadSchools();
+  }, [isLoaded, loadActivities, schoolsLoaded, loadSchools]);
 
   if (!currentUser) return null;
 
@@ -66,13 +66,15 @@ export default function DashboardPage() {
   });
   const maxStageCount = Math.max(...Object.values(stageCounts), 1);
 
-  // Schools with idea counts
-  const schoolIdeaCounts = SCHOOLS.map((name) => ({
-    name,
-    slug: name.toLowerCase().replace(/\s+/g, "-"),
-    count: ideas.filter((i) => i.schoolName === name).length,
+  // Schools with idea counts — live from DB instead of a hard-coded list
+  // so newly onboarded schools appear immediately on the super-admin
+  // dashboard.
+  const schoolIdeaCounts = schools.map((s) => ({
+    name: s.name,
+    slug: slugFor(s.name),
+    count: ideas.filter((i) => i.schoolName === s.name).length,
     advancedCount: ideas.filter(
-      (i) => i.schoolName === name && (i.status === "Prototype" || i.status === "Test")
+      (i) => i.schoolName === s.name && (i.status === "Prototype" || i.status === "Test")
     ).length,
   }));
 

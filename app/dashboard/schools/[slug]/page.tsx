@@ -1,6 +1,6 @@
 "use client";
 
-import { use, useState } from "react";
+import { use, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
@@ -12,9 +12,10 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/shared/status-badge";
-import { DESIGN_THINKING_STAGES, STATUS_COLORS, SCHOOLS } from "@/lib/constants";
+import { DESIGN_THINKING_STAGES, STATUS_COLORS } from "@/lib/constants";
 import { useIdeaStore } from "@/store/use-idea-store";
 import { useAuthStore } from "@/store/use-auth-store";
+import { useSchoolStore } from "@/store/use-school-store";
 import { KanbanBoard } from "@/components/dashboard/kanban-board";
 import type { DesignThinkingStatus } from "@/types";
 import { cn } from "@/lib/utils";
@@ -28,14 +29,26 @@ export default function SchoolDetailPage({
   const router = useRouter();
   const { ideas } = useIdeaStore();
   const { currentUser } = useAuthStore();
+  const { schools, isLoaded: schoolsLoaded, loadSchools, getBySlug } = useSchoolStore();
   const [viewMode, setViewMode] = useState<"kanban" | "list">("kanban");
+
+  useEffect(() => {
+    if (!schoolsLoaded) loadSchools();
+  }, [schoolsLoaded, loadSchools]);
 
   if (!currentUser) return null;
 
-  // Convert slug back to school name
-  const schoolName = SCHOOLS.find(
-    (s) => s.toLowerCase().replace(/\s+/g, "-") === slug
-  );
+  // Resolve slug -> school via live data; null until the store finishes loading
+  const matched = getBySlug(slug);
+  const schoolName = matched?.name;
+
+  if (!schoolsLoaded) {
+    return (
+      <div className="mx-auto max-w-7xl px-4 py-16 text-center sm:px-6 lg:px-8">
+        <div className="h-8 w-8 mx-auto animate-spin rounded-full border-4 border-primary border-t-transparent" />
+      </div>
+    );
+  }
 
   if (!schoolName) {
     return (

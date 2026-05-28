@@ -14,6 +14,7 @@ const PROTECTED_API = [
   "/api/activities",
   "/api/activity-reports",
   "/api/admin",
+  "/api/schools",
 ];
 
 const PUBLIC_AUTH_API = ["/api/auth"];
@@ -51,5 +52,6 @@ export const config = {
     "/api/activities/:path*",
     "/api/activity-reports/:path*",
     "/api/admin/:path*",
+    "/api/schools/:path*",
   ],
 };
