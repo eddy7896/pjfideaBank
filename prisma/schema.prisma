@@ -39,9 +39,10 @@ model User {
   teamId         String?
   geographyId    String?
   subGeographyId String?
-  assignedLeadId String?
-  createdAt      DateTime      @default(now())
-  createdById    Int?
+  assignedLeadId     String?  // DEPRECATED: legacy email string, kept for back-compat reads. Use assignedLeadUserId.
+  assignedLeadUserId Int?
+  createdAt          DateTime @default(now())
+  createdById        Int?
 
   geography           Geography?         @relation(fields: [geographyId], references: [id])
   subGeography        SubGeography?      @relation(fields: [subGeographyId], references: [id])
@@ -49,11 +50,14 @@ model User {
   assignedSubGeos     UserSubGeography[]
   createdBy           User?              @relation("UserCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
   createdUsers        User[]             @relation("UserCreatedBy")
+  assignedLead        User?              @relation("AssignedLead", fields: [assignedLeadUserId], references: [id], onDelete: SetNull)
+  assignedTrainers    User[]             @relation("AssignedLead")
 
   @@index([geographyId])
   @@index([subGeographyId])
   @@index([schoolId])
   @@index([role])
+  @@index([assignedLeadUserId])
 }
 
 // Many-to-many join so a geography-lead can be assigned to several

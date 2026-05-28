@@ -217,9 +217,14 @@ export async function POST(request: NextRequest) {
           { status: 400 }
         );
       }
+      // Accept either a numeric User.id or a legacy email reference so
+      // older clients keep working through the cutover.
+      const maybeId = Number(assignedLeadId);
       const lead = await prisma.user.findFirst({
-        where: { email: assignedLeadId.toLowerCase(), role: 'geography-lead' },
-        select: { id: true, geographyId: true },
+        where: Number.isInteger(maybeId)
+          ? { id: maybeId, role: 'geography-lead' }
+          : { email: assignedLeadId.toLowerCase(), role: 'geography-lead' },
+        select: { id: true, email: true, geographyId: true },
       });
       if (!lead) {
         return NextResponse.json(
@@ -236,7 +241,8 @@ export async function POST(request: NextRequest) {
         email: teacherEmail,
         geographyId: lead.geographyId ?? geographyId,
         subGeographyId,
-        assignedLeadId: assignedLeadId.toLowerCase(),
+        assignedLeadId: lead.email, // keep legacy text in sync until column drop
+        assignedLeadUserId: lead.id,
         passwordHash: hashedPassword,
       });
 
@@ -245,7 +251,7 @@ export async function POST(request: NextRequest) {
         entityType: 'User',
         payload: {
           teacherEmail,
-          assignedLeadId: assignedLeadId.toLowerCase(),
+          assignedLeadUserId: lead.id,
           geographyId: lead.geographyId ?? geographyId,
           subGeographyId,
         },

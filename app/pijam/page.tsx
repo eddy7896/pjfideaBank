@@ -562,8 +562,8 @@ export default function PijamPortalPage() {
                               : "no scope";
                           return (
                             <option
-                              key={lead.email}
-                              value={lead.email}
+                              key={lead.id}
+                              value={String(lead.id)}
                               className="bg-card text-slate-800 font-semibold"
                             >
                               {lead.displayName} — {scope}

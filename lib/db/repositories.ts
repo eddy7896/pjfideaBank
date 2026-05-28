@@ -43,7 +43,9 @@ export async function getUserByEmail(email: string) {
   });
 }
 
-export async function createUser(user: Omit<User, 'email'> & { email: string }) {
+export async function createUser(
+  user: Omit<User, 'email'> & { email: string; assignedLeadUserId?: number | null }
+) {
   // Dual-write schoolId FK alongside the legacy schoolName during the
   // additive cutover (Phase 3.2). When the user has no schoolName the
   // lookup is skipped.
@@ -67,6 +69,7 @@ export async function createUser(user: Omit<User, 'email'> & { email: string }) 
       geographyId: user.geographyId,
       subGeographyId: user.subGeographyId,
       assignedLeadId: user.assignedLeadId,
+      assignedLeadUserId: user.assignedLeadUserId ?? null,
       passwordHash: user.passwordHash,
     }
   });
