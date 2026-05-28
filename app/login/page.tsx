@@ -231,30 +231,35 @@ export default function LoginPage() {
                 </Button>
               </form>
 
-              {/* Demo Teacher Credentials */}
-              <div className="space-y-3 border-t border-border/20 pt-6">
-                <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">
-                  Demo Accounts
-                </p>
-                <div className="space-y-2">
-                  {DEMO_CREDENTIALS.map((cred) => (
-                    <button
-                      key={cred.email}
-                      onClick={() => fillCredentials(cred.email, cred.password)}
-                      className={`w-full flex items-start gap-3 rounded-xl border p-3 text-left transition-all hover:border-primary/30 hover:bg-primary/5 active:scale-[0.98] ${
-                        email === cred.email ? "border-primary bg-primary/5 shadow-sm" : "border-border bg-slate-50/30"
-                      }`}
-                    >
-                      <div className="min-w-0 flex-1">
-                        <p className="text-sm font-bold text-slate-800">{cred.label}</p>
-                        <p className="mt-0.5 text-xs text-slate-500 font-medium">
-                          {cred.email}
-                        </p>
-                      </div>
-                    </button>
-                  ))}
+              {/* Demo Teacher Credentials — visible only when explicitly
+                  enabled via env. Production deploys should leave the flag
+                  unset so seeded admin/school passwords don't leak via the
+                  login UI. */}
+              {process.env.NEXT_PUBLIC_SHOW_DEMO_CREDENTIALS === "true" && (
+                <div className="space-y-3 border-t border-border/20 pt-6">
+                  <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+                    Demo Accounts
+                  </p>
+                  <div className="space-y-2">
+                    {DEMO_CREDENTIALS.map((cred) => (
+                      <button
+                        key={cred.email}
+                        onClick={() => fillCredentials(cred.email, cred.password)}
+                        className={`w-full flex items-start gap-3 rounded-xl border p-3 text-left transition-all hover:border-primary/30 hover:bg-primary/5 active:scale-[0.98] ${
+                          email === cred.email ? "border-primary bg-primary/5 shadow-sm" : "border-border bg-slate-50/30"
+                        }`}
+                      >
+                        <div className="min-w-0 flex-1">
+                          <p className="text-sm font-bold text-slate-800">{cred.label}</p>
+                          <p className="mt-0.5 text-xs text-slate-500 font-medium">
+                            {cred.email}
+                          </p>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
                 </div>
-              </div>
+              )}
             </TabsContent>
 
             {/* Student Login */}
