@@ -156,28 +156,40 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      // Create school
-      const school = await createSchool({
-        name: schoolName,
-        location,
-        subGeographyId,
-        address,
-        phone,
-        website,
-        principalName,
-        udaiseCode,
-        createdBy: teacherEmail,
-      });
+      // Create school + admin user atomically. Earlier deploys minted the
+      // school row but lost the user row when the second statement crashed
+      // (e.g. duplicate email surfaced after a partial submit retry),
+      // leaving an orphan school nobody could log into.
+      const school = await prisma.$transaction(async (tx) => {
+        const created = await tx.school.create({
+          data: {
+            id: `SCH-${Date.now()}`,
+            name: schoolName!,
+            location: location!,
+            subGeographyId,
+            address: address!,
+            phone: phone!,
+            website: website || null,
+            principalName: principalName!,
+            udaiseCode: udaiseCode!,
+            createdBy: teacherEmail,
+          },
+        });
 
-      // Create school admin user
-      await createUser({
-        role: 'school',
-        schoolName,
-        displayName: teacherName,
-        email: teacherEmail,
-        geographyId,
-        subGeographyId,
-        passwordHash: hashedPassword,
+        await tx.user.create({
+          data: {
+            role: 'school',
+            schoolName: schoolName!,
+            schoolId: created.id,
+            displayName: teacherName,
+            email: teacherEmail.toLowerCase(),
+            geographyId,
+            subGeographyId,
+            passwordHash: hashedPassword,
+          },
+        });
+
+        return created;
       });
 
 
