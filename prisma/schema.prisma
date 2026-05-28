@@ -34,7 +34,7 @@ model User {
   schoolName     String?
   schoolId       String?
   displayName    String
-  email          String        @unique
+  email          String        @unique @db.Citext
   passwordHash   String?
   teamId         String?
   geographyId    String?
