@@ -159,7 +159,7 @@ export default function PijamPortalPage() {
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(onboardData.teacherEmail))
           newErrors.teacherEmail = "Valid email required";
         if (onboardData.teacherPassword.length < 6)
-          onboardData.teacherPassword = "Password min 6 characters";
+          newErrors.teacherPassword = "Password min 6 characters";
         if (onboardData.teacherPassword !== onboardData.confirmPassword)
           newErrors.confirmPassword = "Passwords must match";
       }
@@ -652,15 +652,26 @@ export default function PijamPortalPage() {
             </form>
           </div>
 
-          <p className="text-xs text-muted-foreground text-center">
-            Already registered?{" "}
-            <Link
-              href="/login"
-              className="text-primary hover:text-primary/80 font-bold hover:underline"
-            >
-              Sign in to Platform
-            </Link>
-          </p>
+          <div className="text-center space-y-2">
+            <p className="text-xs text-muted-foreground">
+              Already registered?{" "}
+              <Link
+                href="/login"
+                className="text-primary hover:text-primary/80 font-bold hover:underline"
+              >
+                Sign in to Platform
+              </Link>
+            </p>
+            <p className="text-xs text-slate-400">
+              Registering a school instead?{" "}
+              <Link
+                href="/onboard"
+                className="text-primary hover:text-primary/80 font-bold hover:underline"
+              >
+                Register your school
+              </Link>
+            </p>
+          </div>
         </motion.div>
       </div>
 

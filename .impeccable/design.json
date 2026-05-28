@@ -1,0 +1,145 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-05-28T23:03:00Z",
+  "title": "Design System: Pi Jam Idea Bank",
+  "extensions": {
+    "colorMeta": {
+      "primary": {
+        "role": "primary",
+        "displayName": "Pi Jam Teal-Blue",
+        "canonical": "oklch(0.65 0.12 250)",
+        "tonalRamp": [
+          "oklch(0.25 0.05 250)",
+          "oklch(0.35 0.07 250)",
+          "oklch(0.45 0.09 250)",
+          "oklch(0.55 0.11 250)",
+          "oklch(0.65 0.12 250)",
+          "oklch(0.75 0.10 250)",
+          "oklch(0.85 0.07 250)",
+          "oklch(0.95 0.03 250)"
+        ]
+      },
+      "background": {
+        "role": "neutral",
+        "displayName": "Slate Canvas",
+        "canonical": "#F8FAFC"
+      },
+      "foreground": {
+        "role": "neutral",
+        "displayName": "Slate Ink",
+        "canonical": "#0F172A"
+      },
+      "card": {
+        "role": "neutral",
+        "displayName": "Ice Glass",
+        "canonical": "#FFFFFF"
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display Heading",
+        "purpose": "Hero and high-impact page headings."
+      },
+      "headline": {
+        "displayName": "Section Heading",
+        "purpose": "Major section visual blocks."
+      },
+      "title": {
+        "displayName": "Card Title",
+        "purpose": "Standard module and card titles."
+      },
+      "body": {
+        "displayName": "Body Paragraph",
+        "purpose": "Standard paragraphs and text elements."
+      }
+    },
+    "shadows": [
+      {
+        "name": "ambient-low",
+        "value": "0 4px 24px rgba(0,0,0,0.06)",
+        "purpose": "Default dashboard cards and structural panels."
+      },
+      {
+        "name": "active-lift",
+        "value": "0 10px 30px rgba(0,0,0,0.12)",
+        "purpose": "Interactive elements during hover or active drags."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease-out-quint",
+        "value": "cubic-bezier(0.23, 1, 0.32, 1)",
+        "purpose": "Smooth, high-fidelity responsive transitions."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "sm",
+        "value": "640px"
+      },
+      {
+        "name": "md",
+        "value": "768px"
+      },
+      {
+        "name": "lg",
+        "value": "1024px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Standard call-to-action button with micro-scaling and smooth transitions.",
+      "html": "<button class=\"ds-btn-primary\">CONTINUE</button>",
+      "css": ".ds-btn-primary { background: #5BA4C7; color: #FFFFFF; font-weight: 500; border-radius: 10px; padding: 12px 24px; font-family: sans-serif; font-size: 0.975rem; border: none; cursor: pointer; transition: background 0.2s, transform 0.1s; } .ds-btn-primary:hover { background: oklch(0.70 0.10 250); } .ds-btn-primary:active { transform: scale(0.98); }"
+    },
+    {
+      "name": "Acrylic Container Card",
+      "kind": "card",
+      "description": "Premium glassmorphic panel overlaying the background gradient.",
+      "html": "<div class=\"ds-acrylic-card\"><h3 class=\"ds-card-title\">Overview</h3><p class=\"ds-card-text\">Nurturing Design-Driven Education and Computational Thinking.</p></div>",
+      "css": ".ds-acrylic-card { backdrop-filter: blur(12px); background: rgba(255, 255, 255, 0.85); border: 1px solid rgba(226, 232, 240, 0.4); border-radius: 10px; padding: 24px; box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06); } .ds-card-title { font-family: sans-serif; font-weight: 500; font-size: 1.25rem; color: #0F172A; margin: 0 0 8px 0; } .ds-card-text { font-family: sans-serif; font-size: 0.975rem; color: #475569; margin: 0; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Digital Glass Lab",
+    "overview": "The visual language of the Pi Jam Idea Bank is designed to evoke a modern, tactile, and professional classroom laboratory environment. It shifts away from basic white panels toward dynamic, translucent glassmorphism overlays floating gracefully over high-fidelity animated gradient backdrops. This depth stimulates students' spatial curiosity, aligning with design-thinking, computational thinking, and hands-on making.",
+    "keyCharacteristics": [
+      "Translucent Depth: Translucent layout shells and cards overlaying floating fluid gradients.",
+      "Micro-Animated Feedbacks: Fast, non-elastic scale-downs on active states to make the interface feel highly responsive.",
+      "Clean Structure: Flat layouts with extremely fine slate borders for precise structural alignment."
+    ],
+    "rules": [
+      {
+        "name": "The Rarity Rule",
+        "body": "The primary accent Teal-Blue is used on <=10% of any given dashboard screen. Its visual rarity is what creates instant structural focus.",
+        "section": "colors"
+      },
+      {
+        "name": "The Tinted Neutral Rule",
+        "body": "Fills and borders are tinted slightly toward the brand accent (utilizing slate-50/100/200 palettes) to avoid clinical, desaturated grays.",
+        "section": "colors"
+      },
+      {
+        "name": "The Flat-By-Default Rule",
+        "body": "Elements sit flat on their glass canvas. Elevation increases only as a reactive state changes (such as hover scale shifts).",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do use translucent glass cards (backdrop-blur-md bg-card/85) to overlay the floating fluid gradients.",
+      "Do keep the brand Teal-Blue reserved for functional elements (buttons, active status, inputs).",
+      "Do use standard 10px corner roundness consistently across all panels."
+    ],
+    "donts": [
+      "Don't use colored accent stripes on borders greater than 1px (e.g. standard SaaS card left borders).",
+      "Don't use gradient text treatments.",
+      "Don't repeat identical card grids endlessly; vary columns and components to maintain rhythm.",
+      "Don't default to modals; prioritize inline forms and layouts.",
+      "Don't use em-dashes (\u2014) or double-hyphens (--) in copy."
+    ]
+  }
+}

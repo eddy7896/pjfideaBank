@@ -1,7 +1,9 @@
 "use client";
 
 import { useAuthStore } from "@/store/use-auth-store";
+import { useSchoolStore } from "@/store/use-school-store";
 import type { Idea } from "@/types";
+
 
 export function usePermissions() {
   const { currentUser } = useAuthStore();
@@ -61,6 +63,19 @@ export function usePermissions() {
   ): boolean => {
     if (!currentUser) return false;
 
+    // Resolve school geographics dynamically from school store if not supplied
+    let geo = ideaSchoolGeographics;
+    if (!geo) {
+      const schools = useSchoolStore.getState().schools;
+      const school = schools.find((s) => s.name === idea.schoolName || s.id === (idea as any).schoolId);
+      if (school?.subGeography) {
+        geo = {
+          geographyId: school.subGeography.geographyId,
+          subGeographyId: school.subGeography.id,
+        };
+      }
+    }
+
     switch (currentUser.role) {
       case "super-admin":
       case "program-lead":
@@ -69,18 +84,19 @@ export function usePermissions() {
 
       case "geography-lead":
         // State-scoped access
-        return ideaSchoolGeographics?.geographyId === currentUser.geographyId;
+        return geo?.geographyId === currentUser.geographyId;
 
       case "sed-department":
         // State-scoped + advanced stage observation only (Prototype & Test)
         const isAdvanced = idea.status === "Prototype" || idea.status === "Test";
         return (
-          ideaSchoolGeographics?.geographyId === currentUser.geographyId && isAdvanced
+          geo?.geographyId === currentUser.geographyId && isAdvanced
         );
 
       case "teacher-trainer":
         // District-scoped access
-        return ideaSchoolGeographics?.subGeographyId === currentUser.subGeographyId;
+        return geo?.subGeographyId === currentUser.subGeographyId;
+
 
       case "school":
         // School-isolated access

@@ -47,11 +47,12 @@ export default function AnalyticsPage() {
   const { ideas } = useIdeaStore();
   const { teams } = useTeamStore();
 
-  if (!currentUser || currentUser.role !== "super-admin") {
+  const allowedRoles = ["super-admin", "program-lead", "geography-lead", "teacher-trainer", "sed-department"];
+  if (!currentUser || !allowedRoles.includes(currentUser.role)) {
     return (
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         <div className="text-center py-12">
-          <p className="text-muted-foreground">Only super admin can view analytics.</p>
+          <p className="text-muted-foreground">You do not have permission to view this analytics dashboard.</p>
         </div>
       </div>
     );
@@ -100,7 +101,11 @@ export default function AnalyticsPage() {
         <div>
           <h1 className="text-3xl font-semibold tracking-tight">Analytics Dashboard</h1>
           <p className="text-muted-foreground mt-1">
-            Welcome back, Admin! Here's what's happening with Ideabank.
+            {currentUser.role === "super-admin" && "Welcome back, Admin! Here's a global overview of Ideabank."}
+            {currentUser.role === "program-lead" && "Global program overview and geographical roll-ups."}
+            {currentUser.role === "geography-lead" && "State overview for your assigned region."}
+            {currentUser.role === "teacher-trainer" && "District overview for your assigned region."}
+            {currentUser.role === "sed-department" && "State Education Department regional monitoring dashboard."}
           </p>
         </div>
 

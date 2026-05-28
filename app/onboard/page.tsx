@@ -587,15 +587,26 @@ export default function OnboardPage() {
             </form>
           </div>
 
-          <p className="text-xs text-muted-foreground text-center">
-            Already have an account?{" "}
-            <Link
-              href="/login"
-              className="text-primary hover:text-primary/80 font-bold hover:underline"
-            >
-              Sign in
-            </Link>
-          </p>
+          <div className="text-center space-y-2">
+            <p className="text-xs text-muted-foreground">
+              Already have an account?{" "}
+              <Link
+                href="/login"
+                className="text-primary hover:text-primary/80 font-bold hover:underline"
+              >
+                Sign in
+              </Link>
+            </p>
+            <p className="text-xs text-slate-400">
+              Are you Pi Jam staff?{" "}
+              <Link
+                href="/pijam"
+                className="text-primary hover:text-primary/80 font-bold hover:underline"
+              >
+                Register as staff
+              </Link>
+            </p>
+          </div>
         </motion.div>
       </div>
 

@@ -20,6 +20,8 @@ import {
   Menu,
   X,
   FileText,
+  Map,
+  BookOpen,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -34,6 +36,9 @@ import { cn } from "@/lib/utils";
 
 const roleIcons: Record<string, typeof ShieldCheck> = {
   "super-admin": ShieldCheck,
+  "program-lead": ShieldCheck,
+  "geography-lead": Map,
+  "teacher-trainer": BookOpen,
   school: School,
   "sed-department": Building2,
   student: UsersIcon,
@@ -41,6 +46,9 @@ const roleIcons: Record<string, typeof ShieldCheck> = {
 
 const roleBadgeColors: Record<string, string> = {
   "super-admin": "bg-primary/10 text-primary border-primary/20",
+  "program-lead": "bg-purple-100 text-purple-700 border-purple-200",
+  "geography-lead": "bg-indigo-100 text-indigo-700 border-indigo-200",
+  "teacher-trainer": "bg-orange-100 text-orange-700 border-orange-200",
   school: "bg-emerald-100 text-emerald-700 border-emerald-200",
   "sed-department": "bg-accent/10 text-accent border-accent/20",
   student: "bg-blue-100 text-blue-700 border-blue-200",
@@ -175,88 +183,83 @@ export default function DashboardLayout({
             Calendar
           </Link>
 
-          {currentUser.role === "school" && (
-            <>
-              <Link
-                href="/dashboard/activities"
-                className={cn(
-                  "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold transition-all active:scale-[0.98]",
-                  pathname === "/dashboard/activities"
-                    ? "bg-primary text-primary-foreground shadow-md shadow-primary/20"
-                    : "text-muted-foreground hover:bg-primary/5 hover:text-primary"
-                )}
-              >
-                <FileText className="h-4 w-4" />
-                Activities
-              </Link>
-
-              <Link
-                href="/dashboard/teams"
-                className={cn(
-                  "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold transition-all active:scale-[0.98]",
-                  pathname === "/dashboard/teams"
-                    ? "bg-primary text-primary-foreground shadow-md shadow-primary/20"
-                    : "text-muted-foreground hover:bg-primary/5 hover:text-primary"
-                )}
-              >
-                <UsersIcon className="h-4 w-4" />
-                Teams
-              </Link>
-
-              <Link
-                href="/dashboard/projects"
-                className={cn(
-                  "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold transition-all active:scale-[0.98]",
-                  pathname.startsWith("/dashboard/projects")
-                    ? "bg-primary text-primary-foreground shadow-md shadow-primary/20"
-                    : "text-muted-foreground hover:bg-primary/5 hover:text-primary"
-                )}
-              >
-                <Folder className="h-4 w-4" />
-                Projects
-              </Link>
-
-              <Link
-                href="/dashboard/submit"
-                className={cn(
-                  "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold transition-all active:scale-[0.98]",
-                  pathname === "/dashboard/submit"
-                    ? "bg-primary text-primary-foreground shadow-md shadow-primary/20"
-                    : "text-muted-foreground hover:bg-primary/5 hover:text-primary"
-                )}
-              >
-                <PlusCircle className="h-4 w-4" />
-                New Idea
-              </Link>
-            </>
+          {currentUser.role === "super-admin" && (
+            <Link
+              href="/dashboard/admin/users"
+              className={cn(
+                "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold transition-all active:scale-[0.98]",
+                pathname.startsWith("/dashboard/admin/users")
+                  ? "bg-primary text-primary-foreground shadow-md shadow-primary/20"
+                  : "text-muted-foreground hover:bg-primary/5 hover:text-primary"
+              )}
+            >
+              <ShieldCheck className="h-4 w-4" />
+              Admin · Users
+            </Link>
           )}
 
-          {currentUser.role === "super-admin" && (
+          {currentUser.role !== "student" && (
+            <Link
+              href="/dashboard/activities"
+              className={cn(
+                "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold transition-all active:scale-[0.98]",
+                pathname === "/dashboard/activities"
+                  ? "bg-primary text-primary-foreground shadow-md shadow-primary/20"
+                  : "text-muted-foreground hover:bg-primary/5 hover:text-primary"
+              )}
+            >
+              <FileText className="h-4 w-4" />
+              Activities
+            </Link>
+          )}
+
+          {currentUser.role === "school" && (
+            <Link
+              href="/dashboard/teams"
+              className={cn(
+                "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold transition-all active:scale-[0.98]",
+                pathname === "/dashboard/teams"
+                  ? "bg-primary text-primary-foreground shadow-md shadow-primary/20"
+                  : "text-muted-foreground hover:bg-primary/5 hover:text-primary"
+              )}
+            >
+              <UsersIcon className="h-4 w-4" />
+              Teams
+            </Link>
+          )}
+
+          {currentUser.role !== "student" && (
+            <Link
+              href="/dashboard/projects"
+              className={cn(
+                "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold transition-all active:scale-[0.98]",
+                pathname.startsWith("/dashboard/projects")
+                  ? "bg-primary text-primary-foreground shadow-md shadow-primary/20"
+                  : "text-muted-foreground hover:bg-primary/5 hover:text-primary"
+              )}
+            >
+              <Folder className="h-4 w-4" />
+              Projects
+            </Link>
+          )}
+
+          {currentUser.role === "school" && (
+            <Link
+              href="/dashboard/submit"
+              className={cn(
+                "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold transition-all active:scale-[0.98]",
+                pathname === "/dashboard/submit"
+                  ? "bg-primary text-primary-foreground shadow-md shadow-primary/20"
+                  : "text-muted-foreground hover:bg-primary/5 hover:text-primary"
+              )}
+            >
+              <PlusCircle className="h-4 w-4" />
+              New Idea
+            </Link>
+          )}
+
+          {currentUser.role !== "school" && currentUser.role !== "student" && (
             <>
-              <Link
-                href="/dashboard/admin/users"
-                className={cn(
-                  "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold transition-all active:scale-[0.98]",
-                  pathname.startsWith("/dashboard/admin/users")
-                    ? "bg-primary text-primary-foreground shadow-md shadow-primary/20"
-                    : "text-muted-foreground hover:bg-primary/5 hover:text-primary"
-                )}
-              >
-                <ShieldCheck className="h-4 w-4" />
-                Admin · Users
-              </Link>
-              <Link
-                href="/dashboard/activities"
-                className={cn(
-                  "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold transition-all active:scale-[0.98]",
-                  pathname === "/dashboard/activities"
-                    ? "bg-primary text-primary-foreground shadow-md shadow-primary/20"
-                    : "text-muted-foreground hover:bg-primary/5 hover:text-primary"
-                )}
-              >
-                <FileText className="h-4 w-4" />
-                Activities
-              </Link>
               <Link
                 href="/dashboard/schools"
                 className={cn(

@@ -21,15 +21,40 @@ export async function GET(_request: NextRequest) {
   const { user } = gate;
 
   try {
-    // Activities are visible to all authenticated users but scoped:
-    // schools see their own activities + global (schoolName null);
-    // admins see everything.
-    const where =
-      user.role === 'super-admin' || user.role === 'program-lead'
-        ? {}
-        : user.schoolName
-          ? { OR: [{ schoolName: null }, { schoolName: user.schoolName }] }
-          : { schoolName: null };
+    let where: any = {};
+    if (user.role === 'super-admin' || user.role === 'program-lead') {
+      where = {};
+    } else if (user.role === 'school') {
+      where = { OR: [{ schoolName: null }, { schoolName: user.schoolName }] };
+    } else if (user.role === 'geography-lead' || user.role === 'teacher-trainer' || user.role === 'sed-department') {
+      let schoolGeoWhere: any = {};
+      if (user.role === 'geography-lead') {
+        if (user.subGeographyIds && user.subGeographyIds.length > 0) {
+          schoolGeoWhere = { subGeographyId: { in: user.subGeographyIds } };
+        } else {
+          schoolGeoWhere = { subGeography: { geographyId: user.geographyId } };
+        }
+      } else if (user.role === 'teacher-trainer') {
+        schoolGeoWhere = { subGeographyId: user.subGeographyId };
+      } else if (user.role === 'sed-department') {
+        schoolGeoWhere = { subGeography: { geographyId: user.geographyId } };
+      }
+
+      const schools = await prisma.school.findMany({
+        where: schoolGeoWhere,
+        select: { name: true },
+      });
+      const schoolNames = schools.map((s) => s.name);
+
+      where = {
+        OR: [
+          { schoolName: null },
+          { schoolName: { in: schoolNames } }
+        ]
+      };
+    } else {
+      where = { schoolName: null };
+    }
 
     const activities = await prisma.themeActivity.findMany({ where });
     return NextResponse.json(activities);

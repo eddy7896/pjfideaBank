@@ -371,6 +371,12 @@ export default function LoginPage() {
                 Register your school
               </Link>
             </p>
+            <p className="text-xs text-slate-400">
+              Are you Pi Jam staff?{" "}
+              <Link href="/pijam" className="text-primary hover:text-primary/80 font-bold hover:underline">
+                Onboard here
+              </Link>
+            </p>
           </div>
         </motion.div>
       </div>

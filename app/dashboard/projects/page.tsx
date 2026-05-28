@@ -11,16 +11,11 @@ import { usePermissions } from "@/lib/permissions";
 export default function ProjectsPage() {
   const router = useRouter();
   const { ideas } = useIdeaStore();
-  const { currentUser, canSubmitIdeas } = usePermissions();
+  const { currentUser, canSubmitIdeas, canViewIdea } = usePermissions();
 
   if (!currentUser) return null;
 
-  const schoolProjects =
-    currentUser.role === "school"
-      ? ideas.filter((idea) => idea.schoolName === currentUser.schoolName)
-      : currentUser.role === "student"
-      ? ideas.filter((idea) => idea.teamId === currentUser.teamId)
-      : [];
+  const schoolProjects = ideas.filter((idea) => canViewIdea(idea));
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
