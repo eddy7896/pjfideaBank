@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Users, Eye, EyeOff, Plus, Trash2, AlertTriangle } from "lucide-react";
+import { Users, Eye, EyeOff, Plus, Trash2, AlertTriangle, Pencil } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -19,10 +19,11 @@ import { toast } from "sonner";
 
 export default function TeamsPage() {
   const { currentUser } = useAuthStore();
-  const { teams, createTeam, deleteTeam, getTeamsBySchool } = useTeamStore();
+  const { teams, createTeam, updateTeam, deleteTeam, getTeamsBySchool } = useTeamStore();
   const { ideas } = useIdeaStore();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [teamToEdit, setTeamToEdit] = useState<any>(null);
   const [visiblePins, setVisiblePins] = useState<Set<string>>(new Set());
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
 
@@ -46,6 +47,24 @@ export default function TeamsPage() {
     toast.success(`Team "${name}" created successfully!`);
     await useTeamStore.getState().loadTeams();
     return { id: newTeam.id, pin: newTeam.pin };
+  };
+
+  const handleEditSubmit = async (name: string, members: any[]) => {
+    if (!teamToEdit) throw new Error("No team selected for editing");
+    const updatedTeam = await updateTeam(teamToEdit.id, name, members);
+    toast.success(`Team "${name}" updated successfully!`);
+    await useTeamStore.getState().loadTeams();
+    return { id: updatedTeam.id, pin: updatedTeam.pin };
+  };
+
+  const handleStartEdit = (team: any) => {
+    setTeamToEdit(team);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setTeamToEdit(null);
   };
 
   const handleDeleteTeam = async (id: string) => {
@@ -99,13 +118,23 @@ export default function TeamsPage() {
                       Created {new Date(team.createdAt).toLocaleDateString()}
                     </p>
                   </div>
-                  <Button
-                    variant="destructive"
-                    size="sm"
-                    onClick={() => setDeleteTarget(team.id)}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleStartEdit(team)}
+                    >
+                      <Pencil className="h-4 w-4 mr-2" />
+                      Edit
+                    </Button>
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      onClick={() => setDeleteTarget(team.id)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </div>
 
                 <div className="grid gap-4 sm:grid-cols-3 mb-4">
@@ -211,12 +240,13 @@ export default function TeamsPage() {
         )}
       </div>
 
-      {/* Create Team Modal */}
+      {/* Create / Edit Team Modal */}
       <CreateTeamModal
         open={isModalOpen}
         schoolName={currentUser.schoolName!}
-        onClose={() => setIsModalOpen(false)}
-        onSubmit={handleCreateTeam}
+        onClose={handleCloseModal}
+        teamToEdit={teamToEdit}
+        onSubmit={teamToEdit ? handleEditSubmit : handleCreateTeam}
       />
 
       {/* Delete Confirmation Dialog */}

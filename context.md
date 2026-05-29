@@ -188,6 +188,10 @@ A series of critical hotfixes and architectural upgrades have been successfully 
 * **Problem**: Although the `program-lead` (TTL) role was supported by permissions checks (`lib/permissions.ts`), the Super Admin dashboard and account creation API strictly limited creation scope to `super-admin` and `geography-lead`.
 * **Resolution**: Updated the validation schema in `app/api/admin/users/route.ts` and the Admin Users Dashboard UI in `app/dashboard/admin/users/page.tsx` to support creating, displaying, and managing `program-lead` accounts directly alongside other admin types.
 
+### 🔄 5. In-Place Team Editing & Secure PIN Reset
+* **Problem**: When student teams forgot their login PINs, teachers were forced to delete and recreate the team to generate a new PIN. This de-associated the student's project (Idea), setting `Idea.teamId` to `null` due to database referential rules.
+* **Resolution**: Implemented a secure in-place team editing flow. Added a `PUT /api/teams/[id]` route that allows teachers to modify the team name or members list while automatically generating and secure-hashing a brand new 6-digit login PIN inside a single Prisma database transaction. Re-used `CreateTeamModal` to seamlessly render the updated team's new plaintext PIN so teachers can copy it, completely retaining project links in the database without any de-association.
+
 ---
 
 ## ⚙️ 8. Local Workspace Commands

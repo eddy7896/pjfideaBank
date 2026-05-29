@@ -8,6 +8,7 @@ interface TeamState {
   isLoaded: boolean;
   loadTeams: () => Promise<void>;
   createTeam: (name: string, schoolName: string, members: TeamMember[]) => Promise<StudentTeam>;
+  updateTeam: (id: string, name: string, members: TeamMember[]) => Promise<StudentTeam>;
   deleteTeam: (id: string) => Promise<void>;
   getTeamsBySchool: (schoolName: string) => StudentTeam[];
   getTeamById: (id: string) => StudentTeam | undefined;
@@ -72,6 +73,27 @@ export const useTeamStore = create<TeamState>((set, get) => ({
     }
 
     return newTeam;
+  },
+
+  updateTeam: async (id: string, name: string, members: TeamMember[]) => {
+    try {
+      const res = await fetch(`/api/teams/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, members }),
+      });
+
+      if (res.ok) {
+        const updatedTeam = await res.json();
+        set((state) => ({
+          teams: state.teams.map((t) => (t.id === id ? updatedTeam : t)),
+        }));
+        return updatedTeam;
+      }
+    } catch (error) {
+      console.error("Failed to update team:", error);
+    }
+    throw new Error("Failed to update team");
   },
 
   deleteTeam: async (id: string) => {

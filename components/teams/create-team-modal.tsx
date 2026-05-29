@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,13 +13,14 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { X, Plus, Copy, Check } from "lucide-react";
-import type { TeamMember } from "@/types";
+import type { TeamMember, StudentTeam } from "@/types";
 
 interface CreateTeamModalProps {
   open: boolean;
   schoolName: string;
   onClose: () => void;
   onSubmit: (name: string, members: TeamMember[]) => Promise<{ id: string; pin: string }>;
+  teamToEdit?: StudentTeam | null;
 }
 
 const GRADES = ["9", "10", "11", "12"];
@@ -30,9 +31,21 @@ export function CreateTeamModal({
   schoolName,
   onClose,
   onSubmit,
+  teamToEdit = null,
 }: CreateTeamModalProps) {
   const [teamName, setTeamName] = useState("");
   const [members, setMembers] = useState<TeamMember[]>([]);
+
+  useEffect(() => {
+    if (teamToEdit) {
+      setTeamName(teamToEdit.name);
+      setMembers(teamToEdit.members || []);
+    } else {
+      setTeamName("");
+      setMembers([]);
+    }
+    setCreatedTeam(null);
+  }, [teamToEdit, open]);
   const [newMember, setNewMember] = useState({
     name: "",
     grade: "",
@@ -91,13 +104,19 @@ export function CreateTeamModal({
       <Dialog open={open} onOpenChange={handleClose}>
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle>Team Created Successfully!</DialogTitle>
+            <DialogTitle>
+              {teamToEdit ? "Team Updated Successfully!" : "Team Created Successfully!"}
+            </DialogTitle>
           </DialogHeader>
 
           <div className="space-y-6">
             <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-4">
               <p className="text-sm text-emerald-900">
-                Your team <strong>{teamName}</strong> is ready to use. Share these credentials with your students.
+                {teamToEdit ? (
+                  <>Your team <strong>{teamName}</strong> has been updated and a new 6-digit PIN has been generated. Share these credentials with your students.</>
+                ) : (
+                  <>Your team <strong>{teamName}</strong> is ready to use. Share these credentials with your students.</>
+                )}
               </p>
             </div>
 
@@ -160,7 +179,7 @@ export function CreateTeamModal({
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Create New Team</DialogTitle>
+          <DialogTitle>{teamToEdit ? "Edit Team" : "Create New Team"}</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-6">
@@ -303,7 +322,7 @@ export function CreateTeamModal({
               disabled={!teamName.trim() || members.length === 0}
               className="flex-1"
             >
-              Create Team
+              {teamToEdit ? "Save Changes" : "Create Team"}
             </Button>
           </div>
         </div>
