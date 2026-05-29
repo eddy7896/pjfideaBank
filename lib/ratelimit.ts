@@ -37,10 +37,23 @@ export function rateLimit(
   };
 }
 
-export function ipFromRequest(req: Request): string {
-  const xff = req.headers.get("x-forwarded-for");
-  if (xff) return xff.split(",")[0].trim();
-  const real = req.headers.get("x-real-ip");
-  if (real) return real;
+export function ipFromRequest(req: any): string {
+  if (!req) return "unknown";
+  const headers = req.headers;
+  if (!headers) return "unknown";
+
+  if (typeof headers.get === "function") {
+    const xff = headers.get("x-forwarded-for");
+    if (xff) return xff.split(",")[0].trim();
+    const real = headers.get("x-real-ip");
+    if (real) return real;
+  } else {
+    const xff = headers["x-forwarded-for"];
+    if (xff) return typeof xff === "string" ? xff.split(",")[0].trim() : String(xff);
+    const real = headers["x-real-ip"];
+    if (real) return typeof real === "string" ? real : String(real);
+  }
+
   return "unknown";
 }
+
