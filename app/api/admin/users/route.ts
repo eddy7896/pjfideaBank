@@ -7,7 +7,7 @@ import { audit } from '@/lib/audit';
 
 const CreateSchema = z
   .object({
-    role: z.enum(['super-admin', 'geography-lead']),
+    role: z.enum(['super-admin', 'program-lead', 'geography-lead']),
     displayName: z.string().min(1).max(200),
     email: z.string().email().max(200),
     password: z.string().min(8).max(200),

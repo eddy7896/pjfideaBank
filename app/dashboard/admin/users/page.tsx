@@ -55,7 +55,7 @@ export default function AdminUsersPage() {
   const [submitting, setSubmitting] = useState(false);
 
   const [form, setForm] = useState({
-    role: "geography-lead" as "geography-lead" | "super-admin",
+    role: "geography-lead" as "geography-lead" | "super-admin" | "program-lead",
     displayName: "",
     email: "",
     password: "",
@@ -158,6 +158,7 @@ export default function AdminUsersPage() {
   if (!currentUser || currentUser.role !== "super-admin") return null;
 
   const superAdmins = users.filter((u) => u.role === "super-admin");
+  const programLeads = users.filter((u) => u.role === "program-lead");
   const leads = users.filter((u) => u.role === "geography-lead");
 
   return (
@@ -186,6 +187,13 @@ export default function AdminUsersPage() {
             title="Super Admins"
             icon={<ShieldCheck className="h-4 w-4" />}
             rows={superAdmins}
+            onDelete={setDeleteTarget}
+            currentUserId={String(currentUser.email)}
+          />
+          <UserSection
+            title="Program Leads / TTLs"
+            icon={<ShieldCheck className="h-4 w-4" />}
+            rows={programLeads}
             onDelete={setDeleteTarget}
             currentUserId={String(currentUser.email)}
           />
@@ -229,6 +237,7 @@ export default function AdminUsersPage() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="geography-lead">Geography Lead</SelectItem>
+                  <SelectItem value="program-lead">Program Lead / TTL</SelectItem>
                   <SelectItem value="super-admin">Super Admin</SelectItem>
                 </SelectContent>
               </Select>

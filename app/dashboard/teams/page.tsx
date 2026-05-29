@@ -44,7 +44,6 @@ export default function TeamsPage() {
   const handleCreateTeam = async (name: string, members: any[]) => {
     const newTeam = await createTeam(name, currentUser.schoolName!, members);
     toast.success(`Team "${name}" created successfully!`);
-    setIsModalOpen(false);
     await useTeamStore.getState().loadTeams();
     return { id: newTeam.id, pin: newTeam.pin };
   };
@@ -126,19 +125,23 @@ export default function TeamsPage() {
                       <p className="text-xs font-medium text-muted-foreground">
                         6-Digit PIN
                       </p>
-                      <button
-                        onClick={() => togglePinVisibility(team.id)}
-                        className="text-muted-foreground hover:text-foreground transition"
-                      >
-                        {visiblePins.has(team.id) ? (
-                          <EyeOff className="h-4 w-4" />
-                        ) : (
-                          <Eye className="h-4 w-4" />
-                        )}
-                      </button>
+                      {!team.pin.includes(":") && (
+                        <button
+                          onClick={() => togglePinVisibility(team.id)}
+                          className="text-muted-foreground hover:text-foreground transition"
+                        >
+                          {visiblePins.has(team.id) ? (
+                            <EyeOff className="h-4 w-4" />
+                          ) : (
+                            <Eye className="h-4 w-4" />
+                          )}
+                        </button>
+                      )}
                     </div>
                     <p className="font-mono text-sm font-medium text-foreground tracking-widest">
-                      {visiblePins.has(team.id) ? team.pin : "••••••"}
+                      {team.pin.includes(":") 
+                        ? "Secured" 
+                        : (visiblePins.has(team.id) ? team.pin : "••••••")}
                     </p>
                   </div>
 

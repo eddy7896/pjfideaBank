@@ -128,7 +128,7 @@ Data visibility is strictly filtered in `lib/permissions.ts` to implement a secu
 | Role | Access Level | Operations | Data Bounds |
 | :--- | :--- | :--- | :--- |
 | **Super Admin** | Global | Full platform oversight, manages accounts, seeds databases, schedules themes. | Can view and edit all data across the platform. |
-| **Program Lead / TTL** | Global | Configures geographical structures, states, and districts. | Analytical overview across all states. |
+| **Program Lead / TTL** | Global | Configures geographical structures, states, and districts. | Analytical overview across all states. | 
 | **Geography Lead (GL)** | State-Scoped | Manages operations and supervises Teacher Trainers within their state. | Isolated strictly to their designated `geographyId`. |
 | **State Education Dept (SED)** | State-Scoped (Read-Only) | Observes aggregate progress; views innovative advanced-stage projects. | Only sees `Prototype` & `Test` ideas in their state. |
 | **Teacher Trainer (TT)** | District-Scoped | Tracks and supports schools in their assigned districts. | Scoped to districts in `subGeographyId` / `UserSubGeography`. |
@@ -183,6 +183,10 @@ A series of critical hotfixes and architectural upgrades have been successfully 
   * `npm run typecheck` resolves with **0 TypeScript errors**.
   * `npm run build` succeeds on Next.js App Router compiler layers with **0 warnings or compile-time breaks**.
   * Neon PostgreSQL migrations are successfully mapped and client codes are fully generated (`npx prisma generate`).
+
+### 👑 4. Program Lead / TTL Provisioning
+* **Problem**: Although the `program-lead` (TTL) role was supported by permissions checks (`lib/permissions.ts`), the Super Admin dashboard and account creation API strictly limited creation scope to `super-admin` and `geography-lead`.
+* **Resolution**: Updated the validation schema in `app/api/admin/users/route.ts` and the Admin Users Dashboard UI in `app/dashboard/admin/users/page.tsx` to support creating, displaying, and managing `program-lead` accounts directly alongside other admin types.
 
 ---
 

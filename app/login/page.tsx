@@ -335,13 +335,13 @@ export default function LoginPage() {
               </form>
 
               {/* Demo Student Credentials */}
-              {teams.length > 0 && (
+              {teams.filter((t) => !t.pin.includes(":")).length > 0 && (
                 <div className="space-y-3 border-t border-border/20 pt-6">
                   <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">
                     Demo Teams
                   </p>
                   <div className="space-y-2">
-                    {teams.slice(0, 2).map((team) => (
+                    {teams.filter((t) => !t.pin.includes(":")).slice(0, 2).map((team) => (
                       <button
                         key={team.id}
                         onClick={() => fillStudentCredentials(team.id, team.pin)}
