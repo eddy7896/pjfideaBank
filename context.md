@@ -192,6 +192,10 @@ A series of critical hotfixes and architectural upgrades have been successfully 
 * **Problem**: When student teams forgot their login PINs, teachers were forced to delete and recreate the team to generate a new PIN. This de-associated the student's project (Idea), setting `Idea.teamId` to `null` due to database referential rules.
 * **Resolution**: Implemented a secure in-place team editing flow. Added a `PUT /api/teams/[id]` route that allows teachers to modify the team name or members list while automatically generating and secure-hashing a brand new 6-digit login PIN inside a single Prisma database transaction. Re-used `CreateTeamModal` to seamlessly render the updated team's new plaintext PIN so teachers can copy it, completely retaining project links in the database without any de-association.
 
+### 📋 6. Documentation Review & Reusable Stage Documentation Timeline
+* **Problem**: When student teams submitted a stage advancement request (`advance_requested`), teachers could not review the specific stage documentation filled out by the students directly on the "Pending Review" card before deciding whether to approve or reject the transition. In addition, the project timeline only showed a static event label for submissions rather than rendering the actual documentation details.
+* **Resolution**: Exported a modular, reusable stage documentation renderer `renderStageDataDoc(data)` from `components/project/project-timeline.tsx` to handle read-only layouts for all 5 stages of Design Thinking. Updated the project timeline cards to automatically display full, richly formatted documentation on all `form_submitted` events in-line. Finally, integrated a "Review Documentation" action button and read-only Dialog modal in `app/dashboard/projects/[id]/page.tsx` for teachers to deeply inspect student submissions before approving transitions.
+
 ---
 
 ## ⚙️ 8. Local Workspace Commands

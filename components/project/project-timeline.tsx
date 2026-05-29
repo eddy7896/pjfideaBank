@@ -193,16 +193,19 @@ export function ProjectTimeline({
                 )}
 
                 {event.type === "form_submitted" && event.stage && (
-                  <div className="mt-2 text-xs">
+                  <div className="mt-3 space-y-2">
                     <span
                       className={cn(
-                        "inline-block px-2 py-1 rounded",
+                        "inline-block px-2 py-1 rounded text-xs font-medium",
                         STATUS_COLORS[event.stage].bg,
                         STATUS_COLORS[event.stage].text
                       )}
                     >
                       {event.stage} Documentation
                     </span>
+                    <div className="mt-2 rounded-lg border border-border/50 bg-background p-3 text-foreground/80">
+                      {renderStageDataDoc((idea.stageData as any)?.[event.stage])}
+                    </div>
                   </div>
                 )}
 
@@ -221,3 +224,98 @@ export function ProjectTimeline({
     </div>
   );
 }
+
+export function renderStageDataDoc(data: any) {
+  if (!data) return <p className="text-xs text-muted-foreground italic">No documentation provided.</p>;
+
+  // Empathize
+  if ("what" in data) {
+    return (
+      <div className="space-y-2 text-xs leading-relaxed text-foreground/90">
+        <p><strong>What:</strong> {data.what}</p>
+        <p><strong>When:</strong> {data.when}</p>
+        <p><strong>Where:</strong> {data.where}</p>
+        <p><strong>Who:</strong> {data.who}</p>
+        <p><strong>How:</strong> {data.how}</p>
+        <p><strong>Root Cause Analysis:</strong> {data.rootCause}</p>
+      </div>
+    );
+  }
+
+  // Define
+  if ("problemStatement" in data && !("brainstormIdeas" in data)) {
+    return (
+      <div className="space-y-2 text-xs leading-relaxed text-foreground/90">
+        <p><strong>Problem Statement:</strong> {data.problemStatement}</p>
+        <p><strong>User Persona:</strong> {data.userPersona}</p>
+        <p><strong>Need Statement:</strong> {data.needStatement}</p>
+      </div>
+    );
+  }
+
+  // Ideate
+  if ("brainstormIdeas" in data || "selectedIdea" in data) {
+    return (
+      <div className="space-y-2 text-xs leading-relaxed text-foreground/90">
+        <p><strong>Selected Idea:</strong> {data.selectedIdea}</p>
+        <p><strong>Selection Reason:</strong> {data.selectionReason}</p>
+        {data.brainstormIdeas && data.brainstormIdeas.length > 0 && (
+          <div className="mt-1">
+            <p className="font-semibold">Brainstormed Ideas:</p>
+            <ul className="list-disc pl-4 mt-0.5 space-y-0.5">
+              {data.brainstormIdeas.map((idea: string, i: number) => (
+                <li key={i}>{idea}</li>
+              ))}
+            </ul>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // Prototype
+  if ("toolsRequired" in data) {
+    return (
+      <div className="space-y-2 text-xs leading-relaxed text-foreground/90">
+        {data.toolsRequired && data.toolsRequired.length > 0 && (
+          <div>
+            <p><strong>Tools Required:</strong></p>
+            <ul className="list-disc pl-4 mt-0.5 space-y-0.5">
+              {data.toolsRequired.map((tool: string, i: number) => (
+                <li key={i}>{tool}</li>
+              ))}
+            </ul>
+          </div>
+        )}
+        {data.iterations && data.iterations.length > 0 && (
+          <div className="mt-2">
+            <p className="font-semibold mb-1">Iterations ({data.iterations.length}):</p>
+            <div className="space-y-2 pl-2 border-l-2 border-border/80">
+              {data.iterations.map((it: any, i: number) => (
+                <div key={i} className="bg-muted/50 p-2 rounded">
+                  <p><strong>Description:</strong> {it.description}</p>
+                  <p><strong>Outcome:</strong> {it.outcome}</p>
+                  {it.date && <p className="text-[10px] text-muted-foreground mt-0.5">{it.date}</p>}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // Test
+  if ("testPlan" in data) {
+    return (
+      <div className="space-y-2 text-xs leading-relaxed text-foreground/90">
+        <p><strong>Status:</strong> {data.passed ? "Passed" : "Failed"}</p>
+        <p><strong>Test Plan:</strong> {data.testPlan}</p>
+        {data.results && <p><strong>Test Results:</strong> {data.results}</p>}
+      </div>
+    );
+  }
+
+  return <pre className="text-xs font-mono">{JSON.stringify(data, null, 2)}</pre>;
+}
+

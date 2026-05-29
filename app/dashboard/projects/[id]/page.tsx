@@ -12,6 +12,7 @@ import {
   Pencil,
   Trash2,
   AlertTriangle,
+  Eye,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -27,7 +28,7 @@ import {
 } from "@/components/ui/dialog";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { StageGateModal } from "@/components/project/stage-gate-modal";
-import { ProjectTimeline } from "@/components/project/project-timeline";
+import { ProjectTimeline, renderStageDataDoc } from "@/components/project/project-timeline";
 import { KanbanBoard } from "@/components/dashboard/kanban-board";
 import { DESIGN_THINKING_STAGES, STATUS_COLORS } from "@/lib/constants";
 import { useIdeaStore } from "@/store/use-idea-store";
@@ -46,6 +47,7 @@ export default function ProjectDetailPage({
   const { ideas, updateStageData, advanceStage, addComment, updateIdea, deleteIdea, approveAdvance, rejectAdvance } = useIdeaStore();
   const { canEditIdea, canApproveAdvance, hasPendingAdvance, currentUser } = usePermissions();
   const [isGateModalOpen, setIsGateModalOpen] = useState(false);
+  const [isReviewOpen, setIsReviewOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
@@ -407,25 +409,38 @@ export default function ProjectDetailPage({
         <div className="space-y-6">
           {/* Pending Review Card (school side) */}
           {pending && canApproveAdvance(idea) && nextStage && (
-            <div className="rounded-xl border border-amber-200 bg-amber-50 p-5">
-              <h3 className="font-semibold text-amber-900 mb-2">Pending Review</h3>
-              <p className="text-xs text-amber-800 mb-4">
-                Student team requested advance from{" "}
-                <strong>{idea.status}</strong> to{" "}
-                <strong>{nextStage}</strong>.
-              </p>
-              <div className="flex gap-2">
-                <Button size="sm" className="flex-1" onClick={handleApprove}>
-                  Approve
-                </Button>
+            <div className="rounded-xl border border-amber-200 bg-amber-50 p-5 space-y-4">
+              <div>
+                <h3 className="font-semibold text-amber-900">Pending Review</h3>
+                <p className="text-xs text-amber-800 mt-1">
+                  Student team requested advance from{" "}
+                  <strong>{idea.status}</strong> to{" "}
+                  <strong>{nextStage}</strong>.
+                </p>
+              </div>
+              <div className="space-y-2">
                 <Button
                   size="sm"
                   variant="outline"
-                  className="flex-1"
-                  onClick={handleReject}
+                  className="w-full flex items-center justify-center gap-1.5 bg-white border-amber-300 text-amber-900 hover:bg-amber-100"
+                  onClick={() => setIsReviewOpen(true)}
                 >
-                  Reject
+                  <Eye className="h-4 w-4" />
+                  Review Documentation
                 </Button>
+                <div className="flex gap-2">
+                  <Button size="sm" className="flex-1 bg-amber-600 hover:bg-amber-700 text-white" onClick={handleApprove}>
+                    Approve
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="flex-1 bg-white border-amber-300 text-amber-900 hover:bg-amber-100"
+                    onClick={handleReject}
+                  >
+                    Reject
+                  </Button>
+                </div>
               </div>
             </div>
           )}
@@ -579,6 +594,29 @@ export default function ProjectDetailPage({
               </Button>
               <Button onClick={handleEditSubmit}>Save</Button>
             </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Review Documentation Modal */}
+      <Dialog open={isReviewOpen} onOpenChange={setIsReviewOpen}>
+        <DialogContent className="max-w-xl">
+          <DialogHeader>
+            <DialogTitle className="capitalize">{idea.status} Documentation Review</DialogTitle>
+            <DialogDescription>
+              Review the details provided by the students before approving the stage advancement.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="mt-4 rounded-xl border border-border/50 bg-muted/30 p-5 space-y-4 max-h-[60vh] overflow-y-auto">
+            {renderStageDataDoc(idea.stageData[idea.status])}
+          </div>
+          <div className="flex justify-end gap-2 pt-2">
+            <Button variant="outline" onClick={() => setIsReviewOpen(false)}>
+              Close
+            </Button>
+            <Button className="bg-amber-600 hover:bg-amber-700 text-white" onClick={() => { setIsReviewOpen(false); handleApprove(); }}>
+              Approve Stage
+            </Button>
           </div>
         </DialogContent>
       </Dialog>
