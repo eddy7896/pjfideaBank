@@ -9,6 +9,7 @@ declare module "next-auth" {
       displayName: string;
       schoolName?: string | null;
       teamId?: string | null;
+      teamType?: string | null;
       geographyId?: string | null;
       subGeographyId?: string | null;
       subGeographyIds?: string[];
@@ -21,6 +22,7 @@ declare module "next-auth" {
     displayName: string;
     schoolName?: string | null;
     teamId?: string | null;
+    teamType?: string | null;
     geographyId?: string | null;
     subGeographyId?: string | null;
     subGeographyIds?: string[];
@@ -34,6 +36,7 @@ declare module "@auth/core/jwt" {
     displayName: string;
     schoolName?: string | null;
     teamId?: string | null;
+    teamType?: string | null;
     geographyId?: string | null;
     subGeographyId?: string | null;
     subGeographyIds?: string[];
@@ -60,6 +63,7 @@ export default {
         token.displayName = user.displayName;
         token.schoolName = user.schoolName ?? null;
         token.teamId = user.teamId ?? null;
+        token.teamType = user.teamType ?? null;
         token.geographyId = user.geographyId ?? null;
         token.subGeographyId = user.subGeographyId ?? null;
         token.subGeographyIds = user.subGeographyIds ?? [];
@@ -72,6 +76,7 @@ export default {
       session.user.displayName = token.displayName;
       session.user.schoolName = token.schoolName ?? null;
       session.user.teamId = token.teamId ?? null;
+      session.user.teamType = token.teamType ?? null;
       session.user.geographyId = token.geographyId ?? null;
       session.user.subGeographyId = token.subGeographyId ?? null;
       session.user.subGeographyIds = token.subGeographyIds ?? [];

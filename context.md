@@ -196,6 +196,10 @@ A series of critical hotfixes and architectural upgrades have been successfully 
 * **Problem**: When student teams submitted a stage advancement request (`advance_requested`), teachers could not review the specific stage documentation filled out by the students directly on the "Pending Review" card before deciding whether to approve or reject the transition. In addition, the project timeline only showed a static event label for submissions rather than rendering the actual documentation details.
 * **Resolution**: Exported a modular, reusable stage documentation renderer `renderStageDataDoc(data)` from `components/project/project-timeline.tsx` to handle read-only layouts for all 5 stages of Design Thinking. Updated the project timeline cards to automatically display full, richly formatted documentation on all `form_submitted` events in-line. Finally, integrated a "Review Documentation" action button and read-only Dialog modal in `app/dashboard/projects/[id]/page.tsx` for teachers to deeply inspect student submissions before approving transitions.
 
+### 🎓 7. Teacher Teams & Instant Stage Advancement
+* **Problem**: Teachers wanted to create and develop their own innovative projects without having to go through student approval gates (i.e. self-approving their own stage moves). However, they still needed to fill out stage documentation like any other team.
+* **Resolution**: Added a `type` string column to the `StudentTeam` database schema to support distinguishing between `"student"` and `"teacher"` teams. Modified NextAuth configurations to map this `teamType` into JWT and active session profiles. Refactored `canAdvanceImmediately` inside `lib/permissions.ts` to grant instant stage advancement to teams whose `teamType === "teacher"`. Finally, updated the teams creation/management panels to support setting, updating, and displaying a colorful "Teacher Team" or "Student Team" badge next to each team record.
+
 ---
 
 ## ⚙️ 8. Local Workspace Commands

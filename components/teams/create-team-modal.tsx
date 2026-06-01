@@ -19,7 +19,7 @@ interface CreateTeamModalProps {
   open: boolean;
   schoolName: string;
   onClose: () => void;
-  onSubmit: (name: string, members: TeamMember[]) => Promise<{ id: string; pin: string }>;
+  onSubmit: (name: string, members: TeamMember[], type?: "student" | "teacher") => Promise<{ id: string; pin: string }>;
   teamToEdit?: StudentTeam | null;
 }
 
@@ -34,15 +34,18 @@ export function CreateTeamModal({
   teamToEdit = null,
 }: CreateTeamModalProps) {
   const [teamName, setTeamName] = useState("");
+  const [teamType, setTeamType] = useState<"student" | "teacher">("student");
   const [members, setMembers] = useState<TeamMember[]>([]);
 
   useEffect(() => {
     if (teamToEdit) {
       setTeamName(teamToEdit.name);
       setMembers(teamToEdit.members || []);
+      setTeamType(teamToEdit.type || "student");
     } else {
       setTeamName("");
       setMembers([]);
+      setTeamType("student");
     }
     setCreatedTeam(null);
   }, [teamToEdit, open]);
@@ -81,7 +84,7 @@ export function CreateTeamModal({
 
   const handleCreate = async () => {
     if (!teamName.trim()) return;
-    const result = await onSubmit(teamName.trim(), members);
+    const result = await onSubmit(teamName.trim(), members, teamType);
     setCreatedTeam(result);
   };
 
@@ -89,6 +92,7 @@ export function CreateTeamModal({
     setTeamName("");
     setMembers([]);
     setNewMember({ name: "", grade: "", contactNumber: "", gender: "" });
+    setTeamType("student");
     setCreatedTeam(null);
     onClose();
   };
@@ -183,16 +187,36 @@ export function CreateTeamModal({
         </DialogHeader>
 
         <div className="space-y-6">
-          <div className="space-y-2">
-            <Label htmlFor="teamName" className="text-sm font-medium">
-              Team Name
-            </Label>
-            <Input
-              id="teamName"
-              placeholder="e.g., Green Sparks"
-              value={teamName}
-              onChange={(e) => setTeamName(e.target.value)}
-            />
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="space-y-2">
+              <Label htmlFor="teamName" className="text-sm font-medium">
+                Team Name
+              </Label>
+              <Input
+                id="teamName"
+                placeholder="e.g., Green Sparks"
+                value={teamName}
+                onChange={(e) => setTeamName(e.target.value)}
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="teamType" className="text-sm font-medium">
+                Team Type
+              </Label>
+              <Select
+                value={teamType}
+                onValueChange={(val) => setTeamType(val as "student" | "teacher")}
+              >
+                <SelectTrigger id="teamType">
+                  <SelectValue placeholder="Select type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="student">Student Team</SelectItem>
+                  <SelectItem value="teacher">Teacher Team</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
 
           <div className="space-y-3">

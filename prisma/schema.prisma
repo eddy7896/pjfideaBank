@@ -96,6 +96,7 @@ model StudentTeam {
   // the school does not require cascading text updates.
   schoolName String
   schoolId   String
+  type       String   @default("student")
   createdAt  DateTime @default(now())
 
   members TeamMember[]

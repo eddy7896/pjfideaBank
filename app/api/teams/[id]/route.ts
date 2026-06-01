@@ -81,6 +81,7 @@ export async function PUT(
         data: {
           name: data.name,
           pin: pinHash,
+          type: data.type || existing.type,
           members: data.members ? {
             create: data.members.map((m: any) => ({
               name: m.name,

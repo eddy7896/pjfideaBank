@@ -96,6 +96,7 @@ export async function createTeam(team: StudentTeam) {
       name: team.name,
       schoolName: team.schoolName,
       schoolId: school.id,
+      type: team.type || "student",
       members: team.members ? {
         create: team.members.map((m: any) => ({
           id: m.id || crypto.randomUUID(),
@@ -450,6 +451,7 @@ export async function autoGenerateStudentTeam(schoolName: string) {
     pin,
     name: `Team ${schoolName.split(' ')[0]} ${randomSuffix}`,
     schoolName,
+    type: "student",
     members: [],
     createdAt: new Date().toISOString(),
   };

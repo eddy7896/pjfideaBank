@@ -7,8 +7,8 @@ interface TeamState {
   teams: StudentTeam[];
   isLoaded: boolean;
   loadTeams: () => Promise<void>;
-  createTeam: (name: string, schoolName: string, members: TeamMember[]) => Promise<StudentTeam>;
-  updateTeam: (id: string, name: string, members: TeamMember[]) => Promise<StudentTeam>;
+  createTeam: (name: string, schoolName: string, members: TeamMember[], type?: "student" | "teacher") => Promise<StudentTeam>;
+  updateTeam: (id: string, name: string, members: TeamMember[], type?: "student" | "teacher") => Promise<StudentTeam>;
   deleteTeam: (id: string) => Promise<void>;
   getTeamsBySchool: (schoolName: string) => StudentTeam[];
   getTeamById: (id: string) => StudentTeam | undefined;
@@ -47,12 +47,13 @@ export const useTeamStore = create<TeamState>((set, get) => ({
     }
   },
 
-  createTeam: async (name: string, schoolName: string, members: TeamMember[]) => {
+  createTeam: async (name: string, schoolName: string, members: TeamMember[], type: "student" | "teacher" = "student") => {
     const newTeam: StudentTeam = {
       id: generateTeamId(),
       pin: generatePin(),
       name,
       schoolName,
+      type,
       members,
       createdAt: new Date().toISOString(),
     };
@@ -75,12 +76,12 @@ export const useTeamStore = create<TeamState>((set, get) => ({
     return newTeam;
   },
 
-  updateTeam: async (id: string, name: string, members: TeamMember[]) => {
+  updateTeam: async (id: string, name: string, members: TeamMember[], type?: "student" | "teacher") => {
     try {
       const res = await fetch(`/api/teams/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, members }),
+        body: JSON.stringify({ name, members, type }),
       });
 
       if (res.ok) {

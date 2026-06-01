@@ -32,6 +32,9 @@ export function usePermissions() {
     if (!currentUser) return false;
     if (currentUser.role === "super-admin") return true;
     if (currentUser.role === "school") return idea.schoolName === currentUser.schoolName;
+    if (currentUser.role === "student" && (currentUser as any).teamType === "teacher") {
+      return true;
+    }
     return false;
   };
 

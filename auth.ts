@@ -88,6 +88,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           displayName: team.name,
           schoolName: team.schoolName,
           teamId: team.id,
+          teamType: team.type,
         };
       },
     }),

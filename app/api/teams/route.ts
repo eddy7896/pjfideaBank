@@ -59,6 +59,7 @@ export async function POST(request: NextRequest) {
         name: data.name,
         schoolName: user.schoolName,
         schoolId: school.id,
+        type: data.type || "student",
         members: data.members ? {
           create: data.members.map((m: any) => ({
             id: m.id,

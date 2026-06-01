@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Users, Eye, EyeOff, Plus, Trash2, AlertTriangle, Pencil } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
 import {
   Dialog,
   DialogContent,
@@ -42,16 +43,16 @@ export default function TeamsPage() {
     return ideas.filter((i) => i.teamId === teamId).length;
   };
 
-  const handleCreateTeam = async (name: string, members: any[]) => {
-    const newTeam = await createTeam(name, currentUser.schoolName!, members);
+  const handleCreateTeam = async (name: string, members: any[], type?: "student" | "teacher") => {
+    const newTeam = await createTeam(name, currentUser.schoolName!, members, type);
     toast.success(`Team "${name}" created successfully!`);
     await useTeamStore.getState().loadTeams();
     return { id: newTeam.id, pin: newTeam.pin };
   };
 
-  const handleEditSubmit = async (name: string, members: any[]) => {
+  const handleEditSubmit = async (name: string, members: any[], type?: "student" | "teacher") => {
     if (!teamToEdit) throw new Error("No team selected for editing");
-    const updatedTeam = await updateTeam(teamToEdit.id, name, members);
+    const updatedTeam = await updateTeam(teamToEdit.id, name, members, type);
     toast.success(`Team "${name}" updated successfully!`);
     await useTeamStore.getState().loadTeams();
     return { id: updatedTeam.id, pin: updatedTeam.pin };
@@ -111,9 +112,22 @@ export default function TeamsPage() {
               >
                 <div className="flex items-start justify-between gap-4 mb-4">
                   <div className="flex-1">
-                    <h3 className="text-lg font-semibold text-foreground">
-                      {team.name}
-                    </h3>
+                    <div className="flex items-center gap-2">
+                      <h3 className="text-lg font-semibold text-foreground">
+                        {team.name}
+                      </h3>
+                      <Badge
+                        variant="outline"
+                        className={cn(
+                          "text-xs px-2.5 py-0.5 rounded-full font-medium capitalize",
+                          team.type === "teacher"
+                            ? "bg-purple-50 text-purple-700 border-purple-200"
+                            : "bg-blue-50 text-blue-700 border-blue-200"
+                        )}
+                      >
+                        {team.type === "teacher" ? "Teacher Team" : "Student Team"}
+                      </Badge>
+                    </div>
                     <p className="text-sm text-muted-foreground mt-1">
                       Created {new Date(team.createdAt).toLocaleDateString()}
                     </p>

@@ -41,6 +41,7 @@ export interface User {
   displayName: string;
   email: string;
   teamId?: string;
+  teamType?: string; // "student" or "teacher"
   geographyId?: string;
   subGeographyId?: string;
   assignedLeadId?: string; // assigned GL/PL email
@@ -59,6 +60,7 @@ export interface StudentTeam {
   pin: string;
   name: string;
   schoolName: string;
+  type: "student" | "teacher";
   members: TeamMember[];
   createdAt: string;
 }
