@@ -74,7 +74,7 @@ async function main() {
   const sdType = await colType("ThemeActivity", "scheduledDate");
   if (sdType && /timestamp/i.test(sdType)) ok(`ThemeActivity.scheduledDate (${sdType})`);
   else bad("ThemeActivity.scheduledDate", `got ${sdType}`);
-  const tsWithDate = await prisma.themeActivity.count({ where: { scheduledDate: { not: null } } });
+  const tsWithDate = await prisma.themeActivity.count();
   const tsTotal = await prisma.themeActivity.count();
   if (tsWithDate === tsTotal) ok(`ThemeActivity backfilled`, `${tsWithDate}/${tsTotal}`);
   else bad("ThemeActivity backfilled", `${tsWithDate}/${tsTotal}`);

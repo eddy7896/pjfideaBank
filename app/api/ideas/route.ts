@@ -44,7 +44,10 @@ export async function POST(request: NextRequest) {
   if ('error' in gate) return gate.error;
   const { user } = gate;
 
-  if (user.role !== 'school' || !user.schoolName) {
+  const isSchool = user.role === 'school' && !!user.schoolName;
+  const isStaff = user.role === 'teacher-trainer' || user.role === 'geography-lead';
+
+  if (!isSchool && !isStaff) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }
 
@@ -101,24 +104,48 @@ export async function POST(request: NextRequest) {
       },
     };
 
+    let targetSchoolName = user.schoolName!;
+
+    if (isStaff) {
+      targetSchoolName = "Pi Jam Regional Office";
+    }
+
     // School.id is the authoritative FK after Phase D. Resolve once and
     // require it for both StudentTeam.create and Idea.create.
-    const school = await prisma.school.findUnique({
-      where: { name: user.schoolName },
+    let school = await prisma.school.findUnique({
+      where: { name: targetSchoolName },
       select: { id: true },
     });
+    
     if (!school) {
-      return NextResponse.json(
-        { error: 'School record missing — contact support' },
-        { status: 500 }
-      );
+      if (isStaff) {
+        // Auto-provision the dummy school for staff if it doesn't exist
+        school = await prisma.school.create({
+          data: {
+            id: `SCH-PIJAM-${Date.now()}`,
+            name: targetSchoolName,
+            location: "Regional Office",
+            address: "Pi Jam Foundation",
+            phone: "0000000000",
+            principalName: "Pi Jam Admin",
+            udaiseCode: "PIJAM-OFFICE-01",
+            createdBy: "system",
+          },
+          select: { id: true }
+        });
+      } else {
+        return NextResponse.json(
+          { error: 'School record missing — contact support' },
+          { status: 500 }
+        );
+      }
     }
 
     const idea = await prisma.$transaction(async (tx) => {
       // RBAC.md §2.5: when a school creates an idea without specifying a
       // team, auto-provision a student team so the kids have a login.
       if (!teamId) {
-        const slug = user.schoolName!.slice(0, 3).toUpperCase().replace(/[^A-Z]/g, 'T');
+        const slug = targetSchoolName.slice(0, 3).toUpperCase().replace(/[^A-Z]/g, 'T');
         const suffix = Math.floor(100 + Math.random() * 900);
         const generatedTeamId = `TM-${slug}${suffix}`;
         const teamName = `${data.title} Team`;
@@ -130,8 +157,9 @@ export async function POST(request: NextRequest) {
             id: generatedTeamId,
             pin: pinHash,
             name: teamName,
-            schoolName: user.schoolName!,
+            schoolName: targetSchoolName,
             schoolId: school.id,
+            type: isStaff ? "teacher" : "student",
           },
         });
         teamId = created.id;
@@ -142,7 +170,7 @@ export async function POST(request: NextRequest) {
       const created = await tx.idea.create({
         data: {
           id: data.id,
-          schoolName: user.schoolName!,
+          schoolName: targetSchoolName,
           schoolId: school.id,
           title: data.title,
           theme: data.theme,
@@ -177,7 +205,7 @@ export async function POST(request: NextRequest) {
       action: 'idea.create',
       entityType: 'Idea',
       entityId: idea?.id,
-      schoolName: user.schoolName,
+      schoolName: targetSchoolName,
       payload: {
         title: data.title,
         theme: data.theme,

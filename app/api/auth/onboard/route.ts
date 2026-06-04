@@ -241,7 +241,6 @@ export async function POST(request: NextRequest) {
         email: teacherEmail,
         geographyId: lead.geographyId ?? geographyId,
         subGeographyId,
-        assignedLeadId: lead.email, // keep legacy text in sync until column drop
         assignedLeadUserId: lead.id,
         passwordHash: hashedPassword,
       });

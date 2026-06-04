@@ -95,9 +95,7 @@ export default function CalendarPage() {
       const theme = themes[selectedDate.month]?.theme || "General";
       await createActivity({
         id: crypto.randomUUID(),
-        date: selectedDate.date,
-        month: selectedDate.month,
-        year: selectedDate.year,
+        scheduledDate: new Date(Date.UTC(selectedDate.year, selectedDate.month, selectedDate.date)).toISOString(),
         title: activityForm.title.trim(),
         theme,
         schoolName: activityForm.schoolName || undefined,
@@ -165,7 +163,7 @@ export default function CalendarPage() {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
                         <span className="text-xs font-semibold px-2 py-1 rounded bg-primary/10 text-primary whitespace-nowrap">
-                          {activity.date} {monthNames[activity.month]}
+                          {new Date(activity.scheduledDate).getUTCDate()} {monthNames[new Date(activity.scheduledDate).getUTCMonth()]}
                         </span>
                         {activity.schoolName && (
                           <span className="text-xs text-muted-foreground truncate">{activity.schoolName}</span>

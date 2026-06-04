@@ -68,7 +68,6 @@ export async function createUser(
       teamId: user.teamId,
       geographyId: user.geographyId,
       subGeographyId: user.subGeographyId,
-      assignedLeadId: user.assignedLeadId,
       assignedLeadUserId: user.assignedLeadUserId ?? null,
       passwordHash: user.passwordHash,
     }
@@ -318,9 +317,7 @@ export async function createThemeActivity(activity: ThemeActivity) {
   return await prisma.themeActivity.create({
     data: {
       id: activity.id,
-      date: activity.date,
-      month: activity.month,
-      year: activity.year,
+      scheduledDate: new Date(activity.scheduledDate),
       title: activity.title,
       theme: activity.theme,
       schoolName: activity.schoolName,
@@ -330,12 +327,28 @@ export async function createThemeActivity(activity: ThemeActivity) {
 }
 
 export async function getThemeActivities(month?: number, year?: number) {
-  return await prisma.themeActivity.findMany({
-    where: {
-      month: month !== undefined ? month : undefined,
-      year: year !== undefined ? year : undefined,
-    }
-  });
+  let where: any = {};
+  if (month !== undefined && year !== undefined) {
+    const startDate = new Date(Date.UTC(year, month - 1, 1));
+    const endDate = new Date(Date.UTC(year, month, 1));
+    where = {
+      scheduledDate: {
+        gte: startDate,
+        lt: endDate,
+      }
+    };
+  } else if (year !== undefined) {
+    const startDate = new Date(Date.UTC(year, 0, 1));
+    const endDate = new Date(Date.UTC(year + 1, 0, 1));
+    where = {
+      scheduledDate: {
+        gte: startDate,
+        lt: endDate,
+      }
+    };
+  }
+  
+  return await prisma.themeActivity.findMany({ where });
 }
 
 export async function deleteThemeActivity(id: string) {

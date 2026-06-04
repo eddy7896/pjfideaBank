@@ -39,7 +39,6 @@ model User {
   teamId         String?
   geographyId    String?
   subGeographyId String?
-  assignedLeadId     String?  // DEPRECATED: legacy email string, kept for back-compat reads. Use assignedLeadUserId.
   assignedLeadUserId Int?
   createdAt          DateTime @default(now())
   createdById        Int?
@@ -184,20 +183,13 @@ model AuditLog {
 
 model ThemeActivity {
   id            String   @id
-  // Authoritative scheduled date. The triplet below is denormalized for
-  // UI back-compat and will be dropped in a follow-up.
-  scheduledDate DateTime?
-  date          Int
-  month         Int
-  year          Int
+  scheduledDate DateTime
   title         String
   theme         String
   schoolName    String?
   description   String?
   createdAt     DateTime @default(now())
 
-  @@index([month])
-  @@index([year])
   @@index([scheduledDate])
 }
 

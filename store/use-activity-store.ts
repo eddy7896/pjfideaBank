@@ -67,6 +67,9 @@ export const useActivityStore = create<ActivityState>((set, get) => ({
   },
 
   getActivitiesForMonth: (month: number, year: number) => {
-    return get().activities.filter((a) => a.month === month && a.year === year);
+    return get().activities.filter((a) => {
+      const d = new Date(a.scheduledDate);
+      return (d.getUTCMonth() + 1) === month && d.getUTCFullYear() === year;
+    });
   },
 }));

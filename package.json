@@ -15,7 +15,8 @@
     "verify:phase6": "node --env-file=.env.local node_modules/tsx/dist/cli.mjs scripts/verify-phase6.ts",
     "db:backfill-subgeo": "node --env-file=.env.local node_modules/tsx/dist/cli.mjs scripts/backfill-school-subgeo.ts",
     "db:seed-themes": "node --env-file=.env.local node_modules/tsx/dist/cli.mjs scripts/seed-themes.ts",
-    "verify:phaseL": "node --env-file=.env.local node_modules/tsx/dist/cli.mjs scripts/verify-phaseL.ts"
+    "verify:phaseL": "node --env-file=.env.local node_modules/tsx/dist/cli.mjs scripts/verify-phaseL.ts",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "@base-ui/react": "^1.4.1",
@@ -42,6 +43,7 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
+    "@playwright/test": "^1.60.0",
     "@tailwindcss/postcss": "^4.2.1",
     "@types/bcryptjs": "^3.0.0",
     "@types/node": "^25.5.0",

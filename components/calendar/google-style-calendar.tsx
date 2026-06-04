@@ -9,9 +9,7 @@ import type { ThemeMonth } from "@/types";
 
 interface Activity {
   id: string;
-  date: number;
-  month: number;
-  year: number;
+  scheduledDate: string;
   title: string;
   theme: string;
   schoolName?: string;
@@ -65,9 +63,10 @@ export function GoogleStyleCalendar({
   };
 
   const getActivitiesForDay = (day: number) => {
-    return activities.filter(
-      (a) => a.date === day && a.month === currentMonth && a.year === currentYear
-    );
+    return activities.filter((a) => {
+      const d = new Date(a.scheduledDate);
+      return d.getUTCDate() === day && d.getUTCMonth() === currentMonth && d.getUTCFullYear() === currentYear;
+    });
   };
 
   const days = [];

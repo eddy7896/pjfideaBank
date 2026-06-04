@@ -8,10 +8,13 @@ import type { Idea } from "@/types";
 export function usePermissions() {
   const { currentUser } = useAuthStore();
 
-  // Only school admins can submit new ideas
-  const canSubmitIdeas = currentUser?.role === "school";
+  // School admins and staff can submit new ideas
+  const canSubmitIdeas =
+    currentUser?.role === "school" ||
+    currentUser?.role === "teacher-trainer" ||
+    currentUser?.role === "geography-lead";
 
-  // Only school admins and students can edit their respective ideas
+  // Only school admins, students, and staff can edit their respective ideas
   const canEditIdea = (idea: Idea): boolean => {
     if (!currentUser) return false;
     if (currentUser.role === "super-admin") {
@@ -23,17 +26,23 @@ export function usePermissions() {
     if (currentUser.role === "student") {
       return idea.teamId === currentUser.teamId;
     }
+    if (currentUser.role === "teacher-trainer" || currentUser.role === "geography-lead") {
+      return idea.schoolName === "Pi Jam Regional Office";
+    }
     return false;
   };
 
-  // Students must route every stage move through school approval. Schools
-  // and super-admins move immediately.
+  // Students must route every stage move through school approval. Schools,
+  // super-admins, and staff move immediately.
   const canAdvanceImmediately = (idea: Idea): boolean => {
     if (!currentUser) return false;
     if (currentUser.role === "super-admin") return true;
     if (currentUser.role === "school") return idea.schoolName === currentUser.schoolName;
     if (currentUser.role === "student" && (currentUser as any).teamType === "teacher") {
       return true;
+    }
+    if (currentUser.role === "teacher-trainer" || currentUser.role === "geography-lead") {
+      return idea.schoolName === "Pi Jam Regional Office";
     }
     return false;
   };
@@ -115,7 +124,10 @@ export function usePermissions() {
   };
 
   const isReadOnly =
-    currentUser?.role !== "school" && currentUser?.role !== "student";
+    currentUser?.role !== "school" &&
+    currentUser?.role !== "student" &&
+    currentUser?.role !== "teacher-trainer" &&
+    currentUser?.role !== "geography-lead";
 
   return {
     currentUser,

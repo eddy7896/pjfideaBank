@@ -110,7 +110,7 @@ export default function ActivitiesPage() {
                           {activity.title}
                         </h2>
                         <Badge variant="outline" className="text-xs w-fit">
-                          {monthNames[activity.month]} {activity.date}
+                          {monthNames[new Date(activity.scheduledDate).getUTCMonth()]} {new Date(activity.scheduledDate).getUTCDate()}
                         </Badge>
                       </div>
 
@@ -123,7 +123,7 @@ export default function ActivitiesPage() {
                       <div className="flex flex-col sm:flex-row gap-1 sm:gap-4 text-xs text-muted-foreground">
                         <span className="flex items-center gap-1">
                           <Calendar className="h-3 w-3 sm:h-4 sm:w-4" />
-                          {monthNames[activity.month]} {activity.date}, {activity.year}
+                          {monthNames[new Date(activity.scheduledDate).getUTCMonth()]} {new Date(activity.scheduledDate).getUTCDate()}, {new Date(activity.scheduledDate).getUTCFullYear()}
                         </span>
                         {activity.schoolName && (
                           <span className="flex items-center gap-1">
@@ -178,7 +178,7 @@ export default function ActivitiesPage() {
                   <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 mt-3 sm:mt-4 text-xs sm:text-sm text-muted-foreground">
                     <span className="flex items-center gap-1">
                       <Calendar className="h-3 sm:h-4 w-3 sm:w-4" />
-                      {monthNames[selectedActivity.month]} {selectedActivity.date}, {selectedActivity.year}
+                      {monthNames[new Date(selectedActivity.scheduledDate).getUTCMonth()]} {new Date(selectedActivity.scheduledDate).getUTCDate()}, {new Date(selectedActivity.scheduledDate).getUTCFullYear()}
                     </span>
                     {selectedActivity.schoolName && (
                       <span className="flex items-center gap-1">

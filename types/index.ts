@@ -44,7 +44,7 @@ export interface User {
   teamType?: string; // "student" or "teacher"
   geographyId?: string;
   subGeographyId?: string;
-  assignedLeadId?: string; // assigned GL/PL email
+  assignedLeadUserId?: number;
   passwordHash?: string;
 }
 
@@ -207,9 +207,7 @@ export interface ActivityReport {
 
 export interface ThemeActivity {
   id: string;
-  date: number;
-  month: number;
-  year: number;
+  scheduledDate: string;
   title: string;
   theme: string;
   schoolName?: string;

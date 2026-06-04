@@ -103,9 +103,6 @@ export async function POST(request: NextRequest) {
     const activity = await prisma.themeActivity.create({
       data: {
         id: data.id || `act-${Date.now()}`,
-        date: data.date,
-        month: monthOneIndexed,
-        year: data.year,
         scheduledDate,
         title: data.title,
         theme: data.theme,
