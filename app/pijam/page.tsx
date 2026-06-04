@@ -355,12 +355,12 @@ export default function PijamPortalPage() {
                     Register your access level to manage states or support trainers.
                   </p>
 
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="flex justify-center max-w-sm mx-auto">
                     {/* Teacher Trainer Card */}
                     <button
                       type="button"
                       onClick={() => setOnboardData({ ...onboardData, role: "teacher-trainer" })}
-                      className={`relative flex flex-col items-center p-5 rounded-xl border-2 text-center transition-all duration-300 group ${
+                      className={`w-full relative flex flex-col items-center p-5 rounded-xl border-2 text-center transition-all duration-300 group ${
                         onboardData.role === "teacher-trainer"
                           ? "border-primary bg-primary/5 scale-[1.02] shadow-sm shadow-primary/5"
                           : "border-border bg-slate-50/30 hover:border-primary/45 hover:scale-[1.01]"
@@ -380,22 +380,6 @@ export default function PijamPortalPage() {
                         Support school admins & review district details.
                       </span>
                     </button>
-
-                    {/* Geography Lead — admin-minted only */}
-                    <div
-                      className="relative flex flex-col items-center p-5 rounded-xl border-2 text-center border-dashed border-slate-200 bg-slate-50/30 opacity-60 cursor-not-allowed"
-                      title="Geography Lead accounts are created by a Super Admin. Contact your program lead to be invited."
-                    >
-                      <div className="p-2.5 rounded-full mb-3 bg-slate-200/80 text-slate-500">
-                        <Map className="h-5 w-5" />
-                      </div>
-                      <span className="font-bold text-slate-700 text-xs block">
-                        Geography Lead
-                      </span>
-                      <span className="text-[9px] text-slate-500 mt-1 block leading-normal font-medium">
-                        Created by Super Admin only. Contact your program lead.
-                      </span>
-                    </div>
                   </div>
                 </div>
               )}
