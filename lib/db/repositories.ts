@@ -44,7 +44,7 @@ export async function getUserByEmail(email: string) {
 }
 
 export async function createUser(
-  user: Omit<User, 'email'> & { email: string; assignedLeadUserId?: number | null }
+  user: Omit<User, 'email'> & { email: string; assignedLeadUserId?: number | null; subGeographyIds?: string[] }
 ) {
   // Dual-write schoolId FK alongside the legacy schoolName during the
   // additive cutover (Phase 3.2). When the user has no schoolName the
@@ -70,6 +70,9 @@ export async function createUser(
       subGeographyId: user.subGeographyId,
       assignedLeadUserId: user.assignedLeadUserId ?? null,
       passwordHash: user.passwordHash,
+      assignedSubGeos: user.subGeographyIds && user.subGeographyIds.length > 0 ? {
+        create: user.subGeographyIds.map(id => ({ subGeographyId: id }))
+      } : undefined,
     }
   });
 }

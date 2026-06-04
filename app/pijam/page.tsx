@@ -40,6 +40,7 @@ export default function PijamPortalPage() {
     teacherPassword: "",
     confirmPassword: "",
     location: "",
+    locations: [] as string[],
     assignedLeadId: "",
   });
 
@@ -60,7 +61,7 @@ export default function PijamPortalPage() {
   const [searchState, setSearchState] = useState("");
   const [searchDistrict, setSearchDistrict] = useState("");
   const [selectedState, setSelectedState] = useState("");
-  const [selectedDistrict, setSelectedDistrict] = useState("");
+  const [selectedDistricts, setSelectedDistricts] = useState<string[]>([]);
 
   // Fetch Geography Leads for Teacher Trainer assignment
   useEffect(() => {
@@ -133,7 +134,7 @@ export default function PijamPortalPage() {
     if (r === "teacher-trainer") {
       if (step === 2) {
         if (!onboardData.teacherName.trim()) newErrors.teacherName = "Trainer name required";
-        if (!onboardData.location.trim()) newErrors.location = "Assigned Geography (State & District) required";
+        if (onboardData.locations.length === 0 && !onboardData.location.trim()) newErrors.location = "Assigned Geography (State & District) required";
       }
 
       if (step === 3) {
@@ -191,7 +192,8 @@ export default function PijamPortalPage() {
         teacherName: onboardData.teacherName.trim(),
         teacherEmail: onboardData.teacherEmail.trim(),
         teacherPassword: onboardData.teacherPassword,
-        location: onboardData.location.trim(),
+        location: onboardData.locations.length > 0 ? onboardData.locations[0] : onboardData.location.trim(),
+        locations: onboardData.locations,
         assignedLeadId: onboardData.role === "teacher-trainer" ? onboardData.assignedLeadId : undefined,
       };
 
@@ -244,15 +246,18 @@ export default function PijamPortalPage() {
       setOnboardData({
         ...onboardData,
         location: selectedState,
+        locations: [selectedState],
       });
     } else {
-      if (!selectedState || !selectedDistrict) {
-        toast.error("Please select both a State and a District");
+      if (!selectedState || selectedDistricts.length === 0) {
+        toast.error("Please select both a State and at least one District");
         return;
       }
+      const newLocations = selectedDistricts.map(dist => `${dist}, ${selectedState}`);
       setOnboardData({
         ...onboardData,
-        location: `${selectedDistrict}, ${selectedState}`,
+        location: newLocations[0],
+        locations: newLocations,
       });
     }
     setIsModalOpen(false);
@@ -261,7 +266,7 @@ export default function PijamPortalPage() {
   const isConfirmDisabled =
     onboardData.role === "geography-lead"
       ? !selectedState
-      : !selectedState || !selectedDistrict;
+      : !selectedState || selectedDistricts.length === 0;
 
   return (
     <div className="flex min-h-screen flex-col bg-background relative overflow-hidden">
@@ -415,31 +420,35 @@ export default function PijamPortalPage() {
                         : "Designated Overseeing State *"}
                     </Label>
                     <div className="relative">
-                      <Input
-                        readOnly
-                        placeholder={
-                          onboardData.role === "geography-lead"
-                            ? "Click to select designated State"
-                            : "Click to select State & District"
-                        }
-                        value={onboardData.location}
+                      <div
                         onClick={() => {
-                          if (onboardData.location) {
-                            if (onboardData.role === "geography-lead") {
-                              setSelectedState(onboardData.location);
-                              setSelectedDistrict("");
-                            } else {
-                              const [dist, st] = onboardData.location.split(", ");
-                              setSelectedState(st || "");
-                              setSelectedDistrict(dist || "");
-                            }
+                          if (onboardData.role === "geography-lead") {
+                            if (onboardData.location) setSelectedState(onboardData.location);
+                          } else if (onboardData.locations.length > 0) {
+                            const [, st] = onboardData.locations[0].split(", ");
+                            setSelectedState(st || "");
+                            setSelectedDistricts(onboardData.locations.map(loc => loc.split(", ")[0]));
                           }
                           setIsModalOpen(true);
                         }}
-                        className={`cursor-pointer bg-card/50 backdrop-blur-sm border-slate-200 text-slate-800 placeholder-slate-400 rounded-xl pr-10 focus:border-primary ${
+                        className={`cursor-pointer min-h-[44px] p-2 bg-card/50 backdrop-blur-sm border-slate-200 text-slate-800 rounded-xl pr-10 border hover:border-primary transition-colors flex flex-wrap gap-1.5 items-center ${
                           onboardErrors.location ? "border-destructive focus-visible:ring-destructive" : ""
                         }`}
-                      />
+                      >
+                        {(onboardData.locations.length === 0 && !onboardData.location) && (
+                          <span className="text-slate-400 pl-2 text-sm">
+                            {onboardData.role === "geography-lead" ? "Click to select designated State" : "Click to select State & District(s)"}
+                          </span>
+                        )}
+                        {onboardData.role === "geography-lead" && onboardData.location && (
+                          <span className="pl-2 text-sm">{onboardData.location}</span>
+                        )}
+                        {onboardData.role === "teacher-trainer" && onboardData.locations.map(loc => (
+                          <span key={loc} className="bg-primary/10 text-primary text-[11px] font-semibold px-2 py-1 rounded-md border border-primary/20">
+                            {loc.split(', ')[0]}
+                          </span>
+                        ))}
+                      </div>
                       <MapPin className="absolute right-3.5 top-3 h-4.5 w-4.5 text-slate-450 pointer-events-none" />
                     </div>
                     {onboardErrors.location && (
@@ -589,7 +598,17 @@ export default function PijamPortalPage() {
                       </div>
                       <div className="border-t border-slate-200/40 pt-2">
                         <span className="text-slate-500 block text-[10px]">Jurisdiction:</span>
-                        <span className="font-semibold text-slate-800">{onboardData.location}</span>
+                        <div className="flex flex-wrap gap-1 mt-1">
+                          {onboardData.locations && onboardData.locations.length > 0 ? (
+                            onboardData.locations.map(loc => (
+                              <span key={loc} className="bg-slate-100 text-slate-700 text-[10px] font-semibold px-2 py-0.5 rounded border border-slate-200">
+                                {loc}
+                              </span>
+                            ))
+                          ) : (
+                            <span className="font-semibold text-slate-800">{onboardData.location}</span>
+                          )}
+                        </div>
                       </div>
                       {onboardData.role === "teacher-trainer" && (
                         <div className="border-t border-slate-200/40 pt-2">
@@ -724,7 +743,7 @@ export default function PijamPortalPage() {
                           type="button"
                           onClick={() => {
                             setSelectedState(sd.state);
-                            setSelectedDistrict(""); // Reset district on state change
+                            setSelectedDistricts([]); // Reset districts on state change
                           }}
                           className={`w-full text-left px-4 py-2.5 rounded-lg text-sm transition-all duration-200 flex items-center justify-between group ${
                             selectedState === sd.state
@@ -803,20 +822,26 @@ export default function PijamPortalPage() {
                               <button
                                 key={dist}
                                 type="button"
-                                onClick={() => setSelectedDistrict(dist)}
+                                onClick={() => {
+                                  if (selectedDistricts.includes(dist)) {
+                                    setSelectedDistricts(selectedDistricts.filter(d => d !== dist));
+                                  } else {
+                                    setSelectedDistricts([...selectedDistricts, dist]);
+                                  }
+                                }}
                                 className={`w-full text-left px-4 py-2.5 rounded-lg text-sm transition-all duration-200 flex items-center justify-between group ${
-                                  selectedDistrict === dist
+                                  selectedDistricts.includes(dist)
                                     ? "bg-primary text-primary-foreground font-semibold shadow-md shadow-primary/20"
                                     : "hover:bg-accent/5 text-slate-700 hover:text-primary hover:translate-x-1"
                                 }`}
                               >
                                 <div className="flex items-center gap-2.5">
                                   <MapPin className={`h-4 w-4 transition-all duration-200 ${
-                                    selectedDistrict === dist ? "text-white scale-110" : "text-muted-foreground/60 group-hover:text-primary"
+                                    selectedDistricts.includes(dist) ? "text-white scale-110" : "text-muted-foreground/60 group-hover:text-primary"
                                   }`} />
                                   <span>{highlightText(dist, searchDistrict)}</span>
                                 </div>
-                                {selectedDistrict === dist && (
+                                {selectedDistricts.includes(dist) && (
                                   <Check className="h-4 w-4 text-white" />
                                 )}
                               </button>
@@ -849,13 +874,13 @@ export default function PijamPortalPage() {
                         <Check className="h-4 w-4 text-primary" />
                         Selected State: {selectedState}
                       </span>
-                    ) : selectedDistrict ? (
+                    ) : selectedDistricts.length > 0 ? (
                       <span className="font-semibold text-primary flex items-center gap-1.5">
                         <Check className="h-4 w-4 text-primary" />
-                        Selected: {selectedDistrict}, {selectedState}
+                        Selected {selectedDistricts.length} District(s) in {selectedState}
                       </span>
                     ) : (
-                      <span className="text-muted-foreground italic">Select a district from the right column</span>
+                      <span className="text-muted-foreground italic">Select district(s) from the right column</span>
                     )
                   ) : (
                     <span className="text-muted-foreground italic">No geography selected yet</span>

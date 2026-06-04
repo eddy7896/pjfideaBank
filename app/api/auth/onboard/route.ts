@@ -21,6 +21,7 @@ const OnboardSchema = z.object({
   role: z.enum(['school', 'teacher-trainer']).default('school'),
   schoolName: z.string().min(1).max(200).optional(),
   location: z.string().min(1).max(200).optional(),
+  locations: z.array(z.string()).optional(),
   address: z.string().min(1).max(500).optional(),
   phone: z.string().min(1).max(40).optional(),
   website: z.string().url().max(500).optional().or(z.literal('')),
@@ -57,6 +58,7 @@ export async function POST(request: NextRequest) {
       role,
       schoolName,
       location,
+      locations,
       address,
       phone,
       website,
@@ -81,12 +83,15 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Resolve Geography and SubGeography IDs from location string
+    // Resolve Geography and SubGeography IDs from location string(s)
     let geographyId: string | undefined;
     let subGeographyId: string | undefined;
+    const subGeographyIds: string[] = [];
 
-    if (location) {
-      const parts = location.split(', ');
+    const locsToProcess = locations && locations.length > 0 ? locations : (location ? [location] : []);
+    
+    for (const loc of locsToProcess) {
+      const parts = loc.split(', ');
       const stateName = parts[parts.length - 1];
       const districtName = parts.length > 1 ? parts[0] : null;
 
@@ -113,7 +118,10 @@ export async function POST(request: NextRequest) {
         if (!subGeoRecord) {
           subGeoRecord = await createSubGeography({ name: districtName, geographyId: geographyId! }) as any;
         }
-        subGeographyId = subGeoRecord!.id;
+        subGeographyIds.push(subGeoRecord!.id);
+        if (!subGeographyId) {
+          subGeographyId = subGeoRecord!.id; // set first as legacy primary
+        }
       }
     }
 
@@ -241,6 +249,7 @@ export async function POST(request: NextRequest) {
         email: teacherEmail,
         geographyId: lead.geographyId ?? geographyId,
         subGeographyId,
+        subGeographyIds,
         assignedLeadUserId: lead.id,
         passwordHash: hashedPassword,
       });
@@ -253,6 +262,7 @@ export async function POST(request: NextRequest) {
           assignedLeadUserId: lead.id,
           geographyId: lead.geographyId ?? geographyId,
           subGeographyId,
+          subGeographyIds,
         },
       });
 
