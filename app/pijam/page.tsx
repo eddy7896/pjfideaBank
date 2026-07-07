@@ -17,6 +17,8 @@ import {
   Map,
   ArrowRight,
   Sparkles,
+  User,
+  GraduationCap
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -34,13 +36,24 @@ export default function PijamPortalPage() {
   // Onboarding states
   const [onboardStep, setOnboardStep] = useState(1);
   const [onboardData, setOnboardData] = useState({
-    role: "teacher-trainer" as "teacher-trainer" | "geography-lead",
+    role: "teacher-trainer" as "teacher-trainer" | "instructor",
+    // Shared
     teacherName: "",
     teacherEmail: "",
     teacherPassword: "",
     confirmPassword: "",
-    location: "",
-    locations: [] as string[],
+    location: "", // single location string for instructor
+    locations: [] as string[], // multiple districts for TT
+    
+    // Instructor specific (School)
+    schoolName: "",
+    address: "",
+    phone: "",
+    website: "",
+    principalName: "",
+    udaiseCode: "",
+
+    // TT specific
     assignedLeadId: "",
   });
 
@@ -61,9 +74,9 @@ export default function PijamPortalPage() {
   const [searchState, setSearchState] = useState("");
   const [searchDistrict, setSearchDistrict] = useState("");
   const [selectedState, setSelectedState] = useState("");
-  const [selectedDistricts, setSelectedDistricts] = useState<string[]>([]);
+  const [selectedDistrict, setSelectedDistrict] = useState(""); // single district for instructor
+  const [selectedDistricts, setSelectedDistricts] = useState<string[]>([]); // multiple for TT
 
-  // Fetch Geography Leads for Teacher Trainer assignment
   useEffect(() => {
     async function fetchLeads() {
       try {
@@ -79,7 +92,6 @@ export default function PijamPortalPage() {
     fetchLeads();
   }, []);
 
-  // Search text highlighter helper
   const highlightText = (text: string, search: string) => {
     if (!search.trim()) return <span>{text}</span>;
     const regex = new RegExp(`(${search.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&")})`, "gi");
@@ -99,23 +111,22 @@ export default function PijamPortalPage() {
     );
   };
 
-  // Onboard wizard steps
   const getStepsForRole = (r: string) => {
-    if (r === "teacher-trainer") {
+    if (r === "instructor") {
       return [
         { num: 1, title: "Choose Role" },
-        { num: 2, title: "Trainer Details" },
-        { num: 3, title: "Reporting Details" },
-        { num: 4, title: "Review Details" },
-      ];
-    } else {
-      return [
-        { num: 1, title: "Choose Role" },
-        { num: 2, title: "Lead Details" },
-        { num: 3, title: "Credentials" },
-        { num: 4, title: "Review Details" },
+        { num: 2, title: "School Basics" },
+        { num: 3, title: "School Details" },
+        { num: 4, title: "Instructor Credentials" },
+        { num: 5, title: "Review Details" },
       ];
     }
+    return [
+      { num: 1, title: "Choose Role" },
+      { num: 2, title: "Trainer Details" },
+      { num: 3, title: "Reporting Details" },
+      { num: 4, title: "Review Details" },
+    ];
   };
 
   const steps = getStepsForRole(onboardData.role);
@@ -126,43 +137,42 @@ export default function PijamPortalPage() {
     const r = onboardData.role;
 
     if (step === 1) {
-      if (!onboardData.role) {
-        newErrors.role = "Please select a role to proceed";
+      if (!onboardData.role) newErrors.role = "Please select a role";
+    }
+
+    if (r === "instructor") {
+      if (step === 2) {
+        if (!onboardData.schoolName.trim()) newErrors.schoolName = "School name required";
+        if (!onboardData.udaiseCode.trim()) newErrors.udaiseCode = "UDAISE code required";
+        if (onboardData.udaiseCode.length !== 11) newErrors.udaiseCode = "UDAISE code must be 11 digits";
+        if (!onboardData.location.trim()) newErrors.location = "Geography required";
+      }
+      if (step === 3) {
+        if (!onboardData.address.trim()) newErrors.address = "Address required";
+        if (!onboardData.phone.trim()) newErrors.phone = "Phone required";
+        if (!/^\d{10,}$/.test(onboardData.phone.replace(/[^\d]/g, ""))) newErrors.phone = "Valid phone required";
+        if (!onboardData.principalName.trim()) newErrors.principalName = "Principal name required";
+      }
+      if (step === 4) {
+        if (!onboardData.teacherName.trim()) newErrors.teacherName = "Name required";
+        if (!onboardData.teacherEmail.trim()) newErrors.teacherEmail = "Email required";
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(onboardData.teacherEmail)) newErrors.teacherEmail = "Valid email required";
+        if (onboardData.teacherPassword.length < 6) newErrors.teacherPassword = "Password min 6 characters";
+        if (onboardData.teacherPassword !== onboardData.confirmPassword) newErrors.confirmPassword = "Passwords must match";
       }
     }
 
     if (r === "teacher-trainer") {
       if (step === 2) {
         if (!onboardData.teacherName.trim()) newErrors.teacherName = "Trainer name required";
-        if (onboardData.locations.length === 0 && !onboardData.location.trim()) newErrors.location = "Assigned Geography (State & District) required";
+        if (onboardData.locations.length === 0) newErrors.location = "Assigned District(s) required";
       }
-
       if (step === 3) {
         if (!onboardData.teacherEmail.trim()) newErrors.teacherEmail = "Email required";
-        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(onboardData.teacherEmail))
-          newErrors.teacherEmail = "Valid email required";
-        if (onboardData.teacherPassword.length < 6)
-          newErrors.teacherPassword = "Password min 6 characters";
-        if (onboardData.teacherPassword !== onboardData.confirmPassword)
-          newErrors.confirmPassword = "Passwords must match";
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(onboardData.teacherEmail)) newErrors.teacherEmail = "Valid email required";
+        if (onboardData.teacherPassword.length < 6) newErrors.teacherPassword = "Password min 6 characters";
+        if (onboardData.teacherPassword !== onboardData.confirmPassword) newErrors.confirmPassword = "Passwords must match";
         if (!onboardData.assignedLeadId) newErrors.assignedLeadId = "Please select an assigned Geography Lead";
-      }
-    }
-
-    if (r === "geography-lead") {
-      if (step === 2) {
-        if (!onboardData.teacherName.trim()) newErrors.teacherName = "Lead name required";
-        if (!onboardData.location.trim()) newErrors.location = "Designated State required";
-      }
-
-      if (step === 3) {
-        if (!onboardData.teacherEmail.trim()) newErrors.teacherEmail = "Email required";
-        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(onboardData.teacherEmail))
-          newErrors.teacherEmail = "Valid email required";
-        if (onboardData.teacherPassword.length < 6)
-          newErrors.teacherPassword = "Password min 6 characters";
-        if (onboardData.teacherPassword !== onboardData.confirmPassword)
-          newErrors.confirmPassword = "Passwords must match";
       }
     }
 
@@ -187,15 +197,32 @@ export default function PijamPortalPage() {
     setIsLoading(true);
 
     try {
-      const payload = {
-        role: onboardData.role,
-        teacherName: onboardData.teacherName.trim(),
-        teacherEmail: onboardData.teacherEmail.trim(),
-        teacherPassword: onboardData.teacherPassword,
-        location: onboardData.locations.length > 0 ? onboardData.locations[0] : onboardData.location.trim(),
-        locations: onboardData.locations,
-        assignedLeadId: onboardData.role === "teacher-trainer" ? onboardData.assignedLeadId : undefined,
-      };
+      let payload: any = {};
+      if (onboardData.role === "instructor") {
+        payload = {
+          role: "school",
+          schoolName: onboardData.schoolName.trim(),
+          location: onboardData.location.trim(),
+          address: onboardData.address.trim(),
+          phone: onboardData.phone.trim(),
+          website: onboardData.website.trim(),
+          principalName: onboardData.principalName.trim(),
+          udaiseCode: onboardData.udaiseCode.trim(),
+          teacherName: onboardData.teacherName.trim(),
+          teacherEmail: onboardData.teacherEmail.trim(),
+          teacherPassword: onboardData.teacherPassword,
+        };
+      } else {
+        payload = {
+          role: "teacher-trainer",
+          teacherName: onboardData.teacherName.trim(),
+          teacherEmail: onboardData.teacherEmail.trim(),
+          teacherPassword: onboardData.teacherPassword,
+          location: onboardData.locations[0],
+          locations: onboardData.locations,
+          assignedLeadId: onboardData.assignedLeadId,
+        };
+      }
 
       const response = await fetch("/api/auth/onboard", {
         method: "POST",
@@ -210,7 +237,7 @@ export default function PijamPortalPage() {
 
       toast.success(
         `${
-          onboardData.role === "teacher-trainer" ? "Teacher Trainer" : "Geography Lead"
+          onboardData.role === "teacher-trainer" ? "Teacher Trainer" : "Instructor"
         } onboarded successfully! Redirecting to login...`
       );
       
@@ -222,7 +249,6 @@ export default function PijamPortalPage() {
     }
   };
 
-  // Filter states for modal
   const filteredStates = INDIAN_STATES_DISTRICTS.filter((sd) =>
     sd.state.toLowerCase().includes(searchState.toLowerCase())
   );
@@ -238,25 +264,23 @@ export default function PijamPortalPage() {
     : [];
 
   const handleConfirmGeography = () => {
-    if (onboardData.role === "geography-lead") {
-      if (!selectedState) {
-        toast.error("Please select a State");
+    if (onboardData.role === "instructor") {
+      if (!selectedState || !selectedDistrict) {
+        toast.error("Please select both a State and a District");
         return;
       }
       setOnboardData({
         ...onboardData,
-        location: selectedState,
-        locations: [selectedState],
+        location: `${selectedDistrict}, ${selectedState}`,
       });
     } else {
       if (!selectedState || selectedDistricts.length === 0) {
-        toast.error("Please select both a State and at least one District");
+        toast.error("Please select a State and at least one District");
         return;
       }
       const newLocations = selectedDistricts.map(dist => `${dist}, ${selectedState}`);
       setOnboardData({
         ...onboardData,
-        location: newLocations[0],
         locations: newLocations,
       });
     }
@@ -264,15 +288,14 @@ export default function PijamPortalPage() {
   };
 
   const isConfirmDisabled =
-    onboardData.role === "geography-lead"
-      ? !selectedState
+    onboardData.role === "instructor"
+      ? !selectedState || !selectedDistrict
       : !selectedState || selectedDistricts.length === 0;
 
   return (
     <div className="flex min-h-screen flex-col bg-background relative overflow-hidden">
       <AnimatedBackground />
 
-      {/* Top Navbar */}
       <header className="sticky top-0 z-50 border-b border-border/40 bg-background/95 backdrop-blur-sm">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
           <Link href="/" className="transition-opacity hover:opacity-75">
@@ -292,7 +315,6 @@ export default function PijamPortalPage() {
         </div>
       </header>
 
-      {/* Main Content Area */}
       <div className="flex flex-1 items-center justify-center px-4 py-12 relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -300,19 +322,16 @@ export default function PijamPortalPage() {
           transition={{ duration: 0.6 }}
           className="w-full max-w-xl space-y-8"
         >
-          {/* Brand Header */}
           <div className="text-center space-y-2">
             <h1 className="text-3xl font-heading font-bold tracking-tight text-foreground">
               Pi Jam Staff Onboarding
             </h1>
             <p className="text-sm text-muted-foreground">
-              Register as a Geography Lead or Teacher Trainer to manage program operations.
+              Register as an Instructor or Teacher Trainer to manage program operations.
             </p>
           </div>
 
-          {/* Interactive Card */}
           <div className="rounded-2xl border border-border/40 bg-card/85 backdrop-blur-md shadow-2xl p-8 transition-all duration-300 hover:border-primary/20">
-            {/* Onboarding Wizard Stepper */}
             <div className="space-y-4 mb-6">
               <div className="flex items-center justify-between">
                 {steps.map((step, idx) => (
@@ -353,19 +372,39 @@ export default function PijamPortalPage() {
               }
               className="space-y-5"
             >
-              {/* Step 1: Choose Internal Role */}
               {onboardStep === 1 && (
                 <div className="space-y-4">
                   <p className="text-[11px] text-slate-450 text-center leading-relaxed font-medium">
-                    Register your access level to manage states or support trainers.
+                    Register your access level to manage schools or support trainers.
                   </p>
-
-                  <div className="flex justify-center max-w-sm mx-auto">
-                    {/* Teacher Trainer Card */}
+                  <div className="grid grid-cols-2 gap-4">
+                    <button
+                      type="button"
+                      onClick={() => setOnboardData({ ...onboardData, role: "instructor" })}
+                      className={`relative flex flex-col items-center p-5 rounded-xl border-2 text-center transition-all duration-300 group ${
+                        onboardData.role === "instructor"
+                          ? "border-primary bg-primary/5 scale-[1.02] shadow-sm shadow-primary/5"
+                          : "border-border bg-slate-50/30 hover:border-primary/45 hover:scale-[1.01]"
+                      }`}
+                    >
+                      <div
+                        className={`p-2.5 rounded-full mb-3 transition-colors duration-300 ${
+                          onboardData.role === "instructor"
+                            ? "bg-primary text-white"
+                            : "bg-slate-200/80 text-slate-500 group-hover:bg-primary/10 group-hover:text-primary"
+                        }`}
+                      >
+                        <GraduationCap className="h-5 w-5" />
+                      </div>
+                      <span className="font-bold text-slate-700 text-xs block">Instructor</span>
+                      <span className="text-[9px] text-slate-500 mt-1 block leading-normal font-medium">
+                        Manage ideas and data for a specific school.
+                      </span>
+                    </button>
                     <button
                       type="button"
                       onClick={() => setOnboardData({ ...onboardData, role: "teacher-trainer" })}
-                      className={`w-full relative flex flex-col items-center p-5 rounded-xl border-2 text-center transition-all duration-300 group ${
+                      className={`relative flex flex-col items-center p-5 rounded-xl border-2 text-center transition-all duration-300 group ${
                         onboardData.role === "teacher-trainer"
                           ? "border-primary bg-primary/5 scale-[1.02] shadow-sm shadow-primary/5"
                           : "border-border bg-slate-50/30 hover:border-primary/45 hover:scale-[1.01]"
@@ -389,296 +428,408 @@ export default function PijamPortalPage() {
                 </div>
               )}
 
-              {/* Step 2: Basic Profile & Jurisdiction */}
-              {onboardStep === 2 && (
-                <div className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="staffName" className="text-sm font-semibold text-slate-700">
-                      Full Name *
-                    </Label>
-                    <Input
-                      id="staffName"
-                      placeholder="e.g. Ms. Sarah Johnson"
-                      value={onboardData.teacherName}
-                      onChange={(e) =>
-                        setOnboardData({ ...onboardData, teacherName: e.target.value })
-                      }
-                      className={`bg-card/50 backdrop-blur-sm border-slate-200 text-slate-800 placeholder-slate-400 rounded-xl focus:border-primary ${
-                        onboardErrors.teacherName ? "border-destructive focus-visible:ring-destructive" : ""
-                      }`}
-                    />
-                    {onboardErrors.teacherName && (
-                      <p className="text-xs text-destructive">{onboardErrors.teacherName}</p>
-                    )}
-                  </div>
-
-                  {/* State & District triggers */}
-                  <div className="space-y-2">
-                    <Label className="text-sm font-semibold text-slate-700">
-                      {onboardData.role === "teacher-trainer"
-                        ? "Assigned District & State *"
-                        : "Designated Overseeing State *"}
-                    </Label>
-                    <div className="relative">
-                      <div
-                        onClick={() => {
-                          if (onboardData.role === "geography-lead") {
-                            if (onboardData.location) setSelectedState(onboardData.location);
-                          } else if (onboardData.locations.length > 0) {
-                            const [, st] = onboardData.locations[0].split(", ");
-                            setSelectedState(st || "");
-                            setSelectedDistricts(onboardData.locations.map(loc => loc.split(", ")[0]));
-                          }
-                          setIsModalOpen(true);
-                        }}
-                        className={`cursor-pointer min-h-[44px] p-2 bg-card/50 backdrop-blur-sm border-slate-200 text-slate-800 rounded-xl pr-10 border hover:border-primary transition-colors flex flex-wrap gap-1.5 items-center ${
-                          onboardErrors.location ? "border-destructive focus-visible:ring-destructive" : ""
-                        }`}
-                      >
-                        {(onboardData.locations.length === 0 && !onboardData.location) && (
-                          <span className="text-slate-400 pl-2 text-sm">
-                            {onboardData.role === "geography-lead" ? "Click to select designated State" : "Click to select State & District(s)"}
-                          </span>
-                        )}
-                        {onboardData.role === "geography-lead" && onboardData.location && (
-                          <span className="pl-2 text-sm">{onboardData.location}</span>
-                        )}
-                        {onboardData.role === "teacher-trainer" && onboardData.locations.map(loc => (
-                          <span key={loc} className="bg-primary/10 text-primary text-[11px] font-semibold px-2 py-1 rounded-md border border-primary/20">
-                            {loc.split(', ')[0]}
-                          </span>
-                        ))}
+              {/* INSTRUCTOR FLOW */}
+              {onboardData.role === "instructor" && (
+                <>
+                  {onboardStep === 2 && (
+                    <div className="space-y-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="schoolName" className="text-sm font-semibold text-slate-700">School Name *</Label>
+                        <div className="relative">
+                          <Building2 className="absolute left-3.5 top-3 h-4.5 w-4.5 text-slate-450 pointer-events-none" />
+                          <Input
+                            id="schoolName"
+                            placeholder="e.g., Springfield High School"
+                            value={onboardData.schoolName}
+                            onChange={(e) => setOnboardData({ ...onboardData, schoolName: e.target.value })}
+                            className={`pl-10 bg-card/50 backdrop-blur-sm border-slate-200 focus-visible:ring-primary rounded-xl transition-all duration-200 text-slate-800 placeholder-slate-400 ${onboardErrors.schoolName ? "border-destructive focus-visible:ring-destructive" : ""}`}
+                          />
+                        </div>
+                        {onboardErrors.schoolName && <p className="text-xs text-destructive">{onboardErrors.schoolName}</p>}
                       </div>
-                      <MapPin className="absolute right-3.5 top-3 h-4.5 w-4.5 text-slate-450 pointer-events-none" />
-                    </div>
-                    {onboardErrors.location && (
-                      <p className="text-xs text-destructive">{onboardErrors.location}</p>
-                    )}
-                  </div>
-                </div>
-              )}
-
-              {/* Step 3: Credentials / Reporting Assignments */}
-              {onboardStep === 3 && (
-                <div className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="staffEmail" className="text-sm font-semibold text-slate-700">
-                      Email Address *
-                    </Label>
-                    <Input
-                      id="staffEmail"
-                      type="email"
-                      placeholder={
-                        onboardData.role === "teacher-trainer" ? "trainer@pijam.org" : "lead@pijam.org"
-                      }
-                      value={onboardData.teacherEmail}
-                      onChange={(e) =>
-                        setOnboardData({ ...onboardData, teacherEmail: e.target.value })
-                      }
-                      className={`bg-card/50 backdrop-blur-sm border-slate-200 text-slate-800 placeholder-slate-400 rounded-xl focus:border-primary ${
-                        onboardErrors.teacherEmail ? "border-destructive focus-visible:ring-destructive" : ""
-                      }`}
-                    />
-                    {onboardErrors.teacherEmail && (
-                      <p className="text-xs text-destructive">{onboardErrors.teacherEmail}</p>
-                    )}
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="staffPass" className="text-sm font-semibold text-slate-700">
-                        Password *
-                      </Label>
-                      <Input
-                        id="staffPass"
-                        type="password"
-                        placeholder="Min 6 chars"
-                        value={onboardData.teacherPassword}
-                        onChange={(e) =>
-                          setOnboardData({ ...onboardData, teacherPassword: e.target.value })
-                        }
-                        className={`bg-card/50 backdrop-blur-sm border-slate-200 text-slate-850 placeholder-slate-400 rounded-xl focus:border-primary ${
-                          onboardErrors.teacherPassword ? "border-destructive focus-visible:ring-destructive" : ""
-                        }`}
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="staffConfirm" className="text-sm font-semibold text-slate-700">
-                        Confirm Password *
-                      </Label>
-                      <Input
-                        id="staffConfirm"
-                        type="password"
-                        placeholder="Confirm password"
-                        value={onboardData.confirmPassword}
-                        onChange={(e) =>
-                          setOnboardData({ ...onboardData, confirmPassword: e.target.value })
-                        }
-                        className={`bg-card/50 backdrop-blur-sm border-slate-200 text-slate-850 placeholder-slate-400 rounded-xl focus:border-primary ${
-                          onboardErrors.confirmPassword ? "border-destructive focus-visible:ring-destructive" : ""
-                        }`}
-                      />
-                    </div>
-                    {(onboardErrors.teacherPassword || onboardErrors.confirmPassword) && (
-                      <div className="col-span-2">
-                        <p className="text-xs text-destructive font-medium">
-                          {onboardErrors.teacherPassword || onboardErrors.confirmPassword}
-                        </p>
+                      <div className="space-y-2">
+                        <Label htmlFor="udaiseCode" className="text-sm font-semibold text-slate-700">UDAISE Code (11 digits) *</Label>
+                        <Input
+                          id="udaiseCode"
+                          placeholder="12345678901"
+                          value={onboardData.udaiseCode}
+                          onChange={(e) => setOnboardData({ ...onboardData, udaiseCode: e.target.value.replace(/[^\d]/g, "") })}
+                          maxLength={11}
+                          className={`bg-card/50 backdrop-blur-sm border-slate-200 focus-visible:ring-primary rounded-xl transition-all duration-200 text-slate-800 placeholder-slate-400 ${onboardErrors.udaiseCode ? "border-destructive focus-visible:ring-destructive" : ""}`}
+                        />
+                        {onboardErrors.udaiseCode && <p className="text-xs text-destructive">{onboardErrors.udaiseCode}</p>}
                       </div>
-                    )}
-                  </div>
-
-                  {/* Supervisor dropdown (Only for Teacher Trainer) */}
-                  {onboardData.role === "teacher-trainer" && (
-                    <div className="space-y-2 pt-2">
-                      <Label htmlFor="reportingLead" className="text-sm font-semibold text-slate-700">
-                        Assigned Geography Lead *
-                      </Label>
-                      <select
-                        id="reportingLead"
-                        value={onboardData.assignedLeadId}
-                        onChange={(e) =>
-                          setOnboardData({ ...onboardData, assignedLeadId: e.target.value })
-                        }
-                        className={`w-full p-3 rounded-xl border bg-card/50 backdrop-blur-sm border-slate-200 text-slate-700 text-sm focus:ring-1 focus:ring-primary focus:border-primary ${
-                          onboardErrors.assignedLeadId ? "border-destructive focus:ring-destructive" : ""
-                        }`}
-                      >
-                        <option value="" className="bg-card text-slate-400">
-                          -- Choose Supervising Lead --
-                        </option>
-                        {geographyLeads.map((lead) => {
-                          const scope = lead.subGeographies.length
-                            ? lead.subGeographies.map((s) => s.name).join(", ")
-                            : lead.geographyName
-                              ? `${lead.geographyName} (state-wide)`
-                              : "no scope";
-                          return (
-                            <option
-                              key={lead.id}
-                              value={String(lead.id)}
-                              className="bg-card text-slate-800 font-semibold"
-                            >
-                              {lead.displayName} — {scope}
-                            </option>
-                          );
-                        })}
-                      </select>
-                      {onboardErrors.assignedLeadId && (
-                        <p className="text-xs text-destructive">{onboardErrors.assignedLeadId}</p>
-                      )}
+                      <div className="space-y-2">
+                        <Label className="text-sm font-semibold text-slate-700">Geography (State & District) *</Label>
+                        <div className="relative">
+                          <Input
+                            readOnly
+                            placeholder="Click to select State & District"
+                            value={onboardData.location}
+                            onClick={() => {
+                              if (onboardData.location) {
+                                const [dist, st] = onboardData.location.split(", ");
+                                setSelectedState(st || "");
+                                setSelectedDistrict(dist || "");
+                              }
+                              setIsModalOpen(true);
+                            }}
+                            className={`cursor-pointer pr-10 bg-card/50 backdrop-blur-sm border-slate-200 focus-visible:ring-primary rounded-xl transition-all duration-200 text-slate-800 placeholder-slate-400 ${onboardErrors.location ? "border-destructive focus-visible:ring-destructive" : ""}`}
+                          />
+                          <MapPin className="absolute right-3.5 top-3 h-4.5 w-4.5 text-slate-450 pointer-events-none" />
+                        </div>
+                        {onboardErrors.location && <p className="text-xs text-destructive">{onboardErrors.location}</p>}
+                      </div>
                     </div>
                   )}
-                </div>
-              )}
 
-              {/* Step 4: Final Profile Review */}
-              {onboardStep === 4 && (
-                <div className="space-y-4 text-slate-800 text-sm">
-                  <div className="rounded-xl border border-primary/20 bg-primary/5 p-5 space-y-4 shadow-sm">
-                    <h4 className="font-bold text-xs text-primary uppercase tracking-wider">
-                      Review Access Level
-                    </h4>
-                    <div className="grid grid-cols-2 gap-y-3 gap-x-4 text-slate-700">
-                      <div>
-                        <span className="text-slate-500 block text-[10px]">Access Role:</span>
-                        <span className="font-bold text-slate-800 uppercase text-xs">
-                          {onboardData.role === "teacher-trainer"
-                            ? "Teacher Trainer (TT)"
-                            : "Geography Lead (GL)"}
-                        </span>
+                  {onboardStep === 3 && (
+                    <div className="space-y-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="address" className="text-sm font-semibold text-slate-700">School Address *</Label>
+                        <Input
+                          id="address"
+                          placeholder="e.g., 123 School Street, District"
+                          value={onboardData.address}
+                          onChange={(e) => setOnboardData({ ...onboardData, address: e.target.value })}
+                          className={`bg-card/50 backdrop-blur-sm border-slate-200 focus-visible:ring-primary rounded-xl transition-all duration-200 text-slate-800 placeholder-slate-400 ${onboardErrors.address ? "border-destructive focus-visible:ring-destructive" : ""}`}
+                        />
+                        {onboardErrors.address && <p className="text-xs text-destructive">{onboardErrors.address}</p>}
                       </div>
-                      <div>
-                        <span className="text-slate-500 block text-[10px]">Full Name:</span>
-                        <span className="font-semibold text-slate-800">{onboardData.teacherName}</span>
-                      </div>
-                      <div className="col-span-2 border-t border-slate-200/40 pt-2">
-                        <span className="text-slate-500 block text-[10px]">Work Email:</span>
-                        <span className="font-semibold text-slate-800">{onboardData.teacherEmail}</span>
-                      </div>
-                      <div className="border-t border-slate-200/40 pt-2">
-                        <span className="text-slate-500 block text-[10px]">Jurisdiction:</span>
-                        <div className="flex flex-wrap gap-1 mt-1">
-                          {onboardData.locations && onboardData.locations.length > 0 ? (
-                            onboardData.locations.map(loc => (
-                              <span key={loc} className="bg-slate-100 text-slate-700 text-[10px] font-semibold px-2 py-0.5 rounded border border-slate-200">
-                                {loc}
-                              </span>
-                            ))
-                          ) : (
-                            <span className="font-semibold text-slate-800">{onboardData.location}</span>
-                          )}
+                      <div className="space-y-2">
+                        <Label htmlFor="phone" className="text-sm font-semibold text-slate-700">School Phone Number *</Label>
+                        <div className="relative">
+                          <Phone className="absolute left-3.5 top-3 h-4.5 w-4.5 text-slate-450 pointer-events-none" />
+                          <Input
+                            id="phone"
+                            placeholder="e.g., 9876543210"
+                            value={onboardData.phone}
+                            onChange={(e) => setOnboardData({ ...onboardData, phone: e.target.value.replace(/[^\d]/g, "") })}
+                            className={`pl-10 bg-card/50 backdrop-blur-sm border-slate-200 focus-visible:ring-primary rounded-xl transition-all duration-200 text-slate-800 placeholder-slate-400 ${onboardErrors.phone ? "border-destructive focus-visible:ring-destructive" : ""}`}
+                          />
                         </div>
+                        {onboardErrors.phone && <p className="text-xs text-destructive">{onboardErrors.phone}</p>}
                       </div>
-                      {onboardData.role === "teacher-trainer" && (
-                        <div className="border-t border-slate-200/40 pt-2">
-                          <span className="text-slate-500 block text-[10px]">Reports To:</span>
-                          <span className="font-semibold text-slate-800 break-all text-xs">
-                            {onboardData.assignedLeadId}
-                          </span>
-                        </div>
-                      )}
+                      <div className="space-y-2">
+                        <Label htmlFor="principalName" className="text-sm font-semibold text-slate-700">Principal Full Name *</Label>
+                        <Input
+                          id="principalName"
+                          placeholder="e.g., Dr. John Smith"
+                          value={onboardData.principalName}
+                          onChange={(e) => setOnboardData({ ...onboardData, principalName: e.target.value })}
+                          className={`bg-card/50 backdrop-blur-sm border-slate-200 focus-visible:ring-primary rounded-xl transition-all duration-200 text-slate-800 placeholder-slate-400 ${onboardErrors.principalName ? "border-destructive focus-visible:ring-destructive" : ""}`}
+                        />
+                        {onboardErrors.principalName && <p className="text-xs text-destructive">{onboardErrors.principalName}</p>}
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="website" className="text-sm font-semibold text-slate-700">School Website (Optional)</Label>
+                        <Input
+                          id="website"
+                          type="url"
+                          placeholder="e.g., https://www.school.edu"
+                          value={onboardData.website}
+                          onChange={(e) => setOnboardData({ ...onboardData, website: e.target.value })}
+                          className="bg-card/50 backdrop-blur-sm border-slate-200 focus-visible:ring-primary rounded-xl transition-all duration-200 text-slate-800 placeholder-slate-400"
+                        />
+                      </div>
                     </div>
-                  </div>
-                </div>
+                  )}
+
+                  {onboardStep === 4 && (
+                    <div className="space-y-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="teacherName" className="text-sm font-semibold text-slate-700">Instructor Name *</Label>
+                        <div className="relative">
+                          <User className="absolute left-3.5 top-3 h-4.5 w-4.5 text-slate-450 pointer-events-none" />
+                          <Input
+                            id="teacherName"
+                            placeholder="e.g., Ms. Sarah Johnson"
+                            value={onboardData.teacherName}
+                            onChange={(e) => setOnboardData({ ...onboardData, teacherName: e.target.value })}
+                            className={`pl-10 bg-card/50 backdrop-blur-sm border-slate-200 focus-visible:ring-primary rounded-xl transition-all duration-200 text-slate-800 placeholder-slate-400 ${onboardErrors.teacherName ? "border-destructive focus-visible:ring-destructive" : ""}`}
+                          />
+                        </div>
+                        {onboardErrors.teacherName && <p className="text-xs text-destructive">{onboardErrors.teacherName}</p>}
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="teacherEmail" className="text-sm font-semibold text-slate-700">Email Address *</Label>
+                        <div className="relative">
+                          <Mail className="absolute left-3.5 top-3 h-4.5 w-4.5 text-slate-450 pointer-events-none" />
+                          <Input
+                            id="teacherEmail"
+                            type="email"
+                            placeholder="e.g., instructor@pijam.org"
+                            value={onboardData.teacherEmail}
+                            onChange={(e) => setOnboardData({ ...onboardData, teacherEmail: e.target.value })}
+                            className={`pl-10 bg-card/50 backdrop-blur-sm border-slate-200 focus-visible:ring-primary rounded-xl transition-all duration-200 text-slate-800 placeholder-slate-400 ${onboardErrors.teacherEmail ? "border-destructive focus-visible:ring-destructive" : ""}`}
+                          />
+                        </div>
+                        {onboardErrors.teacherEmail && <p className="text-xs text-destructive">{onboardErrors.teacherEmail}</p>}
+                      </div>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="teacherPassword" className="text-sm font-semibold text-slate-700">Password *</Label>
+                          <Input
+                            id="teacherPassword"
+                            type="password"
+                            placeholder="Min 6 chars"
+                            value={onboardData.teacherPassword}
+                            onChange={(e) => setOnboardData({ ...onboardData, teacherPassword: e.target.value })}
+                            className={`bg-card/50 backdrop-blur-sm border-slate-200 focus-visible:ring-primary rounded-xl transition-all duration-200 text-slate-800 placeholder-slate-400 ${onboardErrors.teacherPassword ? "border-destructive focus-visible:ring-destructive" : ""}`}
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="confirmPassword" className="text-sm font-semibold text-slate-700">Confirm Password *</Label>
+                          <Input
+                            id="confirmPassword"
+                            type="password"
+                            placeholder="Confirm password"
+                            value={onboardData.confirmPassword}
+                            onChange={(e) => setOnboardData({ ...onboardData, confirmPassword: e.target.value })}
+                            className={`bg-card/50 backdrop-blur-sm border-slate-200 focus-visible:ring-primary rounded-xl transition-all duration-200 text-slate-800 placeholder-slate-400 ${onboardErrors.confirmPassword ? "border-destructive focus-visible:ring-destructive" : ""}`}
+                          />
+                        </div>
+                        {(onboardErrors.teacherPassword || onboardErrors.confirmPassword) && (
+                          <div className="col-span-2">
+                            <p className="text-xs text-destructive font-medium">{onboardErrors.teacherPassword || onboardErrors.confirmPassword}</p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {onboardStep === 5 && (
+                    <div className="space-y-4 text-sm text-slate-800">
+                      <div className="rounded-xl border border-primary/20 bg-primary/5 p-5 space-y-4 shadow-sm">
+                        <div>
+                          <h4 className="font-bold text-xs text-primary uppercase tracking-wider mb-2">School Information</h4>
+                          <div className="grid grid-cols-2 gap-y-2 gap-x-4">
+                            <div>
+                              <span className="text-slate-500 block text-[11px]">School Name:</span>
+                              <span className="font-bold text-slate-800">{onboardData.schoolName}</span>
+                            </div>
+                            <div>
+                              <span className="text-slate-500 block text-[11px]">UDAISE Code:</span>
+                              <span className="font-bold text-slate-800">{onboardData.udaiseCode}</span>
+                            </div>
+                            <div>
+                              <span className="text-slate-500 block text-[11px]">Geography:</span>
+                              <span className="font-semibold text-slate-800">{onboardData.location}</span>
+                            </div>
+                            <div>
+                              <span className="text-slate-500 block text-[11px]">Phone:</span>
+                              <span className="font-semibold text-slate-800">{onboardData.phone}</span>
+                            </div>
+                            <div className="col-span-2 border-t border-slate-200/40 pt-2">
+                              <span className="text-slate-500 block text-[11px]">Address:</span>
+                              <span className="font-medium text-slate-800">{onboardData.address}</span>
+                            </div>
+                            <div className="border-t border-slate-200/40 pt-2">
+                              <span className="text-slate-500 block text-[11px]">Principal:</span>
+                              <span className="font-semibold text-slate-800">{onboardData.principalName}</span>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="border-t border-slate-200/40 pt-3">
+                          <h4 className="font-bold text-xs text-primary uppercase tracking-wider mb-2">Instructor Profile</h4>
+                          <div className="grid grid-cols-2 gap-y-2 gap-x-4">
+                            <div>
+                              <span className="text-slate-500 block text-[11px]">Instructor Name:</span>
+                              <span className="font-bold text-slate-800">{onboardData.teacherName}</span>
+                            </div>
+                            <div>
+                              <span className="text-slate-500 block text-[11px]">Email Address:</span>
+                              <span className="font-bold text-slate-850 break-all">{onboardData.teacherEmail}</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </>
               )}
 
-              {/* Wizard Footer Navigation */}
+              {/* TEACHER TRAINER FLOW */}
+              {onboardData.role === "teacher-trainer" && (
+                <>
+                  {onboardStep === 2 && (
+                    <div className="space-y-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="staffName" className="text-sm font-semibold text-slate-700">Full Name *</Label>
+                        <Input
+                          id="staffName"
+                          placeholder="e.g. Ms. Sarah Johnson"
+                          value={onboardData.teacherName}
+                          onChange={(e) => setOnboardData({ ...onboardData, teacherName: e.target.value })}
+                          className={`bg-card/50 backdrop-blur-sm border-slate-200 text-slate-800 placeholder-slate-400 rounded-xl focus:border-primary ${onboardErrors.teacherName ? "border-destructive focus-visible:ring-destructive" : ""}`}
+                        />
+                        {onboardErrors.teacherName && <p className="text-xs text-destructive">{onboardErrors.teacherName}</p>}
+                      </div>
+                      <div className="space-y-2">
+                        <Label className="text-sm font-semibold text-slate-700">Assigned District & State *</Label>
+                        <div className="relative">
+                          <div
+                            onClick={() => {
+                              if (onboardData.locations.length > 0) {
+                                const [, st] = onboardData.locations[0].split(", ");
+                                setSelectedState(st || "");
+                                setSelectedDistricts(onboardData.locations.map(loc => loc.split(", ")[0]));
+                              }
+                              setIsModalOpen(true);
+                            }}
+                            className={`cursor-pointer min-h-[44px] p-2 bg-card/50 backdrop-blur-sm border-slate-200 text-slate-800 rounded-xl pr-10 border hover:border-primary transition-colors flex flex-wrap gap-1.5 items-center ${onboardErrors.location ? "border-destructive focus-visible:ring-destructive" : ""}`}
+                          >
+                            {(onboardData.locations.length === 0) && (
+                              <span className="text-slate-400 pl-2 text-sm">Click to select State & District(s)</span>
+                            )}
+                            {onboardData.locations.map(loc => (
+                              <span key={loc} className="bg-primary/10 text-primary text-[11px] font-semibold px-2 py-1 rounded-md border border-primary/20">
+                                {loc.split(', ')[0]}
+                              </span>
+                            ))}
+                          </div>
+                          <MapPin className="absolute right-3.5 top-3 h-4.5 w-4.5 text-slate-450 pointer-events-none" />
+                        </div>
+                        {onboardErrors.location && <p className="text-xs text-destructive">{onboardErrors.location}</p>}
+                      </div>
+                    </div>
+                  )}
+
+                  {onboardStep === 3 && (
+                    <div className="space-y-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="staffEmail" className="text-sm font-semibold text-slate-700">Email Address *</Label>
+                        <Input
+                          id="staffEmail"
+                          type="email"
+                          placeholder="trainer@pijam.org"
+                          value={onboardData.teacherEmail}
+                          onChange={(e) => setOnboardData({ ...onboardData, teacherEmail: e.target.value })}
+                          className={`bg-card/50 backdrop-blur-sm border-slate-200 text-slate-800 placeholder-slate-400 rounded-xl focus:border-primary ${onboardErrors.teacherEmail ? "border-destructive focus-visible:ring-destructive" : ""}`}
+                        />
+                        {onboardErrors.teacherEmail && <p className="text-xs text-destructive">{onboardErrors.teacherEmail}</p>}
+                      </div>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="staffPass" className="text-sm font-semibold text-slate-700">Password *</Label>
+                          <Input
+                            id="staffPass"
+                            type="password"
+                            placeholder="Min 6 chars"
+                            value={onboardData.teacherPassword}
+                            onChange={(e) => setOnboardData({ ...onboardData, teacherPassword: e.target.value })}
+                            className={`bg-card/50 backdrop-blur-sm border-slate-200 text-slate-850 placeholder-slate-400 rounded-xl focus:border-primary ${onboardErrors.teacherPassword ? "border-destructive focus-visible:ring-destructive" : ""}`}
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="staffConfirm" className="text-sm font-semibold text-slate-700">Confirm Password *</Label>
+                          <Input
+                            id="staffConfirm"
+                            type="password"
+                            placeholder="Confirm password"
+                            value={onboardData.confirmPassword}
+                            onChange={(e) => setOnboardData({ ...onboardData, confirmPassword: e.target.value })}
+                            className={`bg-card/50 backdrop-blur-sm border-slate-200 text-slate-850 placeholder-slate-400 rounded-xl focus:border-primary ${onboardErrors.confirmPassword ? "border-destructive focus-visible:ring-destructive" : ""}`}
+                          />
+                        </div>
+                        {(onboardErrors.teacherPassword || onboardErrors.confirmPassword) && (
+                          <div className="col-span-2">
+                            <p className="text-xs text-destructive font-medium">{onboardErrors.teacherPassword || onboardErrors.confirmPassword}</p>
+                          </div>
+                        )}
+                      </div>
+                      <div className="space-y-2 pt-2">
+                        <Label htmlFor="reportingLead" className="text-sm font-semibold text-slate-700">Assigned Geography Lead *</Label>
+                        <select
+                          id="reportingLead"
+                          value={onboardData.assignedLeadId}
+                          onChange={(e) => setOnboardData({ ...onboardData, assignedLeadId: e.target.value })}
+                          className={`w-full p-3 rounded-xl border bg-card/50 backdrop-blur-sm border-slate-200 text-slate-700 text-sm focus:ring-1 focus:ring-primary focus:border-primary ${onboardErrors.assignedLeadId ? "border-destructive focus:ring-destructive" : ""}`}
+                        >
+                          <option value="" className="bg-card text-slate-400">-- Choose Supervising Lead --</option>
+                          {geographyLeads.map((lead) => {
+                            const scope = lead.subGeographies.length
+                              ? lead.subGeographies.map((s) => s.name).join(", ")
+                              : lead.geographyName ? `${lead.geographyName} (state-wide)` : "no scope";
+                            return (
+                              <option key={lead.id} value={String(lead.id)} className="bg-card text-slate-800 font-semibold">
+                                {lead.displayName} — {scope}
+                              </option>
+                            );
+                          })}
+                        </select>
+                        {onboardErrors.assignedLeadId && <p className="text-xs text-destructive">{onboardErrors.assignedLeadId}</p>}
+                      </div>
+                    </div>
+                  )}
+
+                  {onboardStep === 4 && (
+                    <div className="space-y-4 text-slate-800 text-sm">
+                      <div className="rounded-xl border border-primary/20 bg-primary/5 p-5 space-y-4 shadow-sm">
+                        <h4 className="font-bold text-xs text-primary uppercase tracking-wider">Review Access Level</h4>
+                        <div className="grid grid-cols-2 gap-y-3 gap-x-4 text-slate-700">
+                          <div>
+                            <span className="text-slate-500 block text-[10px]">Access Role:</span>
+                            <span className="font-bold text-slate-800 uppercase text-xs">Teacher Trainer (TT)</span>
+                          </div>
+                          <div>
+                            <span className="text-slate-500 block text-[10px]">Full Name:</span>
+                            <span className="font-semibold text-slate-800">{onboardData.teacherName}</span>
+                          </div>
+                          <div className="col-span-2 border-t border-slate-200/40 pt-2">
+                            <span className="text-slate-500 block text-[10px]">Work Email:</span>
+                            <span className="font-semibold text-slate-800">{onboardData.teacherEmail}</span>
+                          </div>
+                          <div className="border-t border-slate-200/40 pt-2">
+                            <span className="text-slate-500 block text-[10px]">Jurisdiction:</span>
+                            <div className="flex flex-wrap gap-1 mt-1">
+                              {onboardData.locations.map(loc => (
+                                <span key={loc} className="bg-slate-100 text-slate-700 text-[10px] font-semibold px-2 py-0.5 rounded border border-slate-200">
+                                  {loc}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                          <div className="border-t border-slate-200/40 pt-2">
+                            <span className="text-slate-500 block text-[10px]">Reports To:</span>
+                            <span className="font-semibold text-slate-800 break-all text-xs">
+                              {geographyLeads.find(l => String(l.id) === onboardData.assignedLeadId)?.displayName || onboardData.assignedLeadId}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </>
+              )}
+
               <div className="flex gap-3 pt-4 border-t border-border/20">
                 {onboardStep > 1 && (
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={handleOnboardPrev}
-                    className="flex-1 rounded-xl shadow-sm text-sm"
-                  >
+                  <Button type="button" variant="outline" onClick={handleOnboardPrev} className="flex-1 rounded-xl shadow-sm text-sm">
                     Back
                   </Button>
                 )}
                 {onboardStep < totalOnboardSteps ? (
-                  <Button
-                    type="submit"
-                    className="flex-1 bg-primary hover:bg-primary/95 text-white font-bold rounded-xl shadow-lg transition-transform active:scale-[0.98] text-sm"
-                  >
+                  <Button type="submit" className="flex-1 bg-primary hover:bg-primary/95 text-white font-bold rounded-xl shadow-lg transition-transform active:scale-[0.98] text-sm">
                     Next
                   </Button>
                 ) : (
-                  <Button
-                    type="submit"
-                    className="flex-1 bg-primary hover:bg-primary/95 text-white font-bold rounded-xl shadow-lg transition-transform active:scale-[0.98] text-sm"
-                    disabled={isLoading}
-                  >
+                  <Button type="submit" className="flex-1 bg-primary hover:bg-primary/95 text-white font-bold rounded-xl shadow-lg transition-transform active:scale-[0.98] text-sm" disabled={isLoading}>
                     {isLoading ? "Submitting..." : "Join Team"}
                   </Button>
                 )}
               </div>
             </form>
           </div>
-
+          
           <div className="text-center space-y-2">
             <p className="text-xs text-muted-foreground">
-              Already registered?{" "}
-              <Link
-                href="/login"
-                className="text-primary hover:text-primary/80 font-bold hover:underline"
-              >
-                Sign in to Platform
-              </Link>
-            </p>
-            <p className="text-xs text-slate-400">
-              Registering a school instead?{" "}
-              <Link
-                href="/onboard"
-                className="text-primary hover:text-primary/80 font-bold hover:underline"
-              >
-                Register your school
-              </Link>
+              Already registered? <Link href="/login" className="text-primary hover:text-primary/80 font-bold hover:underline">Sign in to Platform</Link>
             </p>
           </div>
         </motion.div>
       </div>
 
-      {/* INDIAN GEOGRAPHY / STATE & DISTRICT MODAL */}
       <AnimatePresence>
         {isModalOpen && (
           <motion.div
@@ -697,32 +848,22 @@ export default function PijamPortalPage() {
               transition={{ type: "spring", stiffness: 300, damping: 28 }}
               className="relative w-full max-w-3xl bg-white border border-slate-200/50 rounded-2xl shadow-2xl flex flex-col max-h-[85vh] overflow-hidden text-slate-800"
             >
-              {/* Modal Header */}
               <div className="flex items-center justify-between px-6 py-4 border-b border-border/30 bg-card rounded-t-2xl">
                 <div>
                   <h3 className="text-lg font-bold text-foreground flex items-center gap-2">
                     <Map className="h-5 w-5 text-primary" />
-                    {onboardData.role === "geography-lead" ? "Select Designated State" : "Select Region Geography"}
+                    Select Region Geography
                   </h3>
                   <p className="text-xs text-muted-foreground mt-0.5">
-                    {onboardData.role === "geography-lead"
-                      ? "Choose the state you will oversee as Geography Lead"
-                      : "Choose the state and corresponding educational district"}
+                    Choose the state and corresponding educational district
                   </p>
                 </div>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => setIsModalOpen(false)}
-                  className="h-8 w-8 rounded-full"
-                >
+                <Button variant="ghost" size="icon" onClick={() => setIsModalOpen(false)} className="h-8 w-8 rounded-full">
                   <X className="h-4 w-4" />
                 </Button>
               </div>
 
-              {/* Modal Body */}
               <div className="flex-1 overflow-hidden grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-border/20">
-                {/* Left Column: States List */}
                 <div className="flex flex-col h-[50vh] md:h-[60vh] overflow-hidden">
                   <div className="p-4 border-b border-border/10">
                     <div className="relative">
@@ -743,7 +884,8 @@ export default function PijamPortalPage() {
                           type="button"
                           onClick={() => {
                             setSelectedState(sd.state);
-                            setSelectedDistricts([]); // Reset districts on state change
+                            setSelectedDistrict("");
+                            setSelectedDistricts([]);
                           }}
                           className={`w-full text-left px-4 py-2.5 rounded-lg text-sm transition-all duration-200 flex items-center justify-between group ${
                             selectedState === sd.state
@@ -779,101 +921,87 @@ export default function PijamPortalPage() {
                   </div>
                 </div>
 
-                {/* Right Column: Districts List or State-Level details */}
                 <div className="flex flex-col h-[50vh] md:h-[60vh] overflow-hidden bg-slate-50/30">
-                  {onboardData.role === "geography-lead" ? (
-                    <div className="flex flex-col items-center justify-center h-full p-8 text-center bg-primary/5">
-                      <div className="p-4 bg-primary/10 text-primary rounded-full mb-4 border border-primary/20">
-                        <Map className="h-8 w-8 stroke-[1.5]" />
-                      </div>
-                      <h4 className="font-bold text-slate-800 text-sm">State-Level Access</h4>
-                      <p className="text-xs text-muted-foreground mt-2 max-w-xs leading-relaxed font-medium">
-                        As a Geography Lead, your authority spans the entire state of <strong>{selectedState || "your choice"}</strong>. You will automatically have reporting visibility over all educational districts inside this state.
-                      </p>
-                      {selectedState && (
-                        <div className="mt-6 px-4 py-2 bg-emerald-500/10 text-emerald-600 text-xs font-bold rounded-full border border-emerald-500/20 flex items-center gap-1.5 animate-in fade-in zoom-in-95 shadow-sm">
-                          <Check className="h-3.5 w-3.5" />
-                          Selected State: {selectedState}
-                        </div>
-                      )}
+                  <div className="p-4 border-b border-border/10">
+                    <div className="relative">
+                      <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        placeholder={
+                          selectedState
+                            ? `Search districts in ${selectedState}...`
+                            : "Select a state first..."
+                        }
+                        disabled={!selectedState}
+                        value={searchDistrict}
+                        onChange={(e) => setSearchDistrict(e.target.value)}
+                        className="pl-9 h-9 text-sm focus-visible:ring-1 focus-visible:ring-primary rounded-xl"
+                      />
                     </div>
-                  ) : (
-                    <>
-                      <div className="p-4 border-b border-border/10">
-                        <div className="relative">
-                          <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-                          <Input
-                            placeholder={
-                              selectedState
-                                ? `Search districts in ${selectedState}...`
-                                : "Select a state first..."
-                            }
-                            disabled={!selectedState}
-                            value={searchDistrict}
-                            onChange={(e) => setSearchDistrict(e.target.value)}
-                            className="pl-9 h-9 text-sm focus-visible:ring-1 focus-visible:ring-primary rounded-xl"
-                          />
-                        </div>
-                      </div>
-                      <div className="flex-1 overflow-y-auto p-2 space-y-1">
-                        {selectedState ? (
-                          filteredDistricts.length > 0 ? (
-                            filteredDistricts.map((dist) => (
-                              <button
-                                key={dist}
-                                type="button"
-                                onClick={() => {
-                                  if (selectedDistricts.includes(dist)) {
-                                    setSelectedDistricts(selectedDistricts.filter(d => d !== dist));
-                                  } else {
-                                    setSelectedDistricts([...selectedDistricts, dist]);
-                                  }
-                                }}
-                                className={`w-full text-left px-4 py-2.5 rounded-lg text-sm transition-all duration-200 flex items-center justify-between group ${
-                                  selectedDistricts.includes(dist)
-                                    ? "bg-primary text-primary-foreground font-semibold shadow-md shadow-primary/20"
-                                    : "hover:bg-accent/5 text-slate-700 hover:text-primary hover:translate-x-1"
-                                }`}
-                              >
-                                <div className="flex items-center gap-2.5">
-                                  <MapPin className={`h-4 w-4 transition-all duration-200 ${
-                                    selectedDistricts.includes(dist) ? "text-white scale-110" : "text-muted-foreground/60 group-hover:text-primary"
-                                  }`} />
-                                  <span>{highlightText(dist, searchDistrict)}</span>
-                                </div>
-                                {selectedDistricts.includes(dist) && (
-                                  <Check className="h-4 w-4 text-white" />
-                                )}
-                              </button>
-                            ))
-                          ) : (
-                            <div className="text-center py-8 text-sm text-muted-foreground">
-                              No districts found
+                  </div>
+                  <div className="flex-1 overflow-y-auto p-2 space-y-1">
+                    {selectedState ? (
+                      filteredDistricts.length > 0 ? (
+                        filteredDistricts.map((dist) => (
+                          <button
+                            key={dist}
+                            type="button"
+                            onClick={() => {
+                              if (onboardData.role === "instructor") {
+                                setSelectedDistrict(dist);
+                              } else {
+                                if (selectedDistricts.includes(dist)) {
+                                  setSelectedDistricts(selectedDistricts.filter(d => d !== dist));
+                                } else {
+                                  setSelectedDistricts([...selectedDistricts, dist]);
+                                }
+                              }
+                            }}
+                            className={`w-full text-left px-4 py-2.5 rounded-lg text-sm transition-all duration-200 flex items-center justify-between group ${
+                              (onboardData.role === "instructor" ? selectedDistrict === dist : selectedDistricts.includes(dist))
+                                ? "bg-primary text-primary-foreground font-semibold shadow-md shadow-primary/20"
+                                : "hover:bg-accent/5 text-slate-700 hover:text-primary hover:translate-x-1"
+                            }`}
+                          >
+                            <div className="flex items-center gap-2.5">
+                              <MapPin className={`h-4 w-4 transition-all duration-200 ${
+                                (onboardData.role === "instructor" ? selectedDistrict === dist : selectedDistricts.includes(dist)) ? "text-white scale-110" : "text-muted-foreground/60 group-hover:text-primary"
+                              }`} />
+                              <span>{highlightText(dist, searchDistrict)}</span>
                             </div>
-                          )
-                        ) : (
-                          <div className="flex flex-col items-center justify-center h-full p-6 text-center">
-                            <MapPin className="h-10 w-10 text-muted-foreground/30 mb-2 stroke-[1.2]" />
-                            <p className="text-sm font-medium text-muted-foreground">
-                              Please select a state from the left column to view its educational districts.
-                            </p>
-                          </div>
-                        )}
+                            {(onboardData.role === "instructor" ? selectedDistrict === dist : selectedDistricts.includes(dist)) && (
+                              <Check className="h-4 w-4 text-white" />
+                            )}
+                          </button>
+                        ))
+                      ) : (
+                        <div className="text-center py-8 text-sm text-muted-foreground">
+                          No districts found
+                        </div>
+                      )
+                    ) : (
+                      <div className="flex flex-col items-center justify-center h-full p-6 text-center">
+                        <MapPin className="h-10 w-10 text-muted-foreground/30 mb-2 stroke-[1.2]" />
+                        <p className="text-sm font-medium text-muted-foreground">
+                          Please select a state from the left column to view its educational districts.
+                        </p>
                       </div>
-                    </>
-                  )}
+                    )}
+                  </div>
                 </div>
               </div>
 
-              {/* Modal Footer */}
               <div className="px-6 py-4 border-t border-border/20 bg-card rounded-b-2xl flex flex-col sm:flex-row items-center justify-between gap-3">
                 <div className="text-sm text-slate-700">
                   {selectedState ? (
-                    onboardData.role === "geography-lead" ? (
-                      <span className="font-semibold text-primary flex items-center gap-1.5">
-                        <Check className="h-4 w-4 text-primary" />
-                        Selected State: {selectedState}
-                      </span>
+                    onboardData.role === "instructor" ? (
+                      selectedDistrict ? (
+                        <span className="font-semibold text-primary flex items-center gap-1.5">
+                          <Check className="h-4 w-4 text-primary" />
+                          Selected: {selectedDistrict}, {selectedState}
+                        </span>
+                      ) : (
+                        <span className="text-muted-foreground italic">Select a district</span>
+                      )
                     ) : selectedDistricts.length > 0 ? (
                       <span className="font-semibold text-primary flex items-center gap-1.5">
                         <Check className="h-4 w-4 text-primary" />
@@ -887,20 +1015,10 @@ export default function PijamPortalPage() {
                   )}
                 </div>
                 <div className="flex items-center gap-2 w-full sm:w-auto">
-                  <Button
-                    variant="outline"
-                    type="button"
-                    onClick={() => setIsModalOpen(false)}
-                    className="flex-1 sm:flex-none h-9 text-sm"
-                  >
+                  <Button variant="outline" type="button" onClick={() => setIsModalOpen(false)} className="flex-1 sm:flex-none h-9 text-sm">
                     Cancel
                   </Button>
-                  <Button
-                    type="button"
-                    onClick={handleConfirmGeography}
-                    disabled={isConfirmDisabled}
-                    className="flex-1 sm:flex-none h-9 text-sm font-semibold shadow-md shadow-primary/10 transition-transform active:scale-[0.98]"
-                  >
+                  <Button type="button" onClick={handleConfirmGeography} disabled={isConfirmDisabled} className="flex-1 sm:flex-none h-9 text-sm font-semibold shadow-md shadow-primary/10 transition-transform active:scale-[0.98]">
                     Confirm Selection
                   </Button>
                 </div>

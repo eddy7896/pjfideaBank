@@ -1,0 +1,197 @@
+[
+  {
+    "district": "Pulwama",
+    "schoolName": "GHSS Tral",
+    "address": "Main Road, Pulwama, Jammu and Kashmir",
+    "phone": "+91-9509210214",
+    "website": "https://www.ghsstral.edu.in",
+    "principalName": "Deepika Padukone",
+    "udaiseCode": "19495147879",
+    "teacherName": "Teacher Tariq",
+    "teacherEmail": "contact@ghsstral.edu.in",
+    "defaultPassword": "Abc 123456",
+    "teams": [
+      {
+        "teamName": "Fearless Knights",
+        "students": ["Irtiqa khaliq"],
+        "idea": "womens safety"
+      },
+      {
+        "teamName": "Alpine Dragons",
+        "students": ["Simran bashir"],
+        "idea": "biasness among children"
+      },
+      {
+        "teamName": "Cyber Eagles",
+        "students": ["Sadiya sajad"],
+        "idea": "power/eelctricity/water problems"
+      },
+      {
+        "teamName": "Alpha Panthers",
+        "students": ["Tahzeeba khursheed"],
+        "idea": "air pollution (conversion of gases to o2)"
+      },
+      {
+        "teamName": "Tech Innovators",
+        "students": ["Sabiya yousuf"],
+        "idea": "road rage of hyper people"
+      }
+    ]
+  },
+  {
+    "district": "Bandipora",
+    "schoolName": "GHSS Bandipora",
+    "address": "Main Road, Bandipora, Jammu and Kashmir",
+    "phone": "+91-9533353880",
+    "website": "https://www.ghssbandipora.edu.in",
+    "principalName": "Principal Dar",
+    "udaiseCode": "80649727581",
+    "teacherName": "Teacher Sana",
+    "teacherEmail": "contact@ghssbandipora.edu.in",
+    "defaultPassword": "Abc 123456",
+    "teams": [
+      {
+        "teamName": "Thunder Spartans",
+        "students": ["Insha Naseer"],
+        "idea": "Henna removal is tough"
+      },
+      {
+        "teamName": "Neon Pioneers",
+        "students": ["Tabasum Ara"],
+        "idea": "Hard efforts for ploughing"
+      },
+      {
+        "teamName": "Mighty Tigers",
+        "students": ["Aasra Feroz"],
+        "idea": "Conversion of clothes"
+      },
+      {
+        "teamName": "Quantum Falcons",
+        "students": ["Arib-un-nisa"],
+        "idea": "Problem in cleaning Window Glass"
+      },
+      {
+        "teamName": "Rapid Minds",
+        "students": ["Aaliya Mushtaq"],
+        "idea": "Pollution Control"
+      }
+    ]
+  },
+  {
+    "district": "Bandipora",
+    "schoolName": "N.M.BHSS Bandipora",
+    "address": "Main Road, Bandipora, Jammu and Kashmir",
+    "phone": "+91-9233045612",
+    "website": "https://www.nmbhssbandipo.edu.in",
+    "principalName": "Principal Lone",
+    "udaiseCode": "38275929104",
+    "teacherName": "Teacher Ahmad",
+    "teacherEmail": "contact@nmbhssbandipo.edu.in",
+    "defaultPassword": "Abc 123456",
+    "teams": [
+      {
+        "teamName": "Omega Warriors",
+        "students": ["Ariz Firdous"],
+        "idea": "Wire problem (Short circuit)"
+      },
+      {
+        "teamName": "Snow Ninjas",
+        "students": ["Lone Farhan"],
+        "idea": "Continuous shortage of electricity"
+      },
+      {
+        "teamName": "Cyber Spartans",
+        "students": ["Mohd Adnan Bhat"],
+        "idea": "Darkness in classrooms during rains"
+      },
+      {
+        "teamName": "Fearless Minds",
+        "students": ["Wasif Shabir Lone"],
+        "idea": "Accidents on blind curves"
+      },
+      {
+        "teamName": "Cosmic Knights",
+        "students": ["Sameer Shahnawaz"],
+        "idea": "Accidents near school due to potholes"
+      }
+    ]
+  },
+  {
+    "district": "Baramulla",
+    "schoolName": "BHSS Wagoora",
+    "address": "Main Road, Baramulla, Jammu and Kashmir",
+    "phone": "+91-9876123450",
+    "website": "https://www.bhsswagoora.edu.in",
+    "principalName": "Principal Sharma",
+    "udaiseCode": "47291847563",
+    "teacherName": "Teacher Fatima",
+    "teacherEmail": "contact@bhsswagoora.edu.in",
+    "defaultPassword": "Abc 123456",
+    "teams": [
+      {
+        "teamName": "Alpha Eagles",
+        "students": ["Shahid Shahzad"],
+        "idea": "Destruction of Apple orchards due to hail storm"
+      },
+      {
+        "teamName": "Mighty Panthers",
+        "students": ["Mohammad Shafeeq"],
+        "idea": "Misplacing of dusters in classrooms"
+      },
+      {
+        "teamName": "Tech Dragons",
+        "students": ["Ali Ahmad Dar"],
+        "idea": "Open doors"
+      },
+      {
+        "teamName": "Neon Knights",
+        "students": ["Showkat Ahmad Sofi"],
+        "idea": "Water wastage in public areas"
+      },
+      {
+        "teamName": "Rapid Spartans",
+        "students": ["Tasib Shabir"],
+        "idea": "Long waiting lines in hospitals"
+      }
+    ]
+  },
+  {
+    "district": "Baramulla",
+    "schoolName": "HSS Pattan",
+    "address": "Main Road, Baramulla, Jammu and Kashmir",
+    "phone": "+91-9123456789",
+    "website": "https://www.hsspattan.edu.in",
+    "principalName": "Principal Gupta",
+    "udaiseCode": "10293847564",
+    "teacherName": "Teacher Singh",
+    "teacherEmail": "contact@hsspattan.edu.in",
+    "defaultPassword": "Abc 123456",
+    "teams": [
+      {
+        "teamName": "Quantum Innovators",
+        "students": ["Shahid Khalil"],
+        "idea": "Air Pollution by vehicles"
+      },
+      {
+        "teamName": "Snow Eagles",
+        "students": ["Sahil Imran"],
+        "idea": "Water shortage due excessive use of water pumps"
+      },
+      {
+        "teamName": "Fearless Dragons",
+        "students": ["Shajran Shabir"],
+        "idea": "Freezing of water pipes in winter"
+      },
+      {
+        "teamName": "Cyber Panthers",
+        "students": ["Adnan Ismail"],
+        "idea": "Water Pollution"
+      },
+      {
+        "teamName": "Alpine Knights",
+        "students": ["Shayaan Aalam"],
+        "idea": "Drugs problem"
+      }
+    ]
+  }
+]

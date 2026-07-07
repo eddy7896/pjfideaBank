@@ -70,8 +70,8 @@ export function HeroIllustration() {
       {/* Orbiting Idea Cards */}
       {orbitCards.map((card, i) => {
         const radians = (card.angle * Math.PI) / 180;
-        const x = Math.cos(radians) * radius;
-        const y = Math.sin(radians) * radius;
+        const x = Number((Math.cos(radians) * radius).toFixed(2));
+        const y = Number((Math.sin(radians) * radius).toFixed(2));
 
         return (
           <motion.div
@@ -121,8 +121,8 @@ export function HeroIllustration() {
         >
           {orbitCards.map((card, i) => {
             const radians = (card.angle * Math.PI) / 180;
-            const endX = 50 + (Math.cos(radians) * radius) / 5;
-            const endY = 50 + (Math.sin(radians) * radius) / 5;
+            const endX = Number((50 + (Math.cos(radians) * radius) / 5).toFixed(2));
+            const endY = Number((50 + (Math.sin(radians) * radius) / 5).toFixed(2));
 
             return (
               <line
