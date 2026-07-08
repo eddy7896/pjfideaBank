@@ -95,8 +95,8 @@ export default function OnboardPage() {
       if (!formData.teacherEmail.trim()) newErrors.teacherEmail = "Email required";
       if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.teacherEmail))
         newErrors.teacherEmail = "Valid email required";
-      if (formData.teacherPassword.length < 6)
-        newErrors.teacherPassword = "Password min 6 characters";
+      if (formData.teacherPassword.length < 8)
+        newErrors.teacherPassword = "Password min 8 characters";
       if (formData.teacherPassword !== formData.confirmPassword)
         newErrors.confirmPassword = "Passwords must match";
     }
@@ -464,7 +464,7 @@ export default function OnboardPage() {
                       <Input
                         id="teacherPassword"
                         type="password"
-                        placeholder="Min 6 chars"
+                        placeholder="Min 8 chars"
                         value={formData.teacherPassword}
                         onChange={(e) =>
                           setFormData({ ...formData, teacherPassword: e.target.value })
