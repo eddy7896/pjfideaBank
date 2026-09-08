@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import type { TimelineEvent, Idea } from "@/types";
@@ -46,7 +47,7 @@ const getEventIcon = (event: TimelineEvent) => {
     case "comment":
       return <MessageSquare className="h-5 w-5 text-muted-foreground" />;
     case "test_failed":
-      return <AlertTriangle className="h-5 w-5 text-rose-500" />;
+      return <AlertTriangle className="h-5 w-5 text-status-reject" />;
     default:
       return <div className="h-5 w-5 rounded-full bg-border" />;
   }
@@ -137,7 +138,13 @@ export function ProjectTimeline({
         {/* Events */}
         <div className="space-y-6">
           {sortedTimeline.map((event, index) => (
-            <div key={event.id} className="relative pl-16">
+            <motion.div
+              key={event.id}
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1], delay: index === 0 ? 0.05 : 0 }}
+              className="relative pl-16"
+            >
               {/* Icon bubble */}
               <div className="absolute left-0 top-0 h-12 w-12 rounded-full border-4 border-background bg-card flex items-center justify-center">
                 {getEventIcon(event)}
@@ -210,14 +217,14 @@ export function ProjectTimeline({
                 )}
 
                 {event.type === "test_failed" && (
-                  <div className="mt-2 rounded bg-rose-50 border border-rose-200 p-2">
-                    <p className="text-xs text-rose-700">
+                  <div className="mt-2 rounded bg-status-reject-soft border border-status-reject-border p-2">
+                    <p className="text-xs text-status-reject">
                       Project returned to Prototype stage for refinement based on test results.
                     </p>
                   </div>
                 )}
               </div>
-            </div>
+            </motion.div>
           ))}
         </div>
       </div>

@@ -49,7 +49,7 @@ export function IconPicker({ value, onChange }: IconPickerProps) {
             className={cn(
               "flex h-9 w-9 items-center justify-center rounded-lg transition-all hover:bg-accent",
               value === name
-                ? "bg-indigo-100 text-indigo-600 ring-2 ring-indigo-500/30 shadow-sm"
+                ? "bg-primary/10 text-primary ring-2 ring-indigo-500/30 shadow-sm"
                 : "text-muted-foreground hover:text-foreground"
             )}
             title={name}

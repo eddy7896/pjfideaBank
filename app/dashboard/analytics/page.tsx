@@ -89,9 +89,9 @@ export default function AnalyticsPage() {
 
   const activityIcons: Record<string, React.ReactNode> = {
     idea: <Lightbulb className="h-4 w-4 text-yellow-500" />,
-    team: <Users2 className="h-4 w-4 text-blue-500" />,
-    status: <TrendingUp className="h-4 w-4 text-purple-500" />,
-    student: <Users className="h-4 w-4 text-pink-500" />,
+    team: <Users2 className="h-4 w-4 text-muted-foreground" />,
+    status: <TrendingUp className="h-4 w-4 text-muted-foreground" />,
+    student: <Users className="h-4 w-4 text-muted-foreground" />,
   };
 
   return (
@@ -118,7 +118,7 @@ export default function AnalyticsPage() {
             <CardContent>
               <div className="flex items-baseline justify-between">
                 <p className="text-2xl font-semibold">{analytics.totalSchools}</p>
-                <span className="text-xs text-green-600 flex items-center gap-1">
+                <span className="text-xs text-status-approve flex items-center gap-1">
                   <ArrowUp className="h-3 w-3" /> 12.5%
                 </span>
               </div>
@@ -132,7 +132,7 @@ export default function AnalyticsPage() {
             <CardContent>
               <div className="flex items-baseline justify-between">
                 <p className="text-2xl font-semibold">{analytics.totalIdeas}</p>
-                <span className="text-xs text-green-600 flex items-center gap-1">
+                <span className="text-xs text-status-approve flex items-center gap-1">
                   <ArrowUp className="h-3 w-3" /> 8.3%
                 </span>
               </div>
@@ -146,7 +146,7 @@ export default function AnalyticsPage() {
             <CardContent>
               <div className="flex items-baseline justify-between">
                 <p className="text-2xl font-semibold">{analytics.totalTeams}</p>
-                <span className="text-xs text-green-600 flex items-center gap-1">
+                <span className="text-xs text-status-approve flex items-center gap-1">
                   <ArrowUp className="h-3 w-3" /> 15.7%
                 </span>
               </div>
@@ -160,7 +160,7 @@ export default function AnalyticsPage() {
             <CardContent>
               <div className="flex items-baseline justify-between">
                 <p className="text-2xl font-semibold">{analytics.totalStudents}</p>
-                <span className="text-xs text-green-600 flex items-center gap-1">
+                <span className="text-xs text-status-approve flex items-center gap-1">
                   <ArrowUp className="h-3 w-3" /> 10.1%
                 </span>
               </div>
@@ -174,7 +174,7 @@ export default function AnalyticsPage() {
             <CardContent>
               <div className="flex items-baseline justify-between">
                 <p className="text-2xl font-semibold">{analytics.genderRatio}%</p>
-                <span className="text-xs text-red-600 flex items-center gap-1">
+                <span className="text-xs text-status-reject flex items-center gap-1">
                   <ArrowDown className="h-3 w-3" /> 18.2%
                 </span>
               </div>
@@ -347,7 +347,7 @@ export default function AnalyticsPage() {
                 {analytics.ideasPerTeam.slice(0, 8).map((item) => (
                   <div key={item.teamId} className="flex items-center justify-between">
                     <span className="text-sm font-medium">{item.teamName}</span>
-                    <span className="inline-flex items-center justify-center rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-semibold text-emerald-700">
+                    <span className="inline-flex items-center justify-center rounded-full bg-primary/10 px-2.5 py-1 text-xs font-semibold text-primary">
                       {item.count}
                     </span>
                   </div>

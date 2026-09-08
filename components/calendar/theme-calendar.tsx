@@ -119,7 +119,7 @@ export function ThemeCalendar({ compact = false }: ThemeCalendarProps) {
                 <span className="text-xs text-muted-foreground">
                   {count} {count === 1 ? "idea" : "ideas"}
                 </span>
-                <span className="text-xs font-medium text-indigo-600 opacity-0 transition-opacity group-hover:opacity-100">
+                <span className="text-xs font-medium text-primary opacity-0 transition-opacity group-hover:opacity-100">
                   View →
                 </span>
               </div>

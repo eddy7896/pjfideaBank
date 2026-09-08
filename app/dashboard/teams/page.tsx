@@ -121,8 +121,8 @@ export default function TeamsPage() {
                         className={cn(
                           "text-xs px-2.5 py-0.5 rounded-full font-medium capitalize",
                           team.type === "teacher"
-                            ? "bg-purple-50 text-purple-700 border-purple-200"
-                            : "bg-blue-50 text-blue-700 border-blue-200"
+                            ? "bg-primary/10 text-primary border-primary/20"
+                            : "bg-muted text-muted-foreground border-border"
                         )}
                       >
                         {team.type === "teacher" ? "Teacher Team" : "Student Team"}

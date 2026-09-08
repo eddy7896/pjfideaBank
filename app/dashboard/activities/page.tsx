@@ -237,11 +237,11 @@ export default function ActivitiesPage() {
                     return activityReports.length > 0 ? (
                       <div className="space-y-6">
                         {activityReports.map((rep) => (
-                          <Card key={rep.id} className="border-border/40 p-6 bg-slate-50/50 hover:bg-slate-50/80 transition-all">
+                          <Card key={rep.id} className="border-border/40 p-6 bg-muted/50 hover:bg-muted/60 transition-all">
                             {/* Report Header */}
-                            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-slate-200/60 pb-4 mb-4">
+                            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-border/60 pb-4 mb-4">
                               <div>
-                                <h3 className="font-bold text-slate-800 text-base">{rep.schoolName}</h3>
+                                <h3 className="font-bold text-foreground text-base">{rep.schoolName}</h3>
                                 <p className="text-xs text-muted-foreground mt-0.5">
                                   Submitted by {rep.submittedBy || rep.teacherName} on {new Date(rep.createdAt).toLocaleDateString()}
                                 </p>
@@ -252,26 +252,26 @@ export default function ActivitiesPage() {
                             </div>
 
                             {/* Grid Metadata */}
-                            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 text-xs sm:text-sm mb-6 bg-white rounded-lg p-4 border border-slate-200/50">
+                            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 text-xs sm:text-sm mb-6 bg-white rounded-lg p-4 border border-border/60">
                               <div>
-                                <p className="text-slate-450 text-xs font-semibold uppercase tracking-wider">Timing</p>
-                                <p className="font-semibold text-slate-700 mt-1">{rep.timeIn} - {rep.timeOut}</p>
+                                <p className="text-muted-foreground text-xs font-semibold uppercase tracking-wider">Timing</p>
+                                <p className="font-semibold text-muted-foreground mt-1">{rep.timeIn} - {rep.timeOut}</p>
                               </div>
                               <div>
-                                <p className="text-slate-450 text-xs font-semibold uppercase tracking-wider">Grades Covered</p>
-                                <p className="font-semibold text-slate-700 mt-1">{rep.grades}</p>
+                                <p className="text-muted-foreground text-xs font-semibold uppercase tracking-wider">Grades Covered</p>
+                                <p className="font-semibold text-muted-foreground mt-1">{rep.grades}</p>
                               </div>
                               <div>
-                                <p className="text-slate-450 text-xs font-semibold uppercase tracking-wider">Attendance</p>
-                                <p className="font-semibold text-slate-700 mt-1">
+                                <p className="text-muted-foreground text-xs font-semibold uppercase tracking-wider">Attendance</p>
+                                <p className="font-semibold text-muted-foreground mt-1">
                                   {rep.totalStudents} total ({rep.boysCount} Boys · {rep.girlsCount} Girls)
                                 </p>
                               </div>
                               <div>
-                                <p className="text-slate-450 text-xs font-semibold uppercase tracking-wider">Engagement</p>
+                                <p className="text-muted-foreground text-xs font-semibold uppercase tracking-wider">Engagement</p>
                                 <Badge className={cn("mt-1 text-xs text-white", 
-                                  rep.studentEngagement === "High" ? "bg-emerald-500" :
-                                  rep.studentEngagement === "Moderate" ? "bg-amber-500" : "bg-red-500"
+                                  rep.studentEngagement === "High" ? "bg-status-approve" :
+                                  rep.studentEngagement === "Moderate" ? "bg-status-pending" : "bg-status-reject"
                                 )}>
                                   {rep.studentEngagement}
                                 </Badge>
@@ -281,41 +281,41 @@ export default function ActivitiesPage() {
                             {/* Lessons & Objectives */}
                             <div className="space-y-4 mb-6">
                               <div>
-                                <h4 className="font-bold text-slate-805 text-sm">Lesson Topics Covered</h4>
-                                <p className="text-slate-600 text-sm mt-1 bg-white p-3 rounded-lg border border-slate-100 italic leading-relaxed">{rep.topicsLessons}</p>
+                                <h4 className="font-bold text-foreground text-sm">Lesson Topics Covered</h4>
+                                <p className="text-muted-foreground text-sm mt-1 bg-white p-3 rounded-lg border border-border/60 italic leading-relaxed">{rep.topicsLessons}</p>
                               </div>
                               <div>
-                                <h4 className="font-bold text-slate-805 text-sm">Primary Learning Goal</h4>
-                                <p className="text-slate-600 text-sm mt-1 bg-white p-3 rounded-lg border border-slate-100 italic leading-relaxed">{rep.learningGoal}</p>
+                                <h4 className="font-bold text-foreground text-sm">Primary Learning Goal</h4>
+                                <p className="text-muted-foreground text-sm mt-1 bg-white p-3 rounded-lg border border-border/60 italic leading-relaxed">{rep.learningGoal}</p>
                               </div>
                             </div>
 
                             {/* Safety Auditing Checkboxes */}
-                            <div className="mb-6 p-4 rounded-xl bg-slate-100/50 border border-slate-200/40">
-                              <h4 className="font-bold text-slate-805 text-xs uppercase tracking-wider mb-3">🛠️ Lab Safety & Hygiene Audit</h4>
+                            <div className="mb-6 p-4 rounded-xl bg-muted/60 border border-border/60">
+                              <h4 className="font-bold text-foreground text-xs uppercase tracking-wider mb-3">🛠️ Lab Safety & Hygiene Audit</h4>
                               <div className="flex flex-wrap gap-4 text-xs">
-                                <div className="flex items-center gap-1.5 bg-white px-3 py-1.5 rounded-full border border-slate-200">
-                                  <span className={rep.safetyBriefing ? "text-emerald-500 font-bold" : "text-slate-350"}>
+                                <div className="flex items-center gap-1.5 bg-white px-3 py-1.5 rounded-full border border-border">
+                                  <span className={rep.safetyBriefing ? "text-status-approve font-bold" : "text-muted-foreground/60"}>
                                     {rep.safetyBriefing ? "✓" : "✗"}
                                   </span>
-                                  <span className="font-medium text-slate-600">Safety Briefing</span>
+                                  <span className="font-medium text-muted-foreground">Safety Briefing</span>
                                 </div>
-                                <div className="flex items-center gap-1.5 bg-white px-3 py-1.5 rounded-full border border-slate-200">
-                                  <span className={rep.ppeWorn ? "text-emerald-500 font-bold" : "text-slate-350"}>
+                                <div className="flex items-center gap-1.5 bg-white px-3 py-1.5 rounded-full border border-border">
+                                  <span className={rep.ppeWorn ? "text-status-approve font-bold" : "text-muted-foreground/60"}>
                                     {rep.ppeWorn ? "✓" : "✗"}
                                   </span>
-                                  <span className="font-medium text-slate-600">PPE Worn</span>
+                                  <span className="font-medium text-muted-foreground">PPE Worn</span>
                                 </div>
-                                <div className="flex items-center gap-1.5 bg-white px-3 py-1.5 rounded-full border border-slate-200">
-                                  <span className={rep.labCleanup ? "text-emerald-500 font-bold" : "text-slate-350"}>
+                                <div className="flex items-center gap-1.5 bg-white px-3 py-1.5 rounded-full border border-border">
+                                  <span className={rep.labCleanup ? "text-status-approve font-bold" : "text-muted-foreground/60"}>
                                     {rep.labCleanup ? "✓" : "✗"}
                                   </span>
-                                  <span className="font-medium text-slate-600">Lab Cleaned</span>
+                                  <span className="font-medium text-muted-foreground">Lab Cleaned</span>
                                 </div>
                               </div>
                               {rep.incidentNotes && (
-                                <div className="mt-3 text-xs text-red-600 font-medium">
-                                  <strong className="text-red-700">Incident Notes: </strong> {rep.incidentNotes}
+                                <div className="mt-3 text-xs text-status-reject font-medium">
+                                  <strong className="text-status-reject">Incident Notes: </strong> {rep.incidentNotes}
                                 </div>
                               )}
                             </div>
@@ -323,10 +323,10 @@ export default function ActivitiesPage() {
                             {/* Materials utilized */}
                             {rep.materials && Array.isArray(rep.materials) && rep.materials.length > 0 && (
                               <div className="mb-6">
-                                <h4 className="font-bold text-slate-805 text-xs uppercase tracking-wider mb-2">📦 Materials Utilized</h4>
+                                <h4 className="font-bold text-foreground text-xs uppercase tracking-wider mb-2">📦 Materials Utilized</h4>
                                 <div className="flex flex-wrap gap-2">
                                   {rep.materials.map((m: any, idx: number) => (
-                                    <Badge key={idx} variant="secondary" className="text-xs bg-slate-100 text-slate-700 border border-slate-200/50">
+                                    <Badge key={idx} variant="secondary" className="text-xs bg-muted text-muted-foreground border border-border/60">
                                       {m.name} (Qty: {m.quantityUsed}) · Status: {m.stockStatus}
                                     </Badge>
                                   ))}
@@ -335,25 +335,25 @@ export default function ActivitiesPage() {
                             )}
 
                             {/* Reflections */}
-                            <div className="grid gap-4 sm:grid-cols-3 border-t border-slate-200/40 pt-4 text-xs sm:text-sm">
+                            <div className="grid gap-4 sm:grid-cols-3 border-t border-border/60 pt-4 text-xs sm:text-sm">
                               <div>
-                                <strong className="text-slate-700 font-semibold block mb-1">What Worked Well:</strong>
-                                <p className="text-slate-600 leading-relaxed text-xs sm:text-sm">{rep.successes}</p>
+                                <strong className="text-muted-foreground font-semibold block mb-1">What Worked Well:</strong>
+                                <p className="text-muted-foreground leading-relaxed text-xs sm:text-sm">{rep.successes}</p>
                               </div>
                               <div>
-                                <strong className="text-slate-700 font-semibold block mb-1">Challenges & Blocker:</strong>
-                                <p className="text-slate-600 leading-relaxed text-xs sm:text-sm">{rep.challenges}</p>
+                                <strong className="text-muted-foreground font-semibold block mb-1">Challenges & Blocker:</strong>
+                                <p className="text-muted-foreground leading-relaxed text-xs sm:text-sm">{rep.challenges}</p>
                               </div>
                               <div>
-                                <strong className="text-slate-700 font-semibold block mb-1">Next Preparation:</strong>
-                                <p className="text-slate-600 leading-relaxed text-xs sm:text-sm">{rep.followUpActions}</p>
+                                <strong className="text-muted-foreground font-semibold block mb-1">Next Preparation:</strong>
+                                <p className="text-muted-foreground leading-relaxed text-xs sm:text-sm">{rep.followUpActions}</p>
                               </div>
                             </div>
                           </Card>
                         ))}
                       </div>
                     ) : (
-                      <div className="py-12 text-center text-sm text-muted-foreground border border-dashed rounded-xl p-8 bg-slate-50/50">
+                      <div className="py-12 text-center text-sm text-muted-foreground border border-dashed rounded-xl p-8 bg-muted/50">
                         No educator reports have been submitted for this classroom activity yet.
                       </div>
                     );

@@ -74,8 +74,8 @@ export function TestForm({ initialData, onSubmit, isLoading }: TestFormProps) {
         />
       </div>
 
-      <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-5">
-        <h3 className="mb-4 text-base font-semibold text-emerald-900">Test Outcome</h3>
+      <div className="rounded-xl border border-status-approve-border bg-status-approve-soft p-5">
+        <h3 className="mb-4 text-base font-semibold text-status-approve">Test Outcome</h3>
         <div className="space-y-4">
           <div className="flex gap-4">
             <label className="flex items-center gap-3 cursor-pointer">
@@ -87,8 +87,8 @@ export function TestForm({ initialData, onSubmit, isLoading }: TestFormProps) {
                 className="h-4 w-4"
               />
               <div>
-                <span className="font-semibold text-emerald-900">✓ Test Passed</span>
-                <p className="text-xs text-emerald-700">Solution works and is ready for deployment</p>
+                <span className="font-semibold text-status-approve">✓ Test Passed</span>
+                <p className="text-xs text-status-approve">Solution works and is ready for deployment</p>
               </div>
             </label>
           </div>
@@ -102,8 +102,8 @@ export function TestForm({ initialData, onSubmit, isLoading }: TestFormProps) {
                 className="h-4 w-4"
               />
               <div>
-                <span className="font-semibold text-rose-900">✗ Test Failed</span>
-                <p className="text-xs text-rose-700">Solution needs refinement, will return to Prototype</p>
+                <span className="font-semibold text-status-reject">✗ Test Failed</span>
+                <p className="text-xs text-status-reject">Solution needs refinement, will return to Prototype</p>
               </div>
             </label>
           </div>
@@ -111,12 +111,12 @@ export function TestForm({ initialData, onSubmit, isLoading }: TestFormProps) {
       </div>
 
       {!passed && (
-        <div className="rounded-xl border border-rose-200 bg-rose-50 p-5">
+        <div className="rounded-xl border border-status-reject-border bg-status-reject-soft p-5">
           <div className="mb-3 flex items-start gap-3">
-            <AlertTriangle className="h-5 w-5 text-rose-600 flex-shrink-0 mt-0.5" />
+            <AlertTriangle className="h-5 w-5 text-status-reject flex-shrink-0 mt-0.5" />
             <div>
-              <h4 className="font-semibold text-rose-900">Refinement Needed</h4>
-              <p className="text-sm text-rose-700 mt-1">
+              <h4 className="font-semibold text-status-reject">Refinement Needed</h4>
+              <p className="text-sm text-status-reject mt-1">
                 Document what needs to change. The project will return to Prototype stage.
               </p>
             </div>
@@ -131,12 +131,12 @@ export function TestForm({ initialData, onSubmit, isLoading }: TestFormProps) {
       )}
 
       {errors.length > 0 && (
-        <div className="space-y-2 rounded-lg border border-rose-200 bg-rose-50 p-4">
+        <div className="space-y-2 rounded-lg border border-status-reject-border bg-status-reject-soft p-4">
           <div className="flex items-start gap-3">
-            <AlertCircle className="h-5 w-5 text-rose-600 flex-shrink-0 mt-0.5" />
+            <AlertCircle className="h-5 w-5 text-status-reject flex-shrink-0 mt-0.5" />
             <div className="space-y-1">
               {errors.map((error, i) => (
-                <p key={i} className="text-sm text-rose-700">
+                <p key={i} className="text-sm text-status-reject">
                   {error}
                 </p>
               ))}

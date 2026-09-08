@@ -168,7 +168,7 @@ export default function SchoolDetailPage({
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-sm font-semibold">Project Pipeline</h2>
             {isReadOnly && (
-              <span className="rounded-md bg-amber-50 px-2 py-1 text-[10px] font-medium text-amber-700 border border-amber-200">
+              <span className="rounded-md bg-status-pending-soft px-2 py-1 text-[10px] font-medium text-status-pending border border-status-pending-border">
                 Read-only view
               </span>
             )}
@@ -224,7 +224,7 @@ export default function SchoolDetailPage({
                         <span>Updated {idea.lastUpdated}</span>
                       </div>
                     </div>
-                    <ChevronRight className="ml-3 h-4 w-4 flex-shrink-0 text-muted-foreground/40 transition-colors group-hover:text-indigo-500" />
+                    <ChevronRight className="ml-3 h-4 w-4 flex-shrink-0 text-muted-foreground/40 transition-colors group-hover:text-primary" />
                   </Link>
                 ))}
             </div>

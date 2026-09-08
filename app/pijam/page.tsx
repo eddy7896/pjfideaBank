@@ -296,7 +296,7 @@ export default function PijamPortalPage() {
     <div className="flex min-h-screen flex-col bg-background relative overflow-hidden">
       <AnimatedBackground />
 
-      <header className="sticky top-0 z-50 border-b border-border/40 bg-background/95 backdrop-blur-sm">
+      <header className="sticky top-0 z-50 border-b border-border bg-background">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
           <Link href="/" className="transition-opacity hover:opacity-75">
             <Image
@@ -331,7 +331,7 @@ export default function PijamPortalPage() {
             </p>
           </div>
 
-          <div className="rounded-2xl border border-border/40 bg-card/85 backdrop-blur-md shadow-2xl p-8 transition-all duration-300 hover:border-primary/20">
+          <div className="rounded-2xl border border-border bg-card shadow-sm p-8 transition-colors duration-300 hover:border-primary/30">
             <div className="space-y-4 mb-6">
               <div className="flex items-center justify-between">
                 {steps.map((step, idx) => (
@@ -356,7 +356,7 @@ export default function PijamPortalPage() {
                   </div>
                 ))}
               </div>
-              <h3 className="text-center font-bold text-xs text-slate-700 tracking-wide uppercase">
+              <h3 className="text-center font-bold text-xs text-muted-foreground tracking-wide uppercase">
                 {steps[onboardStep - 1]?.title}
               </h3>
             </div>
@@ -374,7 +374,7 @@ export default function PijamPortalPage() {
             >
               {onboardStep === 1 && (
                 <div className="space-y-4">
-                  <p className="text-[11px] text-slate-450 text-center leading-relaxed font-medium">
+                  <p className="text-[11px] text-muted-foreground text-center leading-relaxed font-medium">
                     Register your access level to manage schools or support trainers.
                   </p>
                   <div className="grid grid-cols-2 gap-4">
@@ -384,20 +384,20 @@ export default function PijamPortalPage() {
                       className={`relative flex flex-col items-center p-5 rounded-xl border-2 text-center transition-all duration-300 group ${
                         onboardData.role === "instructor"
                           ? "border-primary bg-primary/5 scale-[1.02] shadow-sm shadow-primary/5"
-                          : "border-border bg-slate-50/30 hover:border-primary/45 hover:scale-[1.01]"
+                          : "border-border bg-muted/40 hover:border-primary/45 hover:scale-[1.01]"
                       }`}
                     >
                       <div
                         className={`p-2.5 rounded-full mb-3 transition-colors duration-300 ${
                           onboardData.role === "instructor"
                             ? "bg-primary text-white"
-                            : "bg-slate-200/80 text-slate-500 group-hover:bg-primary/10 group-hover:text-primary"
+                            : "bg-muted text-muted-foreground group-hover:bg-primary/10 group-hover:text-primary"
                         }`}
                       >
                         <GraduationCap className="h-5 w-5" />
                       </div>
-                      <span className="font-bold text-slate-700 text-xs block">Instructor</span>
-                      <span className="text-[9px] text-slate-500 mt-1 block leading-normal font-medium">
+                      <span className="font-bold text-muted-foreground text-xs block">Instructor</span>
+                      <span className="text-[9px] text-muted-foreground mt-1 block leading-normal font-medium">
                         Manage ideas and data for a specific school.
                       </span>
                     </button>
@@ -407,20 +407,20 @@ export default function PijamPortalPage() {
                       className={`relative flex flex-col items-center p-5 rounded-xl border-2 text-center transition-all duration-300 group ${
                         onboardData.role === "teacher-trainer"
                           ? "border-primary bg-primary/5 scale-[1.02] shadow-sm shadow-primary/5"
-                          : "border-border bg-slate-50/30 hover:border-primary/45 hover:scale-[1.01]"
+                          : "border-border bg-muted/40 hover:border-primary/45 hover:scale-[1.01]"
                       }`}
                     >
                       <div
                         className={`p-2.5 rounded-full mb-3 transition-colors duration-300 ${
                           onboardData.role === "teacher-trainer"
                             ? "bg-primary text-white"
-                            : "bg-slate-200/80 text-slate-500 group-hover:bg-primary/10 group-hover:text-primary"
+                            : "bg-muted text-muted-foreground group-hover:bg-primary/10 group-hover:text-primary"
                         }`}
                       >
                         <BookOpen className="h-5 w-5" />
                       </div>
-                      <span className="font-bold text-slate-700 text-xs block">Teacher Trainer</span>
-                      <span className="text-[9px] text-slate-500 mt-1 block leading-normal font-medium">
+                      <span className="font-bold text-muted-foreground text-xs block">Teacher Trainer</span>
+                      <span className="text-[9px] text-muted-foreground mt-1 block leading-normal font-medium">
                         Support school admins & review district details.
                       </span>
                     </button>
@@ -434,33 +434,33 @@ export default function PijamPortalPage() {
                   {onboardStep === 2 && (
                     <div className="space-y-4">
                       <div className="space-y-2">
-                        <Label htmlFor="schoolName" className="text-sm font-semibold text-slate-700">School Name *</Label>
+                        <Label htmlFor="schoolName" className="text-sm font-semibold text-muted-foreground">School Name *</Label>
                         <div className="relative">
-                          <Building2 className="absolute left-3.5 top-3 h-4.5 w-4.5 text-slate-450 pointer-events-none" />
+                          <Building2 className="absolute left-3.5 top-3 h-4.5 w-4.5 text-muted-foreground pointer-events-none" />
                           <Input
                             id="schoolName"
                             placeholder="e.g., Springfield High School"
                             value={onboardData.schoolName}
                             onChange={(e) => setOnboardData({ ...onboardData, schoolName: e.target.value })}
-                            className={`pl-10 bg-card/50 backdrop-blur-sm border-slate-200 focus-visible:ring-primary rounded-xl transition-all duration-200 text-slate-800 placeholder-slate-400 ${onboardErrors.schoolName ? "border-destructive focus-visible:ring-destructive" : ""}`}
+                            className={`pl-10 bg-muted border-border focus-visible:ring-primary rounded-xl transition-all duration-200 text-foreground placeholder-muted-foreground ${onboardErrors.schoolName ? "border-destructive focus-visible:ring-destructive" : ""}`}
                           />
                         </div>
                         {onboardErrors.schoolName && <p className="text-xs text-destructive">{onboardErrors.schoolName}</p>}
                       </div>
                       <div className="space-y-2">
-                        <Label htmlFor="udaiseCode" className="text-sm font-semibold text-slate-700">UDAISE Code (11 digits) *</Label>
+                        <Label htmlFor="udaiseCode" className="text-sm font-semibold text-muted-foreground">UDAISE Code (11 digits) *</Label>
                         <Input
                           id="udaiseCode"
                           placeholder="12345678901"
                           value={onboardData.udaiseCode}
                           onChange={(e) => setOnboardData({ ...onboardData, udaiseCode: e.target.value.replace(/[^\d]/g, "") })}
                           maxLength={11}
-                          className={`bg-card/50 backdrop-blur-sm border-slate-200 focus-visible:ring-primary rounded-xl transition-all duration-200 text-slate-800 placeholder-slate-400 ${onboardErrors.udaiseCode ? "border-destructive focus-visible:ring-destructive" : ""}`}
+                          className={`bg-muted border-border focus-visible:ring-primary rounded-xl transition-all duration-200 text-foreground placeholder-muted-foreground ${onboardErrors.udaiseCode ? "border-destructive focus-visible:ring-destructive" : ""}`}
                         />
                         {onboardErrors.udaiseCode && <p className="text-xs text-destructive">{onboardErrors.udaiseCode}</p>}
                       </div>
                       <div className="space-y-2">
-                        <Label className="text-sm font-semibold text-slate-700">Geography (State & District) *</Label>
+                        <Label className="text-sm font-semibold text-muted-foreground">Geography (State & District) *</Label>
                         <div className="relative">
                           <Input
                             readOnly
@@ -474,9 +474,9 @@ export default function PijamPortalPage() {
                               }
                               setIsModalOpen(true);
                             }}
-                            className={`cursor-pointer pr-10 bg-card/50 backdrop-blur-sm border-slate-200 focus-visible:ring-primary rounded-xl transition-all duration-200 text-slate-800 placeholder-slate-400 ${onboardErrors.location ? "border-destructive focus-visible:ring-destructive" : ""}`}
+                            className={`cursor-pointer pr-10 bg-muted border-border focus-visible:ring-primary rounded-xl transition-all duration-200 text-foreground placeholder-muted-foreground ${onboardErrors.location ? "border-destructive focus-visible:ring-destructive" : ""}`}
                           />
-                          <MapPin className="absolute right-3.5 top-3 h-4.5 w-4.5 text-slate-450 pointer-events-none" />
+                          <MapPin className="absolute right-3.5 top-3 h-4.5 w-4.5 text-muted-foreground pointer-events-none" />
                         </div>
                         {onboardErrors.location && <p className="text-xs text-destructive">{onboardErrors.location}</p>}
                       </div>
@@ -486,50 +486,50 @@ export default function PijamPortalPage() {
                   {onboardStep === 3 && (
                     <div className="space-y-4">
                       <div className="space-y-2">
-                        <Label htmlFor="address" className="text-sm font-semibold text-slate-700">School Address *</Label>
+                        <Label htmlFor="address" className="text-sm font-semibold text-muted-foreground">School Address *</Label>
                         <Input
                           id="address"
                           placeholder="e.g., 123 School Street, District"
                           value={onboardData.address}
                           onChange={(e) => setOnboardData({ ...onboardData, address: e.target.value })}
-                          className={`bg-card/50 backdrop-blur-sm border-slate-200 focus-visible:ring-primary rounded-xl transition-all duration-200 text-slate-800 placeholder-slate-400 ${onboardErrors.address ? "border-destructive focus-visible:ring-destructive" : ""}`}
+                          className={`bg-muted border-border focus-visible:ring-primary rounded-xl transition-all duration-200 text-foreground placeholder-muted-foreground ${onboardErrors.address ? "border-destructive focus-visible:ring-destructive" : ""}`}
                         />
                         {onboardErrors.address && <p className="text-xs text-destructive">{onboardErrors.address}</p>}
                       </div>
                       <div className="space-y-2">
-                        <Label htmlFor="phone" className="text-sm font-semibold text-slate-700">School Phone Number *</Label>
+                        <Label htmlFor="phone" className="text-sm font-semibold text-muted-foreground">School Phone Number *</Label>
                         <div className="relative">
-                          <Phone className="absolute left-3.5 top-3 h-4.5 w-4.5 text-slate-450 pointer-events-none" />
+                          <Phone className="absolute left-3.5 top-3 h-4.5 w-4.5 text-muted-foreground pointer-events-none" />
                           <Input
                             id="phone"
                             placeholder="e.g., 9876543210"
                             value={onboardData.phone}
                             onChange={(e) => setOnboardData({ ...onboardData, phone: e.target.value.replace(/[^\d]/g, "") })}
-                            className={`pl-10 bg-card/50 backdrop-blur-sm border-slate-200 focus-visible:ring-primary rounded-xl transition-all duration-200 text-slate-800 placeholder-slate-400 ${onboardErrors.phone ? "border-destructive focus-visible:ring-destructive" : ""}`}
+                            className={`pl-10 bg-muted border-border focus-visible:ring-primary rounded-xl transition-all duration-200 text-foreground placeholder-muted-foreground ${onboardErrors.phone ? "border-destructive focus-visible:ring-destructive" : ""}`}
                           />
                         </div>
                         {onboardErrors.phone && <p className="text-xs text-destructive">{onboardErrors.phone}</p>}
                       </div>
                       <div className="space-y-2">
-                        <Label htmlFor="principalName" className="text-sm font-semibold text-slate-700">Principal Full Name *</Label>
+                        <Label htmlFor="principalName" className="text-sm font-semibold text-muted-foreground">Principal Full Name *</Label>
                         <Input
                           id="principalName"
                           placeholder="e.g., Dr. John Smith"
                           value={onboardData.principalName}
                           onChange={(e) => setOnboardData({ ...onboardData, principalName: e.target.value })}
-                          className={`bg-card/50 backdrop-blur-sm border-slate-200 focus-visible:ring-primary rounded-xl transition-all duration-200 text-slate-800 placeholder-slate-400 ${onboardErrors.principalName ? "border-destructive focus-visible:ring-destructive" : ""}`}
+                          className={`bg-muted border-border focus-visible:ring-primary rounded-xl transition-all duration-200 text-foreground placeholder-muted-foreground ${onboardErrors.principalName ? "border-destructive focus-visible:ring-destructive" : ""}`}
                         />
                         {onboardErrors.principalName && <p className="text-xs text-destructive">{onboardErrors.principalName}</p>}
                       </div>
                       <div className="space-y-2">
-                        <Label htmlFor="website" className="text-sm font-semibold text-slate-700">School Website (Optional)</Label>
+                        <Label htmlFor="website" className="text-sm font-semibold text-muted-foreground">School Website (Optional)</Label>
                         <Input
                           id="website"
                           type="url"
                           placeholder="e.g., https://www.school.edu"
                           value={onboardData.website}
                           onChange={(e) => setOnboardData({ ...onboardData, website: e.target.value })}
-                          className="bg-card/50 backdrop-blur-sm border-slate-200 focus-visible:ring-primary rounded-xl transition-all duration-200 text-slate-800 placeholder-slate-400"
+                          className="bg-muted border-border focus-visible:ring-primary rounded-xl transition-all duration-200 text-foreground placeholder-muted-foreground"
                         />
                       </div>
                     </div>
@@ -538,55 +538,55 @@ export default function PijamPortalPage() {
                   {onboardStep === 4 && (
                     <div className="space-y-4">
                       <div className="space-y-2">
-                        <Label htmlFor="teacherName" className="text-sm font-semibold text-slate-700">Instructor Name *</Label>
+                        <Label htmlFor="teacherName" className="text-sm font-semibold text-muted-foreground">Instructor Name *</Label>
                         <div className="relative">
-                          <User className="absolute left-3.5 top-3 h-4.5 w-4.5 text-slate-450 pointer-events-none" />
+                          <User className="absolute left-3.5 top-3 h-4.5 w-4.5 text-muted-foreground pointer-events-none" />
                           <Input
                             id="teacherName"
                             placeholder="e.g., Ms. Sarah Johnson"
                             value={onboardData.teacherName}
                             onChange={(e) => setOnboardData({ ...onboardData, teacherName: e.target.value })}
-                            className={`pl-10 bg-card/50 backdrop-blur-sm border-slate-200 focus-visible:ring-primary rounded-xl transition-all duration-200 text-slate-800 placeholder-slate-400 ${onboardErrors.teacherName ? "border-destructive focus-visible:ring-destructive" : ""}`}
+                            className={`pl-10 bg-muted border-border focus-visible:ring-primary rounded-xl transition-all duration-200 text-foreground placeholder-muted-foreground ${onboardErrors.teacherName ? "border-destructive focus-visible:ring-destructive" : ""}`}
                           />
                         </div>
                         {onboardErrors.teacherName && <p className="text-xs text-destructive">{onboardErrors.teacherName}</p>}
                       </div>
                       <div className="space-y-2">
-                        <Label htmlFor="teacherEmail" className="text-sm font-semibold text-slate-700">Email Address *</Label>
+                        <Label htmlFor="teacherEmail" className="text-sm font-semibold text-muted-foreground">Email Address *</Label>
                         <div className="relative">
-                          <Mail className="absolute left-3.5 top-3 h-4.5 w-4.5 text-slate-450 pointer-events-none" />
+                          <Mail className="absolute left-3.5 top-3 h-4.5 w-4.5 text-muted-foreground pointer-events-none" />
                           <Input
                             id="teacherEmail"
                             type="email"
                             placeholder="e.g., instructor@pijam.org"
                             value={onboardData.teacherEmail}
                             onChange={(e) => setOnboardData({ ...onboardData, teacherEmail: e.target.value })}
-                            className={`pl-10 bg-card/50 backdrop-blur-sm border-slate-200 focus-visible:ring-primary rounded-xl transition-all duration-200 text-slate-800 placeholder-slate-400 ${onboardErrors.teacherEmail ? "border-destructive focus-visible:ring-destructive" : ""}`}
+                            className={`pl-10 bg-muted border-border focus-visible:ring-primary rounded-xl transition-all duration-200 text-foreground placeholder-muted-foreground ${onboardErrors.teacherEmail ? "border-destructive focus-visible:ring-destructive" : ""}`}
                           />
                         </div>
                         {onboardErrors.teacherEmail && <p className="text-xs text-destructive">{onboardErrors.teacherEmail}</p>}
                       </div>
                       <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
-                          <Label htmlFor="teacherPassword" className="text-sm font-semibold text-slate-700">Password *</Label>
+                          <Label htmlFor="teacherPassword" className="text-sm font-semibold text-muted-foreground">Password *</Label>
                           <Input
                             id="teacherPassword"
                             type="password"
                             placeholder="Min 6 chars"
                             value={onboardData.teacherPassword}
                             onChange={(e) => setOnboardData({ ...onboardData, teacherPassword: e.target.value })}
-                            className={`bg-card/50 backdrop-blur-sm border-slate-200 focus-visible:ring-primary rounded-xl transition-all duration-200 text-slate-800 placeholder-slate-400 ${onboardErrors.teacherPassword ? "border-destructive focus-visible:ring-destructive" : ""}`}
+                            className={`bg-muted border-border focus-visible:ring-primary rounded-xl transition-all duration-200 text-foreground placeholder-muted-foreground ${onboardErrors.teacherPassword ? "border-destructive focus-visible:ring-destructive" : ""}`}
                           />
                         </div>
                         <div className="space-y-2">
-                          <Label htmlFor="confirmPassword" className="text-sm font-semibold text-slate-700">Confirm Password *</Label>
+                          <Label htmlFor="confirmPassword" className="text-sm font-semibold text-muted-foreground">Confirm Password *</Label>
                           <Input
                             id="confirmPassword"
                             type="password"
                             placeholder="Confirm password"
                             value={onboardData.confirmPassword}
                             onChange={(e) => setOnboardData({ ...onboardData, confirmPassword: e.target.value })}
-                            className={`bg-card/50 backdrop-blur-sm border-slate-200 focus-visible:ring-primary rounded-xl transition-all duration-200 text-slate-800 placeholder-slate-400 ${onboardErrors.confirmPassword ? "border-destructive focus-visible:ring-destructive" : ""}`}
+                            className={`bg-muted border-border focus-visible:ring-primary rounded-xl transition-all duration-200 text-foreground placeholder-muted-foreground ${onboardErrors.confirmPassword ? "border-destructive focus-visible:ring-destructive" : ""}`}
                           />
                         </div>
                         {(onboardErrors.teacherPassword || onboardErrors.confirmPassword) && (
@@ -599,47 +599,47 @@ export default function PijamPortalPage() {
                   )}
 
                   {onboardStep === 5 && (
-                    <div className="space-y-4 text-sm text-slate-800">
+                    <div className="space-y-4 text-sm text-foreground">
                       <div className="rounded-xl border border-primary/20 bg-primary/5 p-5 space-y-4 shadow-sm">
                         <div>
                           <h4 className="font-bold text-xs text-primary uppercase tracking-wider mb-2">School Information</h4>
                           <div className="grid grid-cols-2 gap-y-2 gap-x-4">
                             <div>
-                              <span className="text-slate-500 block text-[11px]">School Name:</span>
-                              <span className="font-bold text-slate-800">{onboardData.schoolName}</span>
+                              <span className="text-muted-foreground block text-[11px]">School Name:</span>
+                              <span className="font-bold text-foreground">{onboardData.schoolName}</span>
                             </div>
                             <div>
-                              <span className="text-slate-500 block text-[11px]">UDAISE Code:</span>
-                              <span className="font-bold text-slate-800">{onboardData.udaiseCode}</span>
+                              <span className="text-muted-foreground block text-[11px]">UDAISE Code:</span>
+                              <span className="font-bold text-foreground">{onboardData.udaiseCode}</span>
                             </div>
                             <div>
-                              <span className="text-slate-500 block text-[11px]">Geography:</span>
-                              <span className="font-semibold text-slate-800">{onboardData.location}</span>
+                              <span className="text-muted-foreground block text-[11px]">Geography:</span>
+                              <span className="font-semibold text-foreground">{onboardData.location}</span>
                             </div>
                             <div>
-                              <span className="text-slate-500 block text-[11px]">Phone:</span>
-                              <span className="font-semibold text-slate-800">{onboardData.phone}</span>
+                              <span className="text-muted-foreground block text-[11px]">Phone:</span>
+                              <span className="font-semibold text-foreground">{onboardData.phone}</span>
                             </div>
-                            <div className="col-span-2 border-t border-slate-200/40 pt-2">
-                              <span className="text-slate-500 block text-[11px]">Address:</span>
-                              <span className="font-medium text-slate-800">{onboardData.address}</span>
+                            <div className="col-span-2 border-t border-border/60 pt-2">
+                              <span className="text-muted-foreground block text-[11px]">Address:</span>
+                              <span className="font-medium text-foreground">{onboardData.address}</span>
                             </div>
-                            <div className="border-t border-slate-200/40 pt-2">
-                              <span className="text-slate-500 block text-[11px]">Principal:</span>
-                              <span className="font-semibold text-slate-800">{onboardData.principalName}</span>
+                            <div className="border-t border-border/60 pt-2">
+                              <span className="text-muted-foreground block text-[11px]">Principal:</span>
+                              <span className="font-semibold text-foreground">{onboardData.principalName}</span>
                             </div>
                           </div>
                         </div>
-                        <div className="border-t border-slate-200/40 pt-3">
+                        <div className="border-t border-border/60 pt-3">
                           <h4 className="font-bold text-xs text-primary uppercase tracking-wider mb-2">Instructor Profile</h4>
                           <div className="grid grid-cols-2 gap-y-2 gap-x-4">
                             <div>
-                              <span className="text-slate-500 block text-[11px]">Instructor Name:</span>
-                              <span className="font-bold text-slate-800">{onboardData.teacherName}</span>
+                              <span className="text-muted-foreground block text-[11px]">Instructor Name:</span>
+                              <span className="font-bold text-foreground">{onboardData.teacherName}</span>
                             </div>
                             <div>
-                              <span className="text-slate-500 block text-[11px]">Email Address:</span>
-                              <span className="font-bold text-slate-850 break-all">{onboardData.teacherEmail}</span>
+                              <span className="text-muted-foreground block text-[11px]">Email Address:</span>
+                              <span className="font-bold text-foreground break-all">{onboardData.teacherEmail}</span>
                             </div>
                           </div>
                         </div>
@@ -655,18 +655,18 @@ export default function PijamPortalPage() {
                   {onboardStep === 2 && (
                     <div className="space-y-4">
                       <div className="space-y-2">
-                        <Label htmlFor="staffName" className="text-sm font-semibold text-slate-700">Full Name *</Label>
+                        <Label htmlFor="staffName" className="text-sm font-semibold text-muted-foreground">Full Name *</Label>
                         <Input
                           id="staffName"
                           placeholder="e.g. Ms. Sarah Johnson"
                           value={onboardData.teacherName}
                           onChange={(e) => setOnboardData({ ...onboardData, teacherName: e.target.value })}
-                          className={`bg-card/50 backdrop-blur-sm border-slate-200 text-slate-800 placeholder-slate-400 rounded-xl focus:border-primary ${onboardErrors.teacherName ? "border-destructive focus-visible:ring-destructive" : ""}`}
+                          className={`bg-muted border-border text-foreground placeholder-muted-foreground rounded-xl focus:border-primary ${onboardErrors.teacherName ? "border-destructive focus-visible:ring-destructive" : ""}`}
                         />
                         {onboardErrors.teacherName && <p className="text-xs text-destructive">{onboardErrors.teacherName}</p>}
                       </div>
                       <div className="space-y-2">
-                        <Label className="text-sm font-semibold text-slate-700">Assigned District & State *</Label>
+                        <Label className="text-sm font-semibold text-muted-foreground">Assigned District & State *</Label>
                         <div className="relative">
                           <div
                             onClick={() => {
@@ -677,10 +677,10 @@ export default function PijamPortalPage() {
                               }
                               setIsModalOpen(true);
                             }}
-                            className={`cursor-pointer min-h-[44px] p-2 bg-card/50 backdrop-blur-sm border-slate-200 text-slate-800 rounded-xl pr-10 border hover:border-primary transition-colors flex flex-wrap gap-1.5 items-center ${onboardErrors.location ? "border-destructive focus-visible:ring-destructive" : ""}`}
+                            className={`cursor-pointer min-h-[44px] p-2 bg-muted border-border text-foreground rounded-xl pr-10 border hover:border-primary transition-colors flex flex-wrap gap-1.5 items-center ${onboardErrors.location ? "border-destructive focus-visible:ring-destructive" : ""}`}
                           >
                             {(onboardData.locations.length === 0) && (
-                              <span className="text-slate-400 pl-2 text-sm">Click to select State & District(s)</span>
+                              <span className="text-muted-foreground pl-2 text-sm">Click to select State & District(s)</span>
                             )}
                             {onboardData.locations.map(loc => (
                               <span key={loc} className="bg-primary/10 text-primary text-[11px] font-semibold px-2 py-1 rounded-md border border-primary/20">
@@ -688,7 +688,7 @@ export default function PijamPortalPage() {
                               </span>
                             ))}
                           </div>
-                          <MapPin className="absolute right-3.5 top-3 h-4.5 w-4.5 text-slate-450 pointer-events-none" />
+                          <MapPin className="absolute right-3.5 top-3 h-4.5 w-4.5 text-muted-foreground pointer-events-none" />
                         </div>
                         {onboardErrors.location && <p className="text-xs text-destructive">{onboardErrors.location}</p>}
                       </div>
@@ -698,38 +698,38 @@ export default function PijamPortalPage() {
                   {onboardStep === 3 && (
                     <div className="space-y-4">
                       <div className="space-y-2">
-                        <Label htmlFor="staffEmail" className="text-sm font-semibold text-slate-700">Email Address *</Label>
+                        <Label htmlFor="staffEmail" className="text-sm font-semibold text-muted-foreground">Email Address *</Label>
                         <Input
                           id="staffEmail"
                           type="email"
                           placeholder="trainer@pijam.org"
                           value={onboardData.teacherEmail}
                           onChange={(e) => setOnboardData({ ...onboardData, teacherEmail: e.target.value })}
-                          className={`bg-card/50 backdrop-blur-sm border-slate-200 text-slate-800 placeholder-slate-400 rounded-xl focus:border-primary ${onboardErrors.teacherEmail ? "border-destructive focus-visible:ring-destructive" : ""}`}
+                          className={`bg-muted border-border text-foreground placeholder-muted-foreground rounded-xl focus:border-primary ${onboardErrors.teacherEmail ? "border-destructive focus-visible:ring-destructive" : ""}`}
                         />
                         {onboardErrors.teacherEmail && <p className="text-xs text-destructive">{onboardErrors.teacherEmail}</p>}
                       </div>
                       <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
-                          <Label htmlFor="staffPass" className="text-sm font-semibold text-slate-700">Password *</Label>
+                          <Label htmlFor="staffPass" className="text-sm font-semibold text-muted-foreground">Password *</Label>
                           <Input
                             id="staffPass"
                             type="password"
                             placeholder="Min 6 chars"
                             value={onboardData.teacherPassword}
                             onChange={(e) => setOnboardData({ ...onboardData, teacherPassword: e.target.value })}
-                            className={`bg-card/50 backdrop-blur-sm border-slate-200 text-slate-850 placeholder-slate-400 rounded-xl focus:border-primary ${onboardErrors.teacherPassword ? "border-destructive focus-visible:ring-destructive" : ""}`}
+                            className={`bg-muted border-border text-foreground placeholder-muted-foreground rounded-xl focus:border-primary ${onboardErrors.teacherPassword ? "border-destructive focus-visible:ring-destructive" : ""}`}
                           />
                         </div>
                         <div className="space-y-2">
-                          <Label htmlFor="staffConfirm" className="text-sm font-semibold text-slate-700">Confirm Password *</Label>
+                          <Label htmlFor="staffConfirm" className="text-sm font-semibold text-muted-foreground">Confirm Password *</Label>
                           <Input
                             id="staffConfirm"
                             type="password"
                             placeholder="Confirm password"
                             value={onboardData.confirmPassword}
                             onChange={(e) => setOnboardData({ ...onboardData, confirmPassword: e.target.value })}
-                            className={`bg-card/50 backdrop-blur-sm border-slate-200 text-slate-850 placeholder-slate-400 rounded-xl focus:border-primary ${onboardErrors.confirmPassword ? "border-destructive focus-visible:ring-destructive" : ""}`}
+                            className={`bg-muted border-border text-foreground placeholder-muted-foreground rounded-xl focus:border-primary ${onboardErrors.confirmPassword ? "border-destructive focus-visible:ring-destructive" : ""}`}
                           />
                         </div>
                         {(onboardErrors.teacherPassword || onboardErrors.confirmPassword) && (
@@ -739,20 +739,20 @@ export default function PijamPortalPage() {
                         )}
                       </div>
                       <div className="space-y-2 pt-2">
-                        <Label htmlFor="reportingLead" className="text-sm font-semibold text-slate-700">Assigned Geography Lead *</Label>
+                        <Label htmlFor="reportingLead" className="text-sm font-semibold text-muted-foreground">Assigned Geography Lead *</Label>
                         <select
                           id="reportingLead"
                           value={onboardData.assignedLeadId}
                           onChange={(e) => setOnboardData({ ...onboardData, assignedLeadId: e.target.value })}
-                          className={`w-full p-3 rounded-xl border bg-card/50 backdrop-blur-sm border-slate-200 text-slate-700 text-sm focus:ring-1 focus:ring-primary focus:border-primary ${onboardErrors.assignedLeadId ? "border-destructive focus:ring-destructive" : ""}`}
+                          className={`w-full p-3 rounded-xl border bg-muted border-border text-muted-foreground text-sm focus:ring-1 focus:ring-primary focus:border-primary ${onboardErrors.assignedLeadId ? "border-destructive focus:ring-destructive" : ""}`}
                         >
-                          <option value="" className="bg-card text-slate-400">-- Choose Supervising Lead --</option>
+                          <option value="" className="bg-card text-muted-foreground">-- Choose Supervising Lead --</option>
                           {geographyLeads.map((lead) => {
                             const scope = lead.subGeographies.length
                               ? lead.subGeographies.map((s) => s.name).join(", ")
                               : lead.geographyName ? `${lead.geographyName} (state-wide)` : "no scope";
                             return (
-                              <option key={lead.id} value={String(lead.id)} className="bg-card text-slate-800 font-semibold">
+                              <option key={lead.id} value={String(lead.id)} className="bg-card text-foreground font-semibold">
                                 {lead.displayName} — {scope}
                               </option>
                             );
@@ -764,35 +764,35 @@ export default function PijamPortalPage() {
                   )}
 
                   {onboardStep === 4 && (
-                    <div className="space-y-4 text-slate-800 text-sm">
+                    <div className="space-y-4 text-foreground text-sm">
                       <div className="rounded-xl border border-primary/20 bg-primary/5 p-5 space-y-4 shadow-sm">
                         <h4 className="font-bold text-xs text-primary uppercase tracking-wider">Review Access Level</h4>
-                        <div className="grid grid-cols-2 gap-y-3 gap-x-4 text-slate-700">
+                        <div className="grid grid-cols-2 gap-y-3 gap-x-4 text-muted-foreground">
                           <div>
-                            <span className="text-slate-500 block text-[10px]">Access Role:</span>
-                            <span className="font-bold text-slate-800 uppercase text-xs">Teacher Trainer (TT)</span>
+                            <span className="text-muted-foreground block text-[10px]">Access Role:</span>
+                            <span className="font-bold text-foreground uppercase text-xs">Teacher Trainer (TT)</span>
                           </div>
                           <div>
-                            <span className="text-slate-500 block text-[10px]">Full Name:</span>
-                            <span className="font-semibold text-slate-800">{onboardData.teacherName}</span>
+                            <span className="text-muted-foreground block text-[10px]">Full Name:</span>
+                            <span className="font-semibold text-foreground">{onboardData.teacherName}</span>
                           </div>
-                          <div className="col-span-2 border-t border-slate-200/40 pt-2">
-                            <span className="text-slate-500 block text-[10px]">Work Email:</span>
-                            <span className="font-semibold text-slate-800">{onboardData.teacherEmail}</span>
+                          <div className="col-span-2 border-t border-border/60 pt-2">
+                            <span className="text-muted-foreground block text-[10px]">Work Email:</span>
+                            <span className="font-semibold text-foreground">{onboardData.teacherEmail}</span>
                           </div>
-                          <div className="border-t border-slate-200/40 pt-2">
-                            <span className="text-slate-500 block text-[10px]">Jurisdiction:</span>
+                          <div className="border-t border-border/60 pt-2">
+                            <span className="text-muted-foreground block text-[10px]">Jurisdiction:</span>
                             <div className="flex flex-wrap gap-1 mt-1">
                               {onboardData.locations.map(loc => (
-                                <span key={loc} className="bg-slate-100 text-slate-700 text-[10px] font-semibold px-2 py-0.5 rounded border border-slate-200">
+                                <span key={loc} className="bg-muted text-muted-foreground text-[10px] font-semibold px-2 py-0.5 rounded border border-border">
                                   {loc}
                                 </span>
                               ))}
                             </div>
                           </div>
-                          <div className="border-t border-slate-200/40 pt-2">
-                            <span className="text-slate-500 block text-[10px]">Reports To:</span>
-                            <span className="font-semibold text-slate-800 break-all text-xs">
+                          <div className="border-t border-border/60 pt-2">
+                            <span className="text-muted-foreground block text-[10px]">Reports To:</span>
+                            <span className="font-semibold text-foreground break-all text-xs">
                               {geographyLeads.find(l => String(l.id) === onboardData.assignedLeadId)?.displayName || onboardData.assignedLeadId}
                             </span>
                           </div>
@@ -826,6 +826,12 @@ export default function PijamPortalPage() {
             <p className="text-xs text-muted-foreground">
               Already registered? <Link href="/login" className="text-primary hover:text-primary/80 font-bold hover:underline">Sign in to Platform</Link>
             </p>
+            <p className="text-xs text-muted-foreground">
+              Registering a school on your own?{" "}
+              <Link href="/onboard" className="text-primary hover:text-primary/80 font-bold hover:underline">
+                School sign-up
+              </Link>
+            </p>
           </div>
         </motion.div>
       </div>
@@ -836,7 +842,7 @@ export default function PijamPortalPage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-md p-4"
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md p-4"
             onClick={(e) => {
               if (e.target === e.currentTarget) setIsModalOpen(false);
             }}
@@ -846,7 +852,7 @@ export default function PijamPortalPage() {
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.95, opacity: 0, y: 20 }}
               transition={{ type: "spring", stiffness: 300, damping: 28 }}
-              className="relative w-full max-w-3xl bg-white border border-slate-200/50 rounded-2xl shadow-2xl flex flex-col max-h-[85vh] overflow-hidden text-slate-800"
+              className="relative w-full max-w-3xl bg-card border border-border/60 rounded-2xl shadow-2xl flex flex-col max-h-[85vh] overflow-hidden text-foreground"
             >
               <div className="flex items-center justify-between px-6 py-4 border-b border-border/30 bg-card rounded-t-2xl">
                 <div>
@@ -903,7 +909,7 @@ export default function PijamPortalPage() {
                             <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium transition-colors duration-200 ${
                               selectedState === sd.state
                                 ? "bg-primary text-white"
-                                : "bg-slate-100 text-muted-foreground group-hover:bg-primary/10 group-hover:text-primary"
+                                : "bg-muted text-muted-foreground group-hover:bg-primary/10 group-hover:text-primary"
                             }`}>
                               {sd.districts.length}
                             </span>
@@ -921,7 +927,7 @@ export default function PijamPortalPage() {
                   </div>
                 </div>
 
-                <div className="flex flex-col h-[50vh] md:h-[60vh] overflow-hidden bg-slate-50/30">
+                <div className="flex flex-col h-[50vh] md:h-[60vh] overflow-hidden bg-muted/40">
                   <div className="p-4 border-b border-border/10">
                     <div className="relative">
                       <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -959,7 +965,7 @@ export default function PijamPortalPage() {
                             className={`w-full text-left px-4 py-2.5 rounded-lg text-sm transition-all duration-200 flex items-center justify-between group ${
                               (onboardData.role === "instructor" ? selectedDistrict === dist : selectedDistricts.includes(dist))
                                 ? "bg-primary text-primary-foreground font-semibold shadow-md shadow-primary/20"
-                                : "hover:bg-accent/5 text-slate-700 hover:text-primary hover:translate-x-1"
+                                : "hover:bg-accent/5 text-muted-foreground hover:text-primary hover:translate-x-1"
                             }`}
                           >
                             <div className="flex items-center gap-2.5">
@@ -991,7 +997,7 @@ export default function PijamPortalPage() {
               </div>
 
               <div className="px-6 py-4 border-t border-border/20 bg-card rounded-b-2xl flex flex-col sm:flex-row items-center justify-between gap-3">
-                <div className="text-sm text-slate-700">
+                <div className="text-sm text-muted-foreground">
                   {selectedState ? (
                     onboardData.role === "instructor" ? (
                       selectedDistrict ? (

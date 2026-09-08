@@ -112,21 +112,21 @@ export default function DashboardPage() {
       {currentUser.role !== "student" && (
         <div className="mb-10 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4 lg:gap-6">
           <div className="rounded-2xl border border-border/40 bg-card p-4 sm:p-6 shadow-sm hover:shadow-md hover:border-primary/20 transition-all duration-300">
-            <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
               {currentUser.role === "school" ? "My Ideas" : "Total Ideas"}
             </p>
             <p className="mt-2 text-2xl sm:text-3xl font-heading font-bold text-foreground">{totalIdeas}</p>
           </div>
           <div className="rounded-2xl border border-border/40 bg-card p-4 sm:p-6 shadow-sm hover:shadow-md hover:border-primary/20 transition-all duration-300">
-            <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Schools</p>
+            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Schools</p>
             <p className="mt-2 text-2xl sm:text-3xl font-heading font-bold text-foreground">{schoolsCount}</p>
           </div>
           <div className="rounded-2xl border border-border/40 bg-card p-4 sm:p-6 shadow-sm hover:shadow-md hover:border-primary/20 transition-all duration-300">
-            <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Advanced</p>
+            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Advanced</p>
             <p className="mt-2 text-2xl sm:text-3xl font-heading font-bold text-foreground">{advancedCount}</p>
           </div>
           <div className="rounded-2xl border border-border/40 bg-card p-4 sm:p-6 shadow-sm hover:shadow-md hover:border-primary/20 transition-all duration-300">
-            <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Active Themes</p>
+            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Active Themes</p>
             <p className="mt-2 text-2xl sm:text-3xl font-heading font-bold text-foreground">{themesWithIdeas}</p>
           </div>
         </div>
@@ -282,11 +282,11 @@ export default function DashboardPage() {
                     <Link
                       key={school.name}
                       href={`/dashboard/schools/${school.slug}`}
-                      className="group flex items-center justify-between rounded-lg border border-border/40 p-4 transition-all hover:-translate-y-0.5 hover:shadow-md hover:border-indigo-200"
+                      className="group flex items-center justify-between rounded-lg border border-border/40 p-4 transition-all hover:-translate-y-0.5 hover:shadow-md hover:border-primary/30"
                     >
                       <div className="flex items-center gap-3">
                         <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-100 to-purple-100">
-                          <SchoolIcon className="h-5 w-5 text-indigo-600" />
+                          <SchoolIcon className="h-5 w-5 text-primary" />
                         </div>
                         <div>
                           <p className="text-sm font-semibold">{school.name}</p>
@@ -298,7 +298,7 @@ export default function DashboardPage() {
                           </p>
                         </div>
                       </div>
-                      <ChevronRight className="h-4 w-4 text-muted-foreground/40 transition-colors group-hover:text-indigo-500" />
+                      <ChevronRight className="h-4 w-4 text-muted-foreground/40 transition-colors group-hover:text-primary" />
                     </Link>
                   ))}
                 </div>

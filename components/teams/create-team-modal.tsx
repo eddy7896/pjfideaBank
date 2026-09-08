@@ -114,8 +114,8 @@ export function CreateTeamModal({
           </DialogHeader>
 
           <div className="space-y-6">
-            <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-4">
-              <p className="text-sm text-emerald-900">
+            <div className="rounded-lg border border-status-approve-border bg-status-approve-soft p-4">
+              <p className="text-sm text-status-approve">
                 {teamToEdit ? (
                   <>Your team <strong>{teamName}</strong> has been updated and a new 6-digit PIN has been generated. Share these credentials with your students.</>
                 ) : (

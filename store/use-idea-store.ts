@@ -19,18 +19,20 @@ type StageDataType =
   | PrototypeData
   | TestData;
 
+export type MutationResult = { success: boolean; error?: string };
+
 interface IdeaState {
   ideas: Idea[];
   isLoaded: boolean;
   loadIdeas: () => Promise<void>;
-  addIdea: (idea: Omit<Idea, "id" | "status" | "lastUpdated" | "stageData" | "timeline">) => Promise<void>;
-  updateStatus: (id: string, newStatus: DesignThinkingStatus) => Promise<void>;
+  addIdea: (idea: Omit<Idea, "id" | "status" | "lastUpdated" | "stageData" | "timeline">) => Promise<MutationResult>;
+  updateStatus: (id: string, newStatus: DesignThinkingStatus) => Promise<MutationResult>;
   reorderIdeas: (updatedIdeas: Idea[]) => void;
   getIdeasByTheme: (theme: string) => Idea[];
   getIdeasBySchool: (schoolName: string) => Idea[];
   getAdvancedIdeas: () => Idea[];
   updateStageData: (id: string, stage: DesignThinkingStatus, data: StageDataType) => Promise<void>;
-  addComment: (id: string, content: string) => Promise<void>;
+  addComment: (id: string, content: string) => Promise<boolean>;
   advanceStage: (id: string, toStage: DesignThinkingStatus, formData: StageDataType) => Promise<boolean>;
   updateIdea: (id: string, patch: Partial<Pick<Idea, "title" | "theme" | "problemStatement" | "targetAudience" | "teamId">>) => Promise<boolean>;
   deleteIdea: (id: string) => Promise<boolean>;
@@ -77,13 +79,36 @@ export const useIdeaStore = create<IdeaState>((set, get) => ({
       if (res.ok) {
         const created = (await res.json()) as Idea;
         set((state) => ({ ideas: [created, ...state.ideas] }));
+        return { success: true };
       }
+
+      const body = await res.json().catch(() => null);
+      return { success: false, error: body?.error ?? "Failed to submit idea" };
     } catch (error) {
       console.error("Failed to create idea:", error);
+      return { success: false, error: "Network error — check your connection and try again" };
     }
   },
 
   updateStatus: async (id, newStatus) => {
+    const previous = get().ideas.find((idea) => idea.id === id);
+    if (!previous) return { success: false, error: "Idea not found" };
+    const previousStatus = previous.status;
+
+    // Move optimistically so the drag feels instant; revert below on failure.
+    set((state) => ({
+      ideas: state.ideas.map((idea) =>
+        idea.id === id ? { ...idea, status: newStatus } : idea
+      ),
+    }));
+
+    const revert = () =>
+      set((state) => ({
+        ideas: state.ideas.map((idea) =>
+          idea.id === id ? { ...idea, status: previousStatus } : idea
+        ),
+      }));
+
     try {
       const res = await fetch(`/api/ideas/${id}/status`, {
         method: "PATCH",
@@ -104,9 +129,16 @@ export const useIdeaStore = create<IdeaState>((set, get) => ({
               : idea
           ),
         }));
+        return { success: true };
       }
+
+      revert();
+      const body = await res.json().catch(() => null);
+      return { success: false, error: body?.error ?? "Couldn't move the card" };
     } catch (error) {
       console.error("Failed to update status:", error);
+      revert();
+      return { success: false, error: "Network error — move reverted" };
     }
   },
 
@@ -168,10 +200,12 @@ export const useIdeaStore = create<IdeaState>((set, get) => ({
               : idea
           ),
         }));
+        return true;
       }
     } catch (error) {
       console.error("Failed to add comment:", error);
     }
+    return false;
   },
 
   updateIdea: async (id, patch) => {

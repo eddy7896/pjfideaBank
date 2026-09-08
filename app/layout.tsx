@@ -1,16 +1,18 @@
 import type { Metadata } from "next";
-import { Inter, Outfit } from "next/font/google";
+import { Public_Sans, JetBrains_Mono } from "next/font/google";
+import { MotionConfig } from "framer-motion";
 import "./globals.css";
 import { AuthSessionProvider } from "@/components/providers/session-provider";
+import { ThemeProvider } from "@/components/theme-provider";
 
-const inter = Inter({
+const publicSans = Public_Sans({
   subsets: ["latin"],
   variable: "--font-sans",
 });
 
-const outfit = Outfit({
+const jetbrainsMono = JetBrains_Mono({
   subsets: ["latin"],
-  variable: "--font-heading",
+  variable: "--font-mono",
 });
 
 export const metadata: Metadata = {
@@ -34,9 +36,13 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${inter.variable} ${outfit.variable} min-h-screen bg-background font-sans antialiased`}
+        className={`${publicSans.variable} ${jetbrainsMono.variable} min-h-screen bg-background font-sans antialiased`}
       >
-        <AuthSessionProvider>{children}</AuthSessionProvider>
+        <ThemeProvider>
+          <MotionConfig reducedMotion="user">
+            <AuthSessionProvider>{children}</AuthSessionProvider>
+          </MotionConfig>
+        </ThemeProvider>
       </body>
     </html>
   );

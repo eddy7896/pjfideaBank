@@ -100,7 +100,7 @@ export default function LoginPage() {
       <AnimatedBackground />
 
       {/* Top bar / Navbar */}
-      <header className="sticky top-0 z-50 border-b border-border/40 bg-background/95 backdrop-blur-sm">
+      <header className="sticky top-0 z-50 border-b border-border bg-background">
         <div className="mx-auto flex h-16 max-w-7xl items-center px-4 sm:px-6 lg:px-8">
           <Link href="/" className="transition-opacity hover:opacity-75">
             <Image
@@ -136,7 +136,7 @@ export default function LoginPage() {
           {/* Tabs */}
           <Tabs
             defaultValue="teacher"
-            className="rounded-2xl border border-border/40 bg-card/85 backdrop-blur-md shadow-2xl transition-all duration-300 hover:border-primary/20 overflow-hidden"
+            className="rounded-2xl border border-border bg-card shadow-sm transition-colors duration-300 hover:border-primary/30 overflow-hidden"
           >
             <TabsList className="w-full justify-start rounded-none border-b border-border/30 p-0 bg-muted/40">
               <TabsTrigger
@@ -157,11 +157,11 @@ export default function LoginPage() {
             <TabsContent value="teacher" className="p-6 space-y-4 outline-none">
               <form onSubmit={handleTeacherSubmit} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="email" className="text-sm font-semibold text-slate-700">
+                  <Label htmlFor="email" className="text-sm font-semibold text-muted-foreground">
                     Email
                   </Label>
                   <div className="relative">
-                    <Mail className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400 pointer-events-none" />
+                    <Mail className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground pointer-events-none" />
                     <Input
                       id="email"
                       type="email"
@@ -171,18 +171,18 @@ export default function LoginPage() {
                         setEmail(e.target.value);
                         setError("");
                       }}
-                      className="pl-10 bg-card/50 backdrop-blur-sm border-slate-200 focus-visible:ring-primary rounded-xl transition-all duration-200 text-slate-800 placeholder-slate-400"
+                      className="pl-10 bg-muted border-border focus-visible:ring-primary rounded-xl transition-all duration-200 text-foreground placeholder-muted-foreground"
                       required
                     />
                   </div>
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="password" className="text-sm font-semibold text-slate-700">
+                  <Label htmlFor="password" className="text-sm font-semibold text-muted-foreground">
                     Password
                   </Label>
                   <div className="relative">
-                    <Lock className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400 pointer-events-none" />
+                    <Lock className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground pointer-events-none" />
                     <Input
                       id="password"
                       type={showPassword ? "text" : "password"}
@@ -192,13 +192,13 @@ export default function LoginPage() {
                         setPassword(e.target.value);
                         setError("");
                       }}
-                      className="pl-10 pr-10 bg-card/50 backdrop-blur-sm border-slate-200 focus-visible:ring-primary rounded-xl transition-all duration-200 text-slate-800 placeholder-slate-400"
+                      className="pl-10 pr-10 bg-muted border-border focus-visible:ring-primary rounded-xl transition-all duration-200 text-foreground placeholder-muted-foreground"
                       required
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700"
+                      className="absolute right-3.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                     >
                       {showPassword ? <EyeOff className="h-4.5 w-4.5" /> : <Eye className="h-4.5 w-4.5" />}
                     </button>
@@ -237,7 +237,7 @@ export default function LoginPage() {
                   login UI. */}
               {process.env.NEXT_PUBLIC_SHOW_DEMO_CREDENTIALS === "true" && (
                 <div className="space-y-3 border-t border-border/20 pt-6">
-                  <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+                  <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
                     Demo Accounts
                   </p>
                   <div className="space-y-2">
@@ -246,12 +246,12 @@ export default function LoginPage() {
                         key={cred.email}
                         onClick={() => fillCredentials(cred.email, cred.password)}
                         className={`w-full flex items-start gap-3 rounded-xl border p-3 text-left transition-all hover:border-primary/30 hover:bg-primary/5 active:scale-[0.98] ${
-                          email === cred.email ? "border-primary bg-primary/5 shadow-sm" : "border-border bg-slate-50/30"
+                          email === cred.email ? "border-primary bg-primary/5 shadow-sm" : "border-border bg-muted/40"
                         }`}
                       >
                         <div className="min-w-0 flex-1">
-                          <p className="text-sm font-bold text-slate-800">{cred.label}</p>
-                          <p className="mt-0.5 text-xs text-slate-500 font-medium">
+                          <p className="text-sm font-bold text-foreground">{cred.label}</p>
+                          <p className="mt-0.5 text-xs text-muted-foreground font-medium">
                             {cred.email}
                           </p>
                         </div>
@@ -266,11 +266,11 @@ export default function LoginPage() {
             <TabsContent value="student" className="p-6 space-y-4 outline-none">
               <form onSubmit={handleStudentSubmit} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="teamId" className="text-sm font-semibold text-slate-700">
+                  <Label htmlFor="teamId" className="text-sm font-semibold text-muted-foreground">
                     Team ID
                   </Label>
                   <div className="relative">
-                    <Users className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400 pointer-events-none" />
+                    <Users className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground pointer-events-none" />
                     <Input
                       id="teamId"
                       type="text"
@@ -280,18 +280,18 @@ export default function LoginPage() {
                         setTeamId(e.target.value.toUpperCase());
                         setStudentError("");
                       }}
-                      className="pl-10 bg-card/50 backdrop-blur-sm border-slate-200 focus-visible:ring-primary rounded-xl transition-all duration-200 text-slate-800 placeholder-slate-400"
+                      className="pl-10 bg-muted border-border focus-visible:ring-primary rounded-xl transition-all duration-200 text-foreground placeholder-muted-foreground"
                       required
                     />
                   </div>
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="pin" className="text-sm font-semibold text-slate-700">
+                  <Label htmlFor="pin" className="text-sm font-semibold text-muted-foreground">
                     6-Digit PIN
                   </Label>
                   <div className="relative">
-                    <Lock className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400 pointer-events-none" />
+                    <Lock className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground pointer-events-none" />
                     <Input
                       id="pin"
                       type="password"
@@ -301,7 +301,7 @@ export default function LoginPage() {
                         setPin(e.target.value);
                         setStudentError("");
                       }}
-                      className="pl-10 text-center tracking-widest bg-card/50 backdrop-blur-sm border-slate-200 focus-visible:ring-primary rounded-xl transition-all duration-200 text-slate-800 placeholder-slate-400 font-semibold"
+                      className="pl-10 text-center tracking-widest bg-muted border-border focus-visible:ring-primary rounded-xl transition-all duration-200 text-foreground placeholder-muted-foreground font-semibold"
                       maxLength={6}
                       required
                     />
@@ -337,7 +337,7 @@ export default function LoginPage() {
               {/* Demo Student Credentials */}
               {teams.filter((t) => !t.pin.includes(":")).length > 0 && (
                 <div className="space-y-3 border-t border-border/20 pt-6">
-                  <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+                  <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
                     Demo Teams
                   </p>
                   <div className="space-y-2">
@@ -346,12 +346,12 @@ export default function LoginPage() {
                         key={team.id}
                         onClick={() => fillStudentCredentials(team.id, team.pin)}
                         className={`w-full flex items-start gap-3 rounded-xl border p-3 text-left transition-all hover:border-primary/30 hover:bg-primary/5 active:scale-[0.98] ${
-                          teamId === team.id ? "border-primary bg-primary/5 shadow-sm" : "border-border bg-slate-50/30"
+                          teamId === team.id ? "border-primary bg-primary/5 shadow-sm" : "border-border bg-muted/40"
                         }`}
                       >
                         <div className="min-w-0 flex-1">
-                          <p className="text-sm font-bold text-slate-800">{team.name}</p>
-                          <p className="mt-0.5 text-xs text-slate-500 font-medium">
+                          <p className="text-sm font-bold text-foreground">{team.name}</p>
+                          <p className="mt-0.5 text-xs text-muted-foreground font-medium">
                             {team.id} • PIN: {team.pin}
                           </p>
                         </div>
@@ -364,14 +364,14 @@ export default function LoginPage() {
           </Tabs>
 
           {/* Footer */}
-          <div className="text-center text-sm text-slate-500 space-y-2 pt-2">
+          <div className="text-center text-sm text-muted-foreground space-y-2 pt-2">
             <p>
               Don't have a school account?{" "}
               <Link href="/onboard" className="text-primary hover:text-primary/80 font-bold hover:underline">
                 Register your school
               </Link>
             </p>
-            <p className="text-xs text-slate-400">
+            <p className="text-xs text-muted-foreground">
               Are you Pi Jam staff?{" "}
               <Link href="/pijam" className="text-primary hover:text-primary/80 font-bold hover:underline">
                 Onboard here

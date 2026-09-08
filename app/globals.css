@@ -7,6 +7,7 @@
 @theme inline {
     --font-heading: var(--font-sans);
     --font-sans: var(--font-sans);
+    --font-mono: var(--font-mono);
     --color-sidebar-ring: var(--sidebar-ring);
     --color-sidebar-border: var(--sidebar-border);
     --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -45,75 +46,165 @@
     --radius-2xl: calc(var(--radius) * 1.8);
     --radius-3xl: calc(var(--radius) * 2.2);
     --radius-4xl: calc(var(--radius) * 2.6);
+
+    /* Design Thinking stage palette — separate channel from the brand accent.
+       Used only for stage badges, kanban columns, and analytics charts. */
+    --color-stage-empathize: var(--stage-empathize);
+    --color-stage-empathize-soft: var(--stage-empathize-soft);
+    --color-stage-empathize-border: var(--stage-empathize-border);
+    --color-stage-define: var(--stage-define);
+    --color-stage-define-soft: var(--stage-define-soft);
+    --color-stage-define-border: var(--stage-define-border);
+    --color-stage-ideate: var(--stage-ideate);
+    --color-stage-ideate-soft: var(--stage-ideate-soft);
+    --color-stage-ideate-border: var(--stage-ideate-border);
+    --color-stage-prototype: var(--stage-prototype);
+    --color-stage-prototype-soft: var(--stage-prototype-soft);
+    --color-stage-prototype-border: var(--stage-prototype-border);
+    --color-stage-test: var(--stage-test);
+    --color-stage-test-soft: var(--stage-test-soft);
+    --color-stage-test-border: var(--stage-test-border);
+
+    /* Advance-request / audit status palette. */
+    --color-status-approve: var(--status-approve);
+    --color-status-approve-soft: var(--status-approve-soft);
+    --color-status-approve-border: var(--status-approve-border);
+    --color-status-pending: var(--status-pending);
+    --color-status-pending-soft: var(--status-pending-soft);
+    --color-status-pending-border: var(--status-pending-border);
+    --color-status-reject: var(--status-reject);
+    --color-status-reject-soft: var(--status-reject-soft);
+    --color-status-reject-border: var(--status-reject-border);
 }
 
 :root {
-    --background: #F8FAFC;
-    --foreground: #0F172A;
+    --background: #FAFBFC;
+    --foreground: #161B22;
     --card: #FFFFFF;
-    --card-foreground: #0F172A;
+    --card-foreground: #161B22;
     --popover: #FFFFFF;
-    --popover-foreground: #0F172A;
+    --popover-foreground: #161B22;
     --primary: #5BA4C7;
     --primary-foreground: #FFFFFF;
-    --secondary: #F1F5F9;
-    --secondary-foreground: #0F172A;
-    --muted: #F1F5F9;
-    --muted-foreground: #475569;
+    --secondary: #F0F3F6;
+    --secondary-foreground: #161B22;
+    --muted: #F0F3F6;
+    --muted-foreground: #56606B;
     --accent: #5BA4C7;
     --accent-foreground: #FFFFFF;
-    --destructive: #EF4444;
-    --border: #E2E8F0;
-    --input: #E2E8F0;
+    --destructive: #A3402B;
+    --border: #DFE4EA;
+    --input: #DFE4EA;
     --ring: #5BA4C7;
-    --chart-1: #5BA4C7;
-    --chart-2: #7FB3D5;
-    --chart-3: #10B981;
-    --chart-4: #EC4899;
-    --chart-5: #3D7A99;
     --radius: 0.625rem;
+
+    /* Stage palette — light */
+    --stage-empathize: #C4841F;
+    --stage-empathize-soft: #FBF1E0;
+    --stage-empathize-border: #EFD9AE;
+    --stage-define: #7C5CD6;
+    --stage-define-soft: #F1EDFB;
+    --stage-define-border: #DCD1F5;
+    --stage-ideate: #C23B8A;
+    --stage-ideate-soft: #FBEAF3;
+    --stage-ideate-border: #F3CBE1;
+    --stage-prototype: #D97530;
+    --stage-prototype-soft: #FCEEE2;
+    --stage-prototype-border: #F5D3B4;
+    --stage-test: #2F8F5C;
+    --stage-test-soft: #E7F5EE;
+    --stage-test-border: #BEE3D0;
+
+    /* Status palette — light */
+    --status-approve: #2F8F5C;
+    --status-approve-soft: #E7F5EE;
+    --status-approve-border: #BEE3D0;
+    --status-pending: #A87B1F;
+    --status-pending-soft: #F7EFD9;
+    --status-pending-border: #EBD9A8;
+    --status-reject: #A3402B;
+    --status-reject-soft: #F7E4DF;
+    --status-reject-border: #EAC1B5;
+
+    /* Charts follow the stage palette so analytics stays visually tied to the kanban. */
+    --chart-1: var(--stage-empathize);
+    --chart-2: var(--stage-define);
+    --chart-3: var(--stage-ideate);
+    --chart-4: var(--stage-prototype);
+    --chart-5: var(--stage-test);
+
     --sidebar: #FFFFFF;
-    --sidebar-foreground: #0F172A;
+    --sidebar-foreground: #161B22;
     --sidebar-primary: #5BA4C7;
     --sidebar-primary-foreground: #FFFFFF;
-    --sidebar-accent: #F1F5F9;
-    --sidebar-accent-foreground: #0F172A;
-    --sidebar-border: #E2E8F0;
+    --sidebar-accent: #F0F3F6;
+    --sidebar-accent-foreground: #161B22;
+    --sidebar-border: #DFE4EA;
     --sidebar-ring: #5BA4C7;
 }
 
 .dark {
-    --background: oklch(0.145 0 0);
-    --foreground: oklch(0.985 0 0);
-    --card: oklch(0.205 0 0);
-    --card-foreground: oklch(0.985 0 0);
-    --popover: oklch(0.205 0 0);
-    --popover-foreground: oklch(0.985 0 0);
-    --primary: oklch(0.65 0.12 250);
-    --primary-foreground: oklch(0.985 0 0);
-    --secondary: oklch(0.269 0 0);
-    --secondary-foreground: oklch(0.985 0 0);
-    --muted: oklch(0.269 0 0);
-    --muted-foreground: oklch(0.708 0 0);
-    --accent: oklch(0.65 0.12 250);
-    --accent-foreground: oklch(0.985 0 0);
-    --destructive: oklch(0.704 0.191 22.216);
-    --border: oklch(1 0 0 / 10%);
-    --input: oklch(1 0 0 / 15%);
-    --ring: oklch(0.65 0.12 250);
-    --chart-1: oklch(0.65 0.12 250);
-    --chart-2: oklch(0.72 0.15 250);
-    --chart-3: oklch(0.439 0 0);
-    --chart-4: oklch(0.371 0 0);
-    --chart-5: oklch(0.55 0.1 250);
-    --sidebar: oklch(0.205 0 0);
-    --sidebar-foreground: oklch(0.985 0 0);
-    --sidebar-primary: oklch(0.65 0.12 250);
-    --sidebar-primary-foreground: oklch(0.985 0 0);
-    --sidebar-accent: oklch(0.269 0 0);
-    --sidebar-accent-foreground: oklch(0.985 0 0);
-    --sidebar-border: oklch(1 0 0 / 10%);
-    --sidebar-ring: oklch(0.65 0.12 250);
+    --background: #14181F;
+    --foreground: #EAECEF;
+    --card: #1C222B;
+    --card-foreground: #EAECEF;
+    --popover: #1C222B;
+    --popover-foreground: #EAECEF;
+    --primary: #6EB5D6;
+    --primary-foreground: #0C1116;
+    --secondary: #242B35;
+    --secondary-foreground: #EAECEF;
+    --muted: #242B35;
+    --muted-foreground: #9BA5B0;
+    --accent: #6EB5D6;
+    --accent-foreground: #0C1116;
+    --destructive: #CC6B52;
+    --border: #2D3540;
+    --input: #2D3540;
+    --ring: #6EB5D6;
+
+    /* Stage palette — dark (brightened, tinted background instead of white tints) */
+    --stage-empathize: #D9A44E;
+    --stage-empathize-soft: #3A2E15;
+    --stage-empathize-border: #5C4726;
+    --stage-define: #9B84E0;
+    --stage-define-soft: #241E3D;
+    --stage-define-border: #3C325E;
+    --stage-ideate: #D96BAE;
+    --stage-ideate-soft: #341F2D;
+    --stage-ideate-border: #55324A;
+    --stage-prototype: #E69257;
+    --stage-prototype-soft: #3A2818;
+    --stage-prototype-border: #5C3F27;
+    --stage-test: #4FAE7D;
+    --stage-test-soft: #1B3327;
+    --stage-test-border: #2B4F3C;
+
+    /* Status palette — dark */
+    --status-approve: #4FAE7D;
+    --status-approve-soft: #1B3327;
+    --status-approve-border: #2B4F3C;
+    --status-pending: #D1A24E;
+    --status-pending-soft: #3A2E15;
+    --status-pending-border: #5C4726;
+    --status-reject: #CC6B52;
+    --status-reject-soft: #3A231C;
+    --status-reject-border: #5C392E;
+
+    --chart-1: var(--stage-empathize);
+    --chart-2: var(--stage-define);
+    --chart-3: var(--stage-ideate);
+    --chart-4: var(--stage-prototype);
+    --chart-5: var(--stage-test);
+
+    --sidebar: #1C222B;
+    --sidebar-foreground: #EAECEF;
+    --sidebar-primary: #6EB5D6;
+    --sidebar-primary-foreground: #0C1116;
+    --sidebar-accent: #242B35;
+    --sidebar-accent-foreground: #EAECEF;
+    --sidebar-border: #2D3540;
+    --sidebar-ring: #6EB5D6;
 }
 
 @layer base {

@@ -189,7 +189,7 @@ export default function OnboardPage() {
       <AnimatedBackground />
 
       {/* Top bar / Navbar */}
-      <header className="sticky top-0 z-50 border-b border-border/40 bg-background/95 backdrop-blur-sm">
+      <header className="sticky top-0 z-50 border-b border-border bg-background">
         <div className="mx-auto flex h-16 max-w-7xl items-center px-4 sm:px-6 lg:px-8">
           <Link href="/" className="transition-opacity hover:opacity-75">
             <Image
@@ -249,7 +249,7 @@ export default function OnboardPage() {
           </div>
 
           {/* Form Card */}
-          <div className="rounded-2xl border border-border/40 bg-card/85 backdrop-blur-md shadow-2xl p-8 transition-all duration-300 hover:border-primary/20">
+          <div className="rounded-2xl border border-border bg-card shadow-sm p-8 transition-colors duration-300 hover:border-primary/30">
             <form
               onSubmit={
                 isFinalStep
@@ -265,11 +265,11 @@ export default function OnboardPage() {
               {currentStep === 1 && (
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="schoolName" className="text-sm font-semibold text-slate-700">
+                    <Label htmlFor="schoolName" className="text-sm font-semibold text-muted-foreground">
                       School Name *
                     </Label>
                     <div className="relative">
-                      <Building2 className="absolute left-3.5 top-3 h-4.5 w-4.5 text-slate-450 pointer-events-none" />
+                      <Building2 className="absolute left-3.5 top-3 h-4.5 w-4.5 text-muted-foreground pointer-events-none" />
                       <Input
                         id="schoolName"
                         placeholder="e.g., Springfield High School"
@@ -277,7 +277,7 @@ export default function OnboardPage() {
                         onChange={(e) =>
                           setFormData({ ...formData, schoolName: e.target.value })
                         }
-                        className={`pl-10 bg-card/50 backdrop-blur-sm border-slate-200 focus-visible:ring-primary rounded-xl transition-all duration-200 text-slate-800 placeholder-slate-400 ${errors.schoolName ? "border-destructive focus-visible:ring-destructive" : ""}`}
+                        className={`pl-10 bg-muted border-border focus-visible:ring-primary rounded-xl transition-all duration-200 text-foreground placeholder-muted-foreground ${errors.schoolName ? "border-destructive focus-visible:ring-destructive" : ""}`}
                       />
                     </div>
                     {errors.schoolName && (
@@ -286,7 +286,7 @@ export default function OnboardPage() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="udaiseCode" className="text-sm font-semibold text-slate-700">
+                    <Label htmlFor="udaiseCode" className="text-sm font-semibold text-muted-foreground">
                       UDAISE Code (11 digits) *
                     </Label>
                     <Input
@@ -297,7 +297,7 @@ export default function OnboardPage() {
                         setFormData({ ...formData, udaiseCode: e.target.value.replace(/[^\d]/g, "") })
                       }
                       maxLength={11}
-                      className={`bg-card/50 backdrop-blur-sm border-slate-200 focus-visible:ring-primary rounded-xl transition-all duration-200 text-slate-800 placeholder-slate-400 ${errors.udaiseCode ? "border-destructive focus-visible:ring-destructive" : ""}`}
+                      className={`bg-muted border-border focus-visible:ring-primary rounded-xl transition-all duration-200 text-foreground placeholder-muted-foreground ${errors.udaiseCode ? "border-destructive focus-visible:ring-destructive" : ""}`}
                     />
                     {errors.udaiseCode && (
                       <p className="text-xs text-destructive">{errors.udaiseCode}</p>
@@ -305,7 +305,7 @@ export default function OnboardPage() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label className="text-sm font-semibold text-slate-700">
+                    <Label className="text-sm font-semibold text-muted-foreground">
                       Geography (State & District) *
                     </Label>
                     <div className="relative">
@@ -321,9 +321,9 @@ export default function OnboardPage() {
                           }
                           setIsModalOpen(true);
                         }}
-                        className={`cursor-pointer pr-10 bg-card/50 backdrop-blur-sm border-slate-200 focus-visible:ring-primary rounded-xl transition-all duration-200 text-slate-800 placeholder-slate-400 ${errors.location ? "border-destructive focus-visible:ring-destructive" : ""}`}
+                        className={`cursor-pointer pr-10 bg-muted border-border focus-visible:ring-primary rounded-xl transition-all duration-200 text-foreground placeholder-muted-foreground ${errors.location ? "border-destructive focus-visible:ring-destructive" : ""}`}
                       />
-                      <MapPin className="absolute right-3.5 top-3 h-4.5 w-4.5 text-slate-450 pointer-events-none" />
+                      <MapPin className="absolute right-3.5 top-3 h-4.5 w-4.5 text-muted-foreground pointer-events-none" />
                     </div>
                     {errors.location && (
                       <p className="text-xs text-destructive">{errors.location}</p>
@@ -336,7 +336,7 @@ export default function OnboardPage() {
               {currentStep === 2 && (
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="address" className="text-sm font-semibold text-slate-700">
+                    <Label htmlFor="address" className="text-sm font-semibold text-muted-foreground">
                       School Address *
                     </Label>
                     <Input
@@ -346,7 +346,7 @@ export default function OnboardPage() {
                       onChange={(e) =>
                         setFormData({ ...formData, address: e.target.value })
                       }
-                      className={`bg-card/50 backdrop-blur-sm border-slate-200 focus-visible:ring-primary rounded-xl transition-all duration-200 text-slate-800 placeholder-slate-400 ${errors.address ? "border-destructive focus-visible:ring-destructive" : ""}`}
+                      className={`bg-muted border-border focus-visible:ring-primary rounded-xl transition-all duration-200 text-foreground placeholder-muted-foreground ${errors.address ? "border-destructive focus-visible:ring-destructive" : ""}`}
                     />
                     {errors.address && (
                       <p className="text-xs text-destructive">{errors.address}</p>
@@ -354,11 +354,11 @@ export default function OnboardPage() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="phone" className="text-sm font-semibold text-slate-700">
+                    <Label htmlFor="phone" className="text-sm font-semibold text-muted-foreground">
                       School Phone Number *
                     </Label>
                     <div className="relative">
-                      <Phone className="absolute left-3.5 top-3 h-4.5 w-4.5 text-slate-450 pointer-events-none" />
+                      <Phone className="absolute left-3.5 top-3 h-4.5 w-4.5 text-muted-foreground pointer-events-none" />
                       <Input
                         id="phone"
                         placeholder="e.g., 9876543210"
@@ -366,7 +366,7 @@ export default function OnboardPage() {
                         onChange={(e) =>
                           setFormData({ ...formData, phone: e.target.value.replace(/[^\d]/g, "") })
                         }
-                        className={`pl-10 bg-card/50 backdrop-blur-sm border-slate-200 focus-visible:ring-primary rounded-xl transition-all duration-200 text-slate-800 placeholder-slate-400 ${errors.phone ? "border-destructive focus-visible:ring-destructive" : ""}`}
+                        className={`pl-10 bg-muted border-border focus-visible:ring-primary rounded-xl transition-all duration-200 text-foreground placeholder-muted-foreground ${errors.phone ? "border-destructive focus-visible:ring-destructive" : ""}`}
                       />
                     </div>
                     {errors.phone && (
@@ -375,7 +375,7 @@ export default function OnboardPage() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="principalName" className="text-sm font-semibold text-slate-700">
+                    <Label htmlFor="principalName" className="text-sm font-semibold text-muted-foreground">
                       Principal Full Name *
                     </Label>
                     <Input
@@ -385,7 +385,7 @@ export default function OnboardPage() {
                       onChange={(e) =>
                         setFormData({ ...formData, principalName: e.target.value })
                       }
-                      className={`bg-card/50 backdrop-blur-sm border-slate-200 focus-visible:ring-primary rounded-xl transition-all duration-200 text-slate-800 placeholder-slate-400 ${errors.principalName ? "border-destructive focus-visible:ring-destructive" : ""}`}
+                      className={`bg-muted border-border focus-visible:ring-primary rounded-xl transition-all duration-200 text-foreground placeholder-muted-foreground ${errors.principalName ? "border-destructive focus-visible:ring-destructive" : ""}`}
                     />
                     {errors.principalName && (
                       <p className="text-xs text-destructive">{errors.principalName}</p>
@@ -393,7 +393,7 @@ export default function OnboardPage() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="website" className="text-sm font-semibold text-slate-700">
+                    <Label htmlFor="website" className="text-sm font-semibold text-muted-foreground">
                       School Website (Optional)
                     </Label>
                     <Input
@@ -404,7 +404,7 @@ export default function OnboardPage() {
                       onChange={(e) =>
                         setFormData({ ...formData, website: e.target.value })
                       }
-                      className="bg-card/50 backdrop-blur-sm border-slate-200 focus-visible:ring-primary rounded-xl transition-all duration-200 text-slate-800 placeholder-slate-400"
+                      className="bg-muted border-border focus-visible:ring-primary rounded-xl transition-all duration-200 text-foreground placeholder-muted-foreground"
                     />
                   </div>
                 </div>
@@ -414,11 +414,11 @@ export default function OnboardPage() {
               {currentStep === 3 && (
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="teacherName" className="text-sm font-semibold text-slate-700">
+                    <Label htmlFor="teacherName" className="text-sm font-semibold text-muted-foreground">
                       Teacher Administrator Name *
                     </Label>
                     <div className="relative">
-                      <User className="absolute left-3.5 top-3 h-4.5 w-4.5 text-slate-450 pointer-events-none" />
+                      <User className="absolute left-3.5 top-3 h-4.5 w-4.5 text-muted-foreground pointer-events-none" />
                       <Input
                         id="teacherName"
                         placeholder="e.g., Ms. Sarah Johnson"
@@ -426,7 +426,7 @@ export default function OnboardPage() {
                         onChange={(e) =>
                           setFormData({ ...formData, teacherName: e.target.value })
                         }
-                        className={`pl-10 bg-card/50 backdrop-blur-sm border-slate-200 focus-visible:ring-primary rounded-xl transition-all duration-200 text-slate-800 placeholder-slate-400 ${errors.teacherName ? "border-destructive focus-visible:ring-destructive" : ""}`}
+                        className={`pl-10 bg-muted border-border focus-visible:ring-primary rounded-xl transition-all duration-200 text-foreground placeholder-muted-foreground ${errors.teacherName ? "border-destructive focus-visible:ring-destructive" : ""}`}
                       />
                     </div>
                     {errors.teacherName && (
@@ -435,11 +435,11 @@ export default function OnboardPage() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="teacherEmail" className="text-sm font-semibold text-slate-700">
+                    <Label htmlFor="teacherEmail" className="text-sm font-semibold text-muted-foreground">
                       Email Address *
                     </Label>
                     <div className="relative">
-                      <Mail className="absolute left-3.5 top-3 h-4.5 w-4.5 text-slate-450 pointer-events-none" />
+                      <Mail className="absolute left-3.5 top-3 h-4.5 w-4.5 text-muted-foreground pointer-events-none" />
                       <Input
                         id="teacherEmail"
                         type="email"
@@ -448,7 +448,7 @@ export default function OnboardPage() {
                         onChange={(e) =>
                           setFormData({ ...formData, teacherEmail: e.target.value })
                         }
-                        className={`pl-10 bg-card/50 backdrop-blur-sm border-slate-200 focus-visible:ring-primary rounded-xl transition-all duration-200 text-slate-800 placeholder-slate-400 ${errors.teacherEmail ? "border-destructive focus-visible:ring-destructive" : ""}`}
+                        className={`pl-10 bg-muted border-border focus-visible:ring-primary rounded-xl transition-all duration-200 text-foreground placeholder-muted-foreground ${errors.teacherEmail ? "border-destructive focus-visible:ring-destructive" : ""}`}
                       />
                     </div>
                     {errors.teacherEmail && (
@@ -458,7 +458,7 @@ export default function OnboardPage() {
 
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="teacherPassword" className="text-sm font-semibold text-slate-700">
+                      <Label htmlFor="teacherPassword" className="text-sm font-semibold text-muted-foreground">
                         Password *
                       </Label>
                       <Input
@@ -469,11 +469,11 @@ export default function OnboardPage() {
                         onChange={(e) =>
                           setFormData({ ...formData, teacherPassword: e.target.value })
                         }
-                        className={`bg-card/50 backdrop-blur-sm border-slate-200 focus-visible:ring-primary rounded-xl transition-all duration-200 text-slate-800 placeholder-slate-400 ${errors.teacherPassword ? "border-destructive focus-visible:ring-destructive" : ""}`}
+                        className={`bg-muted border-border focus-visible:ring-primary rounded-xl transition-all duration-200 text-foreground placeholder-muted-foreground ${errors.teacherPassword ? "border-destructive focus-visible:ring-destructive" : ""}`}
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="confirmPassword" className="text-sm font-semibold text-slate-700">
+                      <Label htmlFor="confirmPassword" className="text-sm font-semibold text-muted-foreground">
                         Confirm Password *
                       </Label>
                       <Input
@@ -484,7 +484,7 @@ export default function OnboardPage() {
                         onChange={(e) =>
                           setFormData({ ...formData, confirmPassword: e.target.value })
                         }
-                        className={`bg-card/50 backdrop-blur-sm border-slate-200 focus-visible:ring-primary rounded-xl transition-all duration-200 text-slate-800 placeholder-slate-400 ${errors.confirmPassword ? "border-destructive focus-visible:ring-destructive" : ""}`}
+                        className={`bg-muted border-border focus-visible:ring-primary rounded-xl transition-all duration-200 text-foreground placeholder-muted-foreground ${errors.confirmPassword ? "border-destructive focus-visible:ring-destructive" : ""}`}
                       />
                     </div>
                     {(errors.teacherPassword || errors.confirmPassword) && (
@@ -500,54 +500,54 @@ export default function OnboardPage() {
 
               {/* Step 4: Final Review & Confirmation */}
               {currentStep === 4 && (
-                <div className="space-y-4 text-sm text-slate-800">
+                <div className="space-y-4 text-sm text-foreground">
                   <div className="rounded-xl border border-primary/20 bg-primary/5 p-5 space-y-4 shadow-sm">
                     <div>
                       <h4 className="font-bold text-xs text-primary uppercase tracking-wider mb-2">School Information</h4>
                       <div className="grid grid-cols-2 gap-y-2 gap-x-4">
                         <div>
-                          <span className="text-slate-500 block text-[11px]">School Name:</span>
-                          <span className="font-bold text-slate-800">{formData.schoolName}</span>
+                          <span className="text-muted-foreground block text-[11px]">School Name:</span>
+                          <span className="font-bold text-foreground">{formData.schoolName}</span>
                         </div>
                         <div>
-                          <span className="text-slate-500 block text-[11px]">UDAISE Code:</span>
-                          <span className="font-bold text-slate-800">{formData.udaiseCode}</span>
+                          <span className="text-muted-foreground block text-[11px]">UDAISE Code:</span>
+                          <span className="font-bold text-foreground">{formData.udaiseCode}</span>
                         </div>
                         <div>
-                          <span className="text-slate-500 block text-[11px]">Geography:</span>
-                          <span className="font-semibold text-slate-800">{formData.location}</span>
+                          <span className="text-muted-foreground block text-[11px]">Geography:</span>
+                          <span className="font-semibold text-foreground">{formData.location}</span>
                         </div>
                         <div>
-                          <span className="text-slate-500 block text-[11px]">Phone:</span>
-                          <span className="font-semibold text-slate-800">{formData.phone}</span>
+                          <span className="text-muted-foreground block text-[11px]">Phone:</span>
+                          <span className="font-semibold text-foreground">{formData.phone}</span>
                         </div>
-                        <div className="col-span-2 border-t border-slate-200/40 pt-2">
-                          <span className="text-slate-500 block text-[11px]">Address:</span>
-                          <span className="font-medium text-slate-800">{formData.address}</span>
+                        <div className="col-span-2 border-t border-border/60 pt-2">
+                          <span className="text-muted-foreground block text-[11px]">Address:</span>
+                          <span className="font-medium text-foreground">{formData.address}</span>
                         </div>
-                        <div className="border-t border-slate-200/40 pt-2">
-                          <span className="text-slate-500 block text-[11px]">Principal:</span>
-                          <span className="font-semibold text-slate-800">{formData.principalName}</span>
+                        <div className="border-t border-border/60 pt-2">
+                          <span className="text-muted-foreground block text-[11px]">Principal:</span>
+                          <span className="font-semibold text-foreground">{formData.principalName}</span>
                         </div>
                         {formData.website && (
-                          <div className="border-t border-slate-200/40 pt-2">
-                            <span className="text-slate-500 block text-[11px]">Website:</span>
-                            <span className="font-semibold text-slate-800">{formData.website}</span>
+                          <div className="border-t border-border/60 pt-2">
+                            <span className="text-muted-foreground block text-[11px]">Website:</span>
+                            <span className="font-semibold text-foreground">{formData.website}</span>
                           </div>
                         )}
                       </div>
                     </div>
                     
-                    <div className="border-t border-slate-200/40 pt-3">
+                    <div className="border-t border-border/60 pt-3">
                       <h4 className="font-bold text-xs text-primary uppercase tracking-wider mb-2">Teacher Administrator</h4>
                       <div className="grid grid-cols-2 gap-y-2 gap-x-4">
                         <div>
-                          <span className="text-slate-500 block text-[11px]">Teacher Name:</span>
-                          <span className="font-bold text-slate-800">{formData.teacherName}</span>
+                          <span className="text-muted-foreground block text-[11px]">Teacher Name:</span>
+                          <span className="font-bold text-foreground">{formData.teacherName}</span>
                         </div>
                         <div>
-                          <span className="text-slate-500 block text-[11px]">Email Address:</span>
-                          <span className="font-bold text-slate-850 break-all">{formData.teacherEmail}</span>
+                          <span className="text-muted-foreground block text-[11px]">Email Address:</span>
+                          <span className="font-bold text-foreground break-all">{formData.teacherEmail}</span>
                         </div>
                       </div>
                     </div>
@@ -597,7 +597,7 @@ export default function OnboardPage() {
                 Sign in
               </Link>
             </p>
-            <p className="text-xs text-slate-400">
+            <p className="text-xs text-muted-foreground">
               Are you Pi Jam staff?{" "}
               <Link
                 href="/pijam"
@@ -617,7 +617,7 @@ export default function OnboardPage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-md p-4"
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md p-4"
             onClick={(e) => {
               if (e.target === e.currentTarget) setIsModalOpen(false);
             }}
@@ -627,7 +627,7 @@ export default function OnboardPage() {
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.95, opacity: 0, y: 20 }}
               transition={{ type: "spring", stiffness: 300, damping: 28 }}
-              className="relative w-full max-w-3xl bg-white border border-slate-200/50 rounded-2xl shadow-2xl flex flex-col max-h-[85vh] overflow-hidden text-slate-800"
+              className="relative w-full max-w-3xl bg-card border border-border/60 rounded-2xl shadow-2xl flex flex-col max-h-[85vh] overflow-hidden text-foreground"
             >
               {/* Modal Header */}
               <div className="flex items-center justify-between px-6 py-4 border-b border-border/30 bg-card rounded-t-2xl">
@@ -691,7 +691,7 @@ export default function OnboardPage() {
                             <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium transition-colors duration-200 ${
                               selectedState === sd.state
                                 ? "bg-primary text-white"
-                                : "bg-slate-100 text-muted-foreground group-hover:bg-primary/10 group-hover:text-primary"
+                                : "bg-muted text-muted-foreground group-hover:bg-primary/10 group-hover:text-primary"
                             }`}>
                               {sd.districts.length}
                             </span>
@@ -710,7 +710,7 @@ export default function OnboardPage() {
                 </div>
 
                 {/* Right Column: Districts List */}
-                <div className="flex flex-col h-[50vh] md:h-[60vh] overflow-hidden bg-slate-50/30">
+                <div className="flex flex-col h-[50vh] md:h-[60vh] overflow-hidden bg-muted/40">
                   <div className="p-4 border-b border-border/10">
                     <div className="relative">
                       <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />

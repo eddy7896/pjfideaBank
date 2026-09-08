@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Send, Sparkles } from "lucide-react";
+import { Send, Sparkles, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -49,6 +50,7 @@ export function IdeaForm() {
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const validate = () => {
     const newErrors: Record<string, string> = {};
@@ -65,9 +67,10 @@ export function IdeaForm() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validate()) return;
+    if (isSubmitting) return;
 
     const schoolName =
       currentUser?.role === "school"
@@ -76,7 +79,8 @@ export function IdeaForm() {
 
     const selectedTeam = schoolTeams.find((t) => t.id === formData.teamId);
 
-    addIdea({
+    setIsSubmitting(true);
+    const result = await addIdea({
       schoolName,
       title: formData.title.trim(),
       theme: formData.theme,
@@ -85,6 +89,14 @@ export function IdeaForm() {
       problemStatement: formData.problemStatement.trim(),
       targetAudience: formData.targetAudience.trim(),
     });
+    setIsSubmitting(false);
+
+    if (!result.success) {
+      toast.error(result.error || "Failed to submit idea", {
+        description: "Nothing was saved. Fix the issue and try again.",
+      });
+      return;
+    }
 
     toast.success("Idea submitted successfully!", {
       description: `"${formData.title}" has been added to the Empathize stage.`,
@@ -174,21 +186,27 @@ export function IdeaForm() {
             <SelectValue placeholder="Select a team" />
           </SelectTrigger>
           <SelectContent>
-            {schoolTeams.length > 0 ? (
-              schoolTeams.map((team) => (
-                <SelectItem key={team.id} value={team.id}>
-                  {team.name}
-                </SelectItem>
-              ))
-            ) : (
-              <SelectItem value="" disabled>
-                No teams available. Create teams first.
+            {schoolTeams.map((team) => (
+              <SelectItem key={team.id} value={team.id}>
+                {team.name}
               </SelectItem>
-            )}
+            ))}
           </SelectContent>
         </Select>
         {errors.teamId && (
           <p className="text-xs text-destructive">{errors.teamId}</p>
+        )}
+        {schoolTeams.length === 0 && (
+          <p className="text-xs text-muted-foreground">
+            No teams yet.{" "}
+            <Link
+              href="/dashboard/teams"
+              className="font-medium text-primary underline underline-offset-2"
+            >
+              Create one first
+            </Link>
+            , then come back here.
+          </p>
         )}
       </div>
 
@@ -241,13 +259,13 @@ export function IdeaForm() {
       </div>
 
       {/* Info Banner */}
-      <div className="flex items-start gap-3 rounded-lg border border-indigo-200 bg-indigo-50 p-4">
-        <Sparkles className="mt-0.5 h-5 w-5 flex-shrink-0 text-indigo-500" />
+      <div className="flex items-start gap-3 rounded-lg border border-primary/20 bg-primary/5 p-4">
+        <Sparkles className="mt-0.5 h-5 w-5 flex-shrink-0 text-primary" />
         <div>
-          <p className="text-sm font-medium text-indigo-900">
+          <p className="text-sm font-medium text-foreground">
             Automatic Stage Assignment
           </p>
-          <p className="mt-0.5 text-xs text-indigo-700">
+          <p className="mt-0.5 text-xs text-muted-foreground">
             All new ideas start at the <strong>Empathize</strong> stage. You can
             advance them through the Design Thinking stages in the Repository.
           </p>
@@ -255,9 +273,18 @@ export function IdeaForm() {
       </div>
 
       {/* Submit */}
-      <Button type="submit" className="w-full gap-2" size="lg">
-        <Send className="h-4 w-4" />
-        Submit Idea
+      <Button type="submit" className="w-full gap-2" size="lg" disabled={isSubmitting}>
+        {isSubmitting ? (
+          <>
+            <Loader2 className="h-4 w-4 animate-spin" />
+            Submitting...
+          </>
+        ) : (
+          <>
+            <Send className="h-4 w-4" />
+            Submit Idea
+          </>
+        )}
       </Button>
     </form>
   );

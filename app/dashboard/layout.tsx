@@ -22,7 +22,10 @@ import {
   FileText,
   Map,
   BookOpen,
+  Sun,
+  Moon,
 } from "lucide-react";
+import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Toaster } from "@/components/ui/sonner";
@@ -32,6 +35,7 @@ import { useIdeaStore } from "@/store/use-idea-store";
 import { useActivityStore } from "@/store/use-activity-store";
 import { useSchoolStore } from "@/store/use-school-store";
 import { useThemeStore } from "@/store/use-theme-store";
+import { usePermissions } from "@/lib/permissions";
 import { cn } from "@/lib/utils";
 
 const roleIcons: Record<string, typeof ShieldCheck> = {
@@ -44,15 +48,9 @@ const roleIcons: Record<string, typeof ShieldCheck> = {
   student: UsersIcon,
 };
 
-const roleBadgeColors: Record<string, string> = {
-  "super-admin": "bg-primary/10 text-primary border-primary/20",
-  "program-lead": "bg-purple-100 text-purple-700 border-purple-200",
-  "geography-lead": "bg-indigo-100 text-indigo-700 border-indigo-200",
-  "teacher-trainer": "bg-orange-100 text-orange-700 border-orange-200",
-  school: "bg-emerald-100 text-emerald-700 border-emerald-200",
-  "sed-department": "bg-accent/10 text-accent border-accent/20",
-  student: "bg-blue-100 text-blue-700 border-blue-200",
-};
+// Role identity is carried by the icon + label, not a rainbow of badge colors —
+// color is reserved for the stage/status semantic channel, not role identity.
+const ROLE_BADGE_CLASS = "bg-primary/10 text-primary border-primary/20";
 
 export default function DashboardLayout({
   children,
@@ -62,11 +60,18 @@ export default function DashboardLayout({
   const router = useRouter();
   const pathname = usePathname();
   const { currentUser, isAuthenticated, logout, hydrate } = useAuthStore();
-  const { loadTeams } = useTeamStore();
-  const { loadIdeas } = useIdeaStore();
-  const { loadActivities } = useActivityStore();
-  const { loadSchools } = useSchoolStore();
-  const { loadThemes } = useThemeStore();
+  const { loadTeams, isLoaded: teamsLoaded } = useTeamStore();
+  const { ideas, loadIdeas, isLoaded: ideasLoaded } = useIdeaStore();
+  const { loadActivities, isLoaded: activitiesLoaded } = useActivityStore();
+  const { loadSchools, isLoaded: schoolsLoaded } = useSchoolStore();
+  const { loadThemes, isLoaded: themesLoaded } = useThemeStore();
+  const { canApproveAdvance, hasPendingAdvance } = usePermissions();
+  const { resolvedTheme, setTheme } = useTheme();
+  const dataLoaded =
+    teamsLoaded && ideasLoaded && activitiesLoaded && schoolsLoaded && themesLoaded;
+  const pendingReviewCount = ideas.filter(
+    (idea) => canApproveAdvance(idea) && hasPendingAdvance(idea)
+  ).length;
   const [mounted, setMounted] = useState(false);
   const [hydrated, setHydrated] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -103,7 +108,7 @@ export default function DashboardLayout({
     }
   }, [mounted, isAuthenticated, loadTeams, loadIdeas, loadActivities, loadSchools, loadThemes]);
 
-  if (!mounted || !hydrated || !isAuthenticated || !currentUser) {
+  if (!mounted || !hydrated || !isAuthenticated || !currentUser || !dataLoaded) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background">
         <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
@@ -240,6 +245,11 @@ export default function DashboardLayout({
             >
               <Folder className="h-4 w-4" />
               Projects
+              {pendingReviewCount > 0 && (
+                <span className="ml-auto flex h-5 min-w-5 items-center justify-center rounded-full bg-status-pending px-1.5 text-[11px] font-semibold text-white">
+                  {pendingReviewCount}
+                </span>
+              )}
             </Link>
           )}
 
@@ -304,16 +314,33 @@ export default function DashboardLayout({
         {/* User Info & Logout (Bottom) */}
         <div className="border-t border-border/40 p-4">
           <div className="flex flex-col gap-3">
-            <Badge
-              variant="outline"
-              className={cn(
-                "w-fit gap-1.5 px-2 py-1 text-xs font-medium",
-                roleBadgeColors[currentUser.role]
-              )}
-            >
-              <RoleIcon className="h-3.5 w-3.5" />
-              {currentUser.displayName}
-            </Badge>
+            <div className="flex items-center justify-between gap-2">
+              <Badge
+                variant="outline"
+                className={cn(
+                  "w-fit gap-1.5 px-2 py-1 text-xs font-medium",
+                  ROLE_BADGE_CLASS
+                )}
+              >
+                <RoleIcon className="h-3.5 w-3.5" />
+                {currentUser.displayName}
+              </Badge>
+
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
+                className="h-8 w-8 shrink-0 border-border bg-background text-muted-foreground hover:text-foreground"
+                aria-label="Toggle theme"
+                title="Toggle theme (D)"
+              >
+                {mounted && resolvedTheme === "dark" ? (
+                  <Sun className="h-4 w-4" />
+                ) : (
+                  <Moon className="h-4 w-4" />
+                )}
+              </Button>
+            </div>
 
             <Button
               variant="outline"

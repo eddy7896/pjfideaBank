@@ -7,6 +7,7 @@ import Link from "next/link";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { DESIGN_THINKING_STAGES, STATUS_COLORS } from "@/lib/constants";
 import { useIdeaStore } from "@/store/use-idea-store";
+import { usePermissions } from "@/lib/permissions";
 import type { Idea, DesignThinkingStatus } from "@/types";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
@@ -19,6 +20,7 @@ interface KanbanBoardProps {
 
 export function KanbanBoard({ ideas, readOnly = false, visibleStages }: KanbanBoardProps) {
   const { updateStatus } = useIdeaStore();
+  const { hasPendingAdvance } = usePermissions();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -27,7 +29,7 @@ export function KanbanBoard({ ideas, readOnly = false, visibleStages }: KanbanBo
 
   const stages = visibleStages || DESIGN_THINKING_STAGES;
 
-  const onDragEnd = (result: DropResult) => {
+  const onDragEnd = async (result: DropResult) => {
     if (readOnly) return;
     const { destination, source, draggableId } = result;
 
@@ -40,8 +42,12 @@ export function KanbanBoard({ ideas, readOnly = false, visibleStages }: KanbanBo
     }
 
     const newStatus = destination.droppableId as DesignThinkingStatus;
-    updateStatus(draggableId, newStatus);
-    toast.success(`Moved to ${newStatus}`);
+    const { success, error } = await updateStatus(draggableId, newStatus);
+    if (success) {
+      toast.success(`Moved to ${newStatus}`);
+    } else {
+      toast.error(error || "Couldn't move the card — try again");
+    }
   };
 
   if (!mounted) {
@@ -87,11 +93,17 @@ export function KanbanBoard({ ideas, readOnly = false, visibleStages }: KanbanBo
                             {...provided.draggableProps}
                             {...provided.dragHandleProps}
                             className={cn(
-                              "group flex flex-col rounded-lg border border-border/50 bg-card p-3 shadow-sm transition-all hover:border-indigo-200",
+                              "group flex flex-col rounded-lg border border-border/50 bg-card p-3 shadow-sm transition-[transform,box-shadow,border-color] duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] hover:border-primary/30",
                               snapshot.isDragging && "scale-[1.02] shadow-lg rotate-1"
                             )}
                           >
                             <Link href={`/dashboard/projects/${idea.id}`} className="block">
+                              {hasPendingAdvance(idea) && (
+                                <span className="mb-2 inline-flex w-fit items-center gap-1.5 rounded-full border border-status-pending-border bg-status-pending-soft px-2 py-0.5 text-[10px] font-semibold text-status-pending">
+                                  <span className="h-1.5 w-1.5 rounded-full bg-status-pending" />
+                                  Awaiting review
+                                </span>
+                              )}
                               <div className="flex items-start justify-between gap-2 mb-2">
                                 <p className="text-sm font-semibold line-clamp-2 leading-tight">
                                   {idea.title}

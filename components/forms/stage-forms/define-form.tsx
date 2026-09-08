@@ -141,12 +141,12 @@ export function DefineForm({ initialData, onSubmit, isLoading }: DefineFormProps
       </div>
 
       {errors.length > 0 && (
-        <div className="space-y-2 rounded-lg border border-rose-200 bg-rose-50 p-4">
+        <div className="space-y-2 rounded-lg border border-status-reject-border bg-status-reject-soft p-4">
           <div className="flex items-start gap-3">
-            <AlertCircle className="h-5 w-5 text-rose-600 flex-shrink-0 mt-0.5" />
+            <AlertCircle className="h-5 w-5 text-status-reject flex-shrink-0 mt-0.5" />
             <div className="space-y-1">
               {errors.map((error, i) => (
-                <p key={i} className="text-sm text-rose-700">
+                <p key={i} className="text-sm text-status-reject">
                   {error}
                 </p>
               ))}

@@ -17,8 +17,8 @@ function SubmitContent() {
   if (currentUser.role !== "school") {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-center">
-        <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-amber-50">
-          <ShieldAlert className="h-8 w-8 text-amber-500" />
+        <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-status-pending-soft">
+          <ShieldAlert className="h-8 w-8 text-status-pending" />
         </div>
         <h2 className="mt-4 text-lg font-semibold">Access Restricted</h2>
         <p className="mt-2 max-w-sm text-sm text-muted-foreground">
@@ -81,7 +81,7 @@ export default function SubmitPage() {
       <Suspense
         fallback={
           <div className="flex h-64 items-center justify-center">
-            <div className="h-8 w-8 animate-spin rounded-full border-4 border-emerald-500 border-t-transparent" />
+            <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
           </div>
         }
       >

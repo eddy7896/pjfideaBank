@@ -186,10 +186,10 @@ export default function ThemesPage() {
 
       {/* Add New Theme Form (collapsible) */}
       {showAddForm && (
-        <div className="mb-8 rounded-xl border border-indigo-200 bg-gradient-to-br from-indigo-50/80 to-purple-50/80 p-6 shadow-sm animate-in slide-in-from-top-2 duration-300">
+        <div className="mb-8 rounded-xl border border-primary/20 bg-primary/5 p-6 shadow-sm animate-in slide-in-from-top-2 duration-300">
           <div className="flex items-center justify-between mb-5">
             <div className="flex items-center gap-2">
-              <Sparkles className="h-4 w-4 text-indigo-500" />
+              <Sparkles className="h-4 w-4 text-primary" />
               <h2 className="text-base font-semibold">Add New Theme</h2>
             </div>
             <button
@@ -268,7 +268,7 @@ export default function ThemesPage() {
             </div>
 
             {/* Preview + Submit */}
-            <div className="mt-6 flex items-center justify-between border-t border-indigo-200/50 pt-5">
+            <div className="mt-6 flex items-center justify-between border-t border-primary/20/50 pt-5">
               {/* Mini preview */}
               <div className="flex items-center gap-3">
                 <Eye className="h-4 w-4 text-muted-foreground" />
@@ -308,7 +308,7 @@ export default function ThemesPage() {
             return (
               <div
                 key={tm.month}
-                className="rounded-xl border-2 border-indigo-300 bg-card shadow-lg shadow-indigo-500/10 overflow-hidden animate-in fade-in duration-200"
+                className="rounded-xl border-2 border-primary/40 bg-card shadow-lg shadow-primary/10 overflow-hidden animate-in fade-in duration-200"
               >
                 {/* Live preview header */}
                 <div
@@ -420,7 +420,7 @@ export default function ThemesPage() {
                     <div className="flex items-center gap-0.5 opacity-0 transition-opacity group-hover:opacity-100">
                       <button
                         onClick={() => startEdit(tm)}
-                        className="rounded-lg p-1.5 text-muted-foreground hover:bg-accent hover:text-indigo-600 transition-colors"
+                        className="rounded-lg p-1.5 text-muted-foreground hover:bg-accent hover:text-primary transition-colors"
                         title="Edit theme"
                       >
                         <Pencil className="h-3.5 w-3.5" />
@@ -477,7 +477,7 @@ export default function ThemesPage() {
         {isAdmin && !showAddForm && (
           <button
             onClick={() => { setShowAddForm(true); setEditingMonth(null); }}
-            className="flex flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-border/50 bg-muted/20 py-12 text-muted-foreground transition-all hover:border-indigo-300 hover:bg-indigo-50/50 hover:text-indigo-600"
+            className="flex flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-border/50 bg-muted/20 py-12 text-muted-foreground transition-all hover:border-primary/40 hover:bg-primary/5 hover:text-primary"
           >
             <Plus className="h-8 w-8" />
             <span className="text-sm font-medium">Add New Theme</span>
