@@ -192,11 +192,11 @@ export default function CalendarPage() {
       </div>
 
       {isAdmin && <Dialog open={isThemeModalOpen} onOpenChange={setIsThemeModalOpen}>
-        <DialogContent className="max-w-2xl max-h-96 overflow-y-auto">
+        <DialogContent className="max-w-lg max-h-[70vh] overflow-hidden flex flex-col">
           <DialogHeader>
             <DialogTitle>Monthly Themes</DialogTitle>
             <DialogDescription>
-              Click a month to edit its theme
+              {selectedMonth !== null ? "Edit this month's theme" : "Select a month to edit its theme"}
             </DialogDescription>
           </DialogHeader>
 
@@ -233,17 +233,26 @@ export default function CalendarPage() {
               </div>
             </div>
           ) : (
-            <div className="grid gap-3 grid-cols-3">
+            <div className="-mx-1 space-y-1 overflow-y-auto pr-1">
               {themes.map((theme, idx) => (
-                <Card
+                <button
                   key={theme.month}
+                  type="button"
                   onClick={() => handleEditTheme(idx)}
-                  className="border-border/20 p-3 hover:shadow-md transition-all cursor-pointer hover:bg-accent/5"
+                  className="flex w-full items-center gap-4 rounded-xl px-3 py-3 text-left transition-colors hover:bg-accent/5"
                 >
-                  <p className="text-xs font-semibold text-muted-foreground">{theme.shortMonth}</p>
-                  <p className="text-sm font-semibold text-foreground line-clamp-2">{theme.theme}</p>
-                  <p className="text-xs text-muted-foreground line-clamp-1 mt-1">{theme.description}</p>
-                </Card>
+                  <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-muted text-xs font-semibold text-muted-foreground">
+                    {theme.shortMonth}
+                  </span>
+                  <span className="min-w-0 flex-1">
+                    <span className="block truncate text-sm font-semibold text-foreground">
+                      {theme.theme}
+                    </span>
+                    <span className="block truncate text-xs text-muted-foreground">
+                      {theme.description}
+                    </span>
+                  </span>
+                </button>
               ))}
             </div>
           )}
