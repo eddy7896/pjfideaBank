@@ -1,6 +1,7 @@
 "use client";
 
 import { create } from "zustand";
+import { persist, createJSONStorage } from "zustand/middleware";
 import type { ThemeMonth } from "@/types";
 
 interface ThemeStore {
@@ -13,7 +14,9 @@ interface ThemeStore {
   resetToDefaults: () => Promise<void>;
 }
 
-export const useThemeStore = create<ThemeStore>((set, get) => ({
+export const useThemeStore = create<ThemeStore>()(
+  persist(
+    (set, get) => ({
   themes: [],
   isLoaded: false,
 
@@ -71,4 +74,11 @@ export const useThemeStore = create<ThemeStore>((set, get) => ({
     // `npm run db:seed-themes` if you need to roll back.
     await get().loadThemes();
   },
-}));
+    }),
+    {
+      name: "pijam-themes-cache",
+      storage: createJSONStorage(() => localStorage),
+      partialize: (state) => ({ themes: state.themes, isLoaded: state.isLoaded }),
+    }
+  )
+);

@@ -71,5 +71,13 @@ export const useAuthStore = create<AuthState>()((set) => ({
   logout: async () => {
     await signOut({ redirect: false });
     set({ currentUser: null, isAuthenticated: false });
+    // Schools is role/geography-scoped, so its cache can't outlive the
+    // session on a shared classroom device - clear it on every logout.
+    // Themes is identical for every role, safe to leave cached.
+    try {
+      localStorage.removeItem("pijam-schools-cache");
+    } catch {
+      // localStorage unavailable (private mode, etc.) - nothing to clear
+    }
   },
 }));

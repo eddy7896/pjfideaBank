@@ -1,19 +1,8 @@
 "use client";
 
 import { useMemo } from "react";
+import dynamic from "next/dynamic";
 import { motion } from "framer-motion";
-import {
-  AreaChart,
-  Area,
-  BarChart,
-  Bar,
-  Cell,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-} from "recharts";
 import {
   Card,
   CardContent,
@@ -33,6 +22,20 @@ import {
 import { Users, Lightbulb, School as SchoolIcon, Users2, Info } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { Role } from "@/types";
+
+// recharts is a meaningful chunk of JS that only this route needs - load it
+// only once a chart actually mounts, not as part of every dashboard visit.
+const ChartSkeleton = ({ height = 220 }: { height?: number }) => (
+  <div className="w-full animate-pulse rounded-lg bg-muted" style={{ height }} />
+);
+const TrendAreaChart = dynamic(
+  () => import("@/components/analytics/trend-area-chart").then((m) => m.TrendAreaChart),
+  { ssr: false, loading: () => <ChartSkeleton /> }
+);
+const CategoryBarChart = dynamic(
+  () => import("@/components/analytics/category-bar-chart").then((m) => m.CategoryBarChart),
+  { ssr: false, loading: () => <ChartSkeleton /> }
+);
 
 const STAGE_VAR: Record<string, string> = {
   Empathize: "var(--stage-empathize)",
@@ -79,28 +82,6 @@ const ROLE_COPY: Partial<
     subtitle: "Your school's projects and teams.",
   },
 };
-
-function CustomTooltip({
-  active,
-  payload,
-  label,
-  valueLabel = "Ideas",
-}: {
-  active?: boolean;
-  payload?: { value: number; payload?: Record<string, unknown> }[];
-  label?: string;
-  valueLabel?: string;
-}) {
-  if (!active || !payload?.length) return null;
-  return (
-    <div className="rounded-lg border border-border bg-card px-3 py-2 text-xs shadow-md">
-      <p className="font-semibold text-foreground">{label}</p>
-      <p className="text-muted-foreground">
-        {valueLabel}: <span className="font-semibold text-foreground">{payload[0].value}</span>
-      </p>
-    </div>
-  );
-}
 
 function BentoCard({
   title,
@@ -334,66 +315,16 @@ export default function AnalyticsPage() {
             colSpan={2}
             index={0}
           >
-            <ResponsiveContainer width="100%" height={220}>
-              <AreaChart data={trend} margin={{ left: -20, right: 8, top: 8 }}>
-                <CartesianGrid vertical={false} stroke="var(--border)" />
-                <XAxis
-                  dataKey="label"
-                  stroke="var(--muted-foreground)"
-                  tick={{ fontSize: 11 }}
-                  interval={2}
-                  axisLine={false}
-                  tickLine={false}
-                />
-                <YAxis
-                  stroke="var(--muted-foreground)"
-                  tick={{ fontSize: 11 }}
-                  allowDecimals={false}
-                  axisLine={false}
-                  tickLine={false}
-                />
-                <Tooltip content={<CustomTooltip valueLabel="Ideas submitted" />} />
-                <Area
-                  type="monotone"
-                  dataKey="count"
-                  stroke="var(--primary)"
-                  strokeWidth={2}
-                  fill="var(--primary)"
-                  fillOpacity={0.12}
-                  dot={false}
-                  activeDot={{ r: 4 }}
-                />
-              </AreaChart>
-            </ResponsiveContainer>
+            <TrendAreaChart data={trend} />
           </BentoCard>
 
           {/* Stage breakdown */}
           <BentoCard title="By Stage" description="Design Thinking pipeline" colSpan={1} index={1}>
-            <ResponsiveContainer width="100%" height={220}>
-              <BarChart data={stageChartData} margin={{ left: -20, right: 8, top: 8 }}>
-                <CartesianGrid vertical={false} stroke="var(--border)" />
-                <XAxis
-                  dataKey="status"
-                  stroke="var(--muted-foreground)"
-                  tick={{ fontSize: 10 }}
-                  axisLine={false}
-                  tickLine={false}
-                />
-                <YAxis
-                  stroke="var(--muted-foreground)"
-                  tick={{ fontSize: 11 }}
-                  allowDecimals={false}
-                  axisLine={false}
-                  tickLine={false}
-                />
-                <Tooltip content={<CustomTooltip />} />
-                <Bar dataKey="count" radius={[6, 6, 0, 0]}>
-                  {stageChartData.map((entry) => (
-                    <Cell key={entry.status} fill={STAGE_VAR[entry.status]} />
-                  ))}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
+            <CategoryBarChart
+              data={stageChartData}
+              xKey="status"
+              cellColor={(entry) => STAGE_VAR[entry.status as string]}
+            />
           </BentoCard>
 
           {/* Gender breakdown */}
@@ -423,55 +354,12 @@ export default function AnalyticsPage() {
             colSpan={showGeographyRollup ? 2 : 3}
             index={4}
           >
-            <ResponsiveContainer width="100%" height={240}>
-              <BarChart data={analytics.ideasByTheme} margin={{ left: -20, right: 8, top: 8 }}>
-                <CartesianGrid vertical={false} stroke="var(--border)" />
-                <XAxis
-                  dataKey="theme"
-                  stroke="var(--muted-foreground)"
-                  tick={{ fontSize: 10 }}
-                  angle={-35}
-                  textAnchor="end"
-                  height={70}
-                  axisLine={false}
-                  tickLine={false}
-                />
-                <YAxis
-                  stroke="var(--muted-foreground)"
-                  tick={{ fontSize: 11 }}
-                  allowDecimals={false}
-                  axisLine={false}
-                  tickLine={false}
-                />
-                <Tooltip content={<CustomTooltip />} />
-                <Bar dataKey="count" fill="var(--primary)" fillOpacity={0.85} radius={[6, 6, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
+            <CategoryBarChart data={analytics.ideasByTheme} xKey="theme" height={240} angledLabels />
           </BentoCard>
 
           {/* Grade distribution */}
           <BentoCard title="By Grade" description="Student grade levels" colSpan={1} index={5}>
-            <ResponsiveContainer width="100%" height={220}>
-              <BarChart data={analytics.gradeDistribution} margin={{ left: -20, right: 8, top: 8 }}>
-                <CartesianGrid vertical={false} stroke="var(--border)" />
-                <XAxis
-                  dataKey="grade"
-                  stroke="var(--muted-foreground)"
-                  tick={{ fontSize: 11 }}
-                  axisLine={false}
-                  tickLine={false}
-                />
-                <YAxis
-                  stroke="var(--muted-foreground)"
-                  tick={{ fontSize: 11 }}
-                  allowDecimals={false}
-                  axisLine={false}
-                  tickLine={false}
-                />
-                <Tooltip content={<CustomTooltip valueLabel="Students" />} />
-                <Bar dataKey="count" fill="var(--primary)" fillOpacity={0.85} radius={[6, 6, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
+            <CategoryBarChart data={analytics.gradeDistribution} xKey="grade" valueLabel="Students" />
           </BentoCard>
 
           {/* Ranked: schools — hidden for single-school role */}

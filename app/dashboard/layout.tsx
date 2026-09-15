@@ -89,22 +89,11 @@ export default function DashboardLayout({
 
   useEffect(() => {
     if (mounted && isAuthenticated) {
-      const seed = async () => {
-        try {
-          await fetch("/api/seed", {
-            method: "POST",
-            headers: { "Authorization": "Bearer seed-token-pijam" },
-          });
-        } catch (e) {
-          // Seed may fail if data exists, that's ok
-        }
-        loadTeams();
-        loadIdeas();
-        loadActivities();
-        loadSchools();
-        loadThemes();
-      };
-      seed();
+      loadTeams();
+      loadIdeas();
+      loadActivities();
+      loadSchools();
+      loadThemes();
     }
   }, [mounted, isAuthenticated, loadTeams, loadIdeas, loadActivities, loadSchools, loadThemes]);
 
