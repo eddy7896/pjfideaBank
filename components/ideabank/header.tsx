@@ -62,7 +62,7 @@ export function IdeabankHeader() {
           <Link href="/login" className="text-sm font-medium text-[#3D3D3D] hover:text-[#111111]">
             Sign In
           </Link>
-          <IdeabankButton href="/share" size="sm">
+          <IdeabankButton href="/dashboard" size="sm">
             Share an Idea
           </IdeabankButton>
         </div>
@@ -105,7 +105,7 @@ export function IdeabankHeader() {
               </Link>
             </nav>
             <div className="mt-auto p-4">
-              <IdeabankButton href="/share" className="w-full">
+              <IdeabankButton href="/dashboard" className="w-full">
                 Share an Idea
               </IdeabankButton>
             </div>

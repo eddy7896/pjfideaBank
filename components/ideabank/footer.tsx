@@ -3,7 +3,7 @@ import { IdeabankLogo } from "./logo";
 
 const EXPLORE_LINKS = [
   { href: "/explore", label: "Explore Ideas" },
-  { href: "/share", label: "Share an Idea" },
+  { href: "/dashboard", label: "Share an Idea" },
   { href: "/#how-it-works", label: "How It Works" },
   { href: "/#for-teachers", label: "For Teachers" },
 ];

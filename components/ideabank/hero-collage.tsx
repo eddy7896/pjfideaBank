@@ -25,6 +25,8 @@ export function HeroCollage() {
               imageKey={item.image}
               className="h-full min-h-[120px] w-full"
               iconClassName="h-8 w-8 sm:h-10 sm:w-10"
+              priority={i === 0}
+              sizes="(min-width: 1024px) 380px, (min-width: 640px) 45vw, 40vw"
             />
           </div>
         </div>

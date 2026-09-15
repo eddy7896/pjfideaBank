@@ -108,7 +108,7 @@ export default function HomePage() {
 
             <div className="mt-9 flex flex-col items-center justify-center gap-4 sm:flex-row">
               <IdeabankButton href="/explore">Explore Ideas</IdeabankButton>
-              <IdeabankButton href="/share" variant="secondary">
+              <IdeabankButton href="/dashboard" variant="secondary">
                 Share an Idea
               </IdeabankButton>
             </div>
@@ -300,7 +300,7 @@ export default function HomePage() {
               A small observation could be the beginning of your next project.
             </p>
             <div className="mt-9">
-              <IdeabankButton href="/share" variant="cyan">
+              <IdeabankButton href="/dashboard" variant="cyan">
                 Share an Idea
               </IdeabankButton>
             </div>

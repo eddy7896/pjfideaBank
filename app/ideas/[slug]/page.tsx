@@ -77,7 +77,13 @@ export default async function IdeaDetailPage({
 
           <div className="mt-8 grid grid-cols-1 gap-10 lg:grid-cols-[1fr_1.1fr] lg:gap-14">
             <div>
-              <IdeaIllustration imageKey={idea.image} className="aspect-[4/3] w-full" iconClassName="h-20 w-20" />
+              <IdeaIllustration
+                imageKey={idea.image}
+                className="aspect-[4/3] w-full"
+                iconClassName="h-20 w-20"
+                priority
+                sizes="(min-width: 1024px) 560px, 90vw"
+              />
             </div>
 
             <div>
