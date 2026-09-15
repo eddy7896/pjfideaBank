@@ -28,9 +28,11 @@ export default function LoginPage() {
   const { login, loginStudent } = useAuthStore();
   const { teams, loadTeams } = useTeamStore();
 
+  const showDemoCredentials = process.env.NEXT_PUBLIC_SHOW_DEMO_CREDENTIALS === "true";
+
   useEffect(() => {
-    loadTeams();
-  }, [loadTeams]);
+    if (showDemoCredentials) loadTeams();
+  }, [showDemoCredentials, loadTeams]);
 
   // Teacher login
   const [email, setEmail] = useState("");
@@ -335,7 +337,7 @@ export default function LoginPage() {
               </form>
 
               {/* Demo Student Credentials */}
-              {teams.filter((t) => !t.pin.includes(":")).length > 0 && (
+              {showDemoCredentials && teams.filter((t) => !t.pin.includes(":")).length > 0 && (
                 <div className="space-y-3 border-t border-border/20 pt-6">
                   <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
                     Demo Teams
