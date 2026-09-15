@@ -50,6 +50,8 @@ export interface User {
   teamType?: string; // "student" or "teacher"
   geographyId?: string;
   subGeographyId?: string;
+  subGeographyIds?: string[];
+  schoolIds?: string[];
   assignedLeadUserId?: number;
   passwordHash?: string;
 }

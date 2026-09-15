@@ -25,6 +25,7 @@ model School {
   schoolUsers  User[]         @relation("UserSchool")
   teams        StudentTeam[]  @relation("StudentTeamSchoolById")
   ideas        Idea[]         @relation("IdeaSchoolById")
+  assignedUsers UserSchool[]
 
   @@index([subGeographyId])
 }
@@ -48,6 +49,7 @@ model User {
   subGeography        SubGeography?      @relation(fields: [subGeographyId], references: [id])
   school              School?            @relation("UserSchool", fields: [schoolId], references: [id], onDelete: SetNull)
   assignedSubGeos     UserSubGeography[]
+  assignedSchools     UserSchool[]
   createdBy           User?              @relation("UserCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
   createdUsers        User[]             @relation("UserCreatedBy")
   assignedLead        User?              @relation("AssignedLead", fields: [assignedLeadUserId], references: [id], onDelete: SetNull)
@@ -74,6 +76,24 @@ model UserSubGeography {
 
   @@id([userId, subGeographyId])
   @@index([subGeographyId])
+}
+
+// Many-to-many join so an instructor ("school" role) can be assigned to
+// several schools (a cluster), mirroring UserSubGeography's role for
+// geography-leads. Coexists with the legacy single `User.schoolId` /
+// `User.schoolName` fields; new multi-school assignments use this join,
+// with a single row inserted here for every pre-existing single-school
+// account so scoping has one consistent source to read from.
+model UserSchool {
+  userId    Int
+  schoolId  String
+  createdAt DateTime @default(now())
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  school School @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+
+  @@id([userId, schoolId])
+  @@index([schoolId])
 }
 
 model TeamMember {

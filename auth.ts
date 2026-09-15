@@ -34,12 +34,23 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           where: { email },
           include: {
             assignedSubGeos: { select: { subGeographyId: true } },
+            assignedSchools: { select: { schoolId: true } },
           },
         });
         if (!user || !user.passwordHash) return null;
 
         const ok = await verifyPassword(password, user.passwordHash);
         if (!ok) return null;
+
+        // Multi-school assignment (UserSchool) takes precedence; a legacy
+        // single-school account (schoolId set, no join rows yet) falls
+        // back to that one school so scoping always has something to read.
+        const schoolIds =
+          user.assignedSchools.length > 0
+            ? user.assignedSchools.map((j) => j.schoolId)
+            : user.schoolId
+              ? [user.schoolId]
+              : [];
 
         return {
           id: String(user.id),
@@ -51,6 +62,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           geographyId: user.geographyId,
           subGeographyId: user.subGeographyId,
           subGeographyIds: user.assignedSubGeos.map((j) => j.subGeographyId),
+          schoolIds,
         };
       },
     }),

@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo, useState, useCallback } from "react";
 import dynamic from "next/dynamic";
 import { motion } from "framer-motion";
 import {
@@ -19,9 +19,50 @@ import {
   computeIdeasByDay,
   computeIdeasByGeography,
 } from "@/lib/analytics";
-import { Users, Lightbulb, School as SchoolIcon, Users2, Info } from "lucide-react";
+import { HeatmapGrid } from "@/components/analytics/heatmap-grid";
+import { RosterTable } from "@/components/analytics/roster-table";
+import { AuditLogTable } from "@/components/analytics/audit-log-table";
+import { Users, Lightbulb, School as SchoolIcon, Users2, Info, Database, ShieldAlert } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { Role } from "@/types";
+
+const HEATMAP_ROW_HEADING: Record<string, string> = {
+  geography: "State",
+  subGeography: "District",
+  school: "School",
+};
+
+interface AnalyticsExtra {
+  heatmap: { rowKind: string; rows: string[]; cols: string[]; matrix: number[][] };
+  roster: {
+    id: number;
+    displayName: string;
+    email: string;
+    role: string;
+    scopeLabel: string;
+    ideaCount: number;
+    teamCount: number;
+  }[];
+  systemHealth?: {
+    recordCounts: Record<string, number>;
+    auditLog: {
+      entries: {
+        id: string;
+        actorId: string | null;
+        actorRole: string | null;
+        action: string;
+        entityType: string;
+        entityId: string | null;
+        schoolName: string | null;
+        createdAt: string;
+      }[];
+      total: number;
+      page: number;
+      pageSize: number;
+    };
+    auditByAction: { action: string; count: number }[];
+  };
+}
 
 // recharts is a meaningful chunk of JS that only this route needs - load it
 // only once a chart actually mounts, not as part of every dashboard visit.
@@ -110,8 +151,9 @@ function BentoCard({
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, delay: index * 0.04, ease: [0.16, 1, 0.3, 1] }}
+      className={spanClass}
     >
-      <Card className={cn("h-full border-border shadow-sm", spanClass, className)}>
+      <Card className={cn("h-full border-border shadow-sm", className)}>
         {(title || description) && (
           <CardHeader className="pb-2">
             {title && <CardTitle className="text-sm font-semibold">{title}</CardTitle>}
@@ -259,6 +301,36 @@ export default function AnalyticsPage() {
     [ideas, schools]
   );
 
+  const [extra, setExtra] = useState<AnalyticsExtra | null>(null);
+  const [extraLoading, setExtraLoading] = useState(true);
+  const [auditAction, setAuditAction] = useState("");
+  const [auditEntityType, setAuditEntityType] = useState("");
+  const [auditPage, setAuditPage] = useState(1);
+
+  const loadExtra = useCallback(async () => {
+    if (!currentUser) return;
+    setExtraLoading(true);
+    try {
+      const params = new URLSearchParams();
+      if (auditAction) params.set("auditAction", auditAction);
+      if (auditEntityType) params.set("auditEntityType", auditEntityType);
+      params.set("auditPage", String(auditPage));
+      const res = await fetch(`/api/dashboard/analytics?${params.toString()}`, {
+        credentials: "include",
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setExtra(data);
+      }
+    } finally {
+      setExtraLoading(false);
+    }
+  }, [currentUser, auditAction, auditEntityType, auditPage]);
+
+  useEffect(() => {
+    void loadExtra();
+  }, [loadExtra]);
+
   if (!currentUser || !allowedRoles.includes(currentUser.role)) {
     return (
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
@@ -274,7 +346,10 @@ export default function AnalyticsPage() {
   const role = currentUser.role;
   const copy = ROLE_COPY[role] ?? { headline: "Overview", subtitle: "" };
   const isSingleSchool = role === "school";
+  const schoolCount = currentUser.schoolIds?.length ?? (currentUser.schoolName ? 1 : 0);
   const showGeographyRollup = role === "super-admin" || role === "program-lead";
+  const hasRoster = ["super-admin", "program-lead", "geography-lead", "teacher-trainer"].includes(role);
+  const isSuperAdmin = role === "super-admin";
 
   const stageChartData = Object.entries(analytics.ideasByStatus).map(([status, count]) => ({
     status,
@@ -298,8 +373,13 @@ export default function AnalyticsPage() {
 
         {/* KPI strip */}
         <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-          {!isSingleSchool && (
-            <StatTile label="Schools" value={analytics.totalSchools} icon={SchoolIcon} index={0} />
+          {(!isSingleSchool || schoolCount > 1) && (
+            <StatTile
+              label={isSingleSchool ? "Your Schools" : "Schools"}
+              value={isSingleSchool ? schoolCount : analytics.totalSchools}
+              icon={SchoolIcon}
+              index={0}
+            />
           )}
           <StatTile label="Ideas" value={analytics.totalIdeas} icon={Lightbulb} index={1} />
           <StatTile label="Teams" value={analytics.totalTeams} icon={Users2} index={2} />
@@ -362,8 +442,8 @@ export default function AnalyticsPage() {
             <CategoryBarChart data={analytics.gradeDistribution} xKey="grade" valueLabel="Students" />
           </BentoCard>
 
-          {/* Ranked: schools — hidden for single-school role */}
-          {!isSingleSchool && (
+          {/* Ranked: schools — hidden for a single-school instructor, shown for multi-school ones */}
+          {(!isSingleSchool || schoolCount > 1) && (
             <BentoCard title="Top Schools" description="By ideas submitted" colSpan={2} index={6}>
               <RankedList
                 rows={analytics.ideasPerSchool.slice(0, 8).map((s) => ({
@@ -379,7 +459,7 @@ export default function AnalyticsPage() {
           <BentoCard
             title="Top Teams"
             description="By ideas submitted"
-            colSpan={isSingleSchool ? 4 : 2}
+            colSpan={isSingleSchool && schoolCount <= 1 ? 4 : 2}
             index={7}
           >
             <RankedList
@@ -390,7 +470,111 @@ export default function AnalyticsPage() {
               emptyLabel="No teams yet."
             />
           </BentoCard>
+
+          {/* Heatmap — territory x Design Thinking stage */}
+          <BentoCard
+            title="Stage Heatmap"
+            description={`Ideas by ${HEATMAP_ROW_HEADING[extra?.heatmap.rowKind ?? "school"].toLowerCase()} and stage`}
+            colSpan={4}
+            index={8}
+          >
+            {extraLoading && !extra ? (
+              <div className="h-40 animate-pulse rounded-lg bg-muted" />
+            ) : (
+              <HeatmapGrid
+                rows={extra?.heatmap.rows ?? []}
+                cols={extra?.heatmap.cols ?? []}
+                matrix={extra?.heatmap.matrix ?? []}
+                rowHeading={HEATMAP_ROW_HEADING[extra?.heatmap.rowKind ?? "school"]}
+                emptyLabel="No ideas in this scope yet."
+              />
+            )}
+          </BentoCard>
+
+          {/* Staff roster — geography-lead sees their TTs + instructors,
+              teacher-trainer sees their instructors, super-admin/program-lead see everyone. */}
+          {hasRoster && (
+            <BentoCard
+              title="Staff in Your Scope"
+              description="Teacher trainers and instructors reporting into this view, with their activity"
+              colSpan={4}
+              index={9}
+            >
+              {extraLoading && !extra ? (
+                <div className="h-40 animate-pulse rounded-lg bg-muted" />
+              ) : (
+                <RosterTable rows={extra?.roster ?? []} />
+              )}
+            </BentoCard>
+          )}
         </div>
+
+        {/* Technical / system health — super-admin only */}
+        {isSuperAdmin && (
+          <div className="space-y-4">
+            <div className="flex items-center gap-2">
+              <ShieldAlert className="h-5 w-5 text-muted-foreground" />
+              <h2 className="text-xl font-bold tracking-tight text-foreground">
+                System Health &amp; Maintenance
+              </h2>
+            </div>
+            <p className="text-sm text-muted-foreground">
+              Real record counts and the audit trail — nothing here is estimated or simulated.
+            </p>
+
+            <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+              {extra?.systemHealth &&
+                Object.entries(extra.systemHealth.recordCounts).map(([key, value], i) => (
+                  <StatTile
+                    key={key}
+                    label={key.replace(/([A-Z])/g, " $1").replace(/^./, (c) => c.toUpperCase())}
+                    value={value}
+                    icon={Database}
+                    index={i}
+                  />
+                ))}
+            </div>
+
+            <div className="grid grid-cols-1 gap-4 lg:grid-cols-4">
+              <BentoCard title="Top Audit Actions" colSpan={1} index={0}>
+                {extra?.systemHealth ? (
+                  <CategoryBarChart
+                    data={extra.systemHealth.auditByAction.map((a) => ({ action: a.action, count: a.count }))}
+                    xKey="action"
+                    angledLabels
+                  />
+                ) : (
+                  <div className="h-40 animate-pulse rounded-lg bg-muted" />
+                )}
+              </BentoCard>
+
+              <BentoCard title="Audit Log" description="Every recorded system action" colSpan={3} index={1}>
+                {extra?.systemHealth ? (
+                  <AuditLogTable
+                    entries={extra.systemHealth.auditLog.entries}
+                    total={extra.systemHealth.auditLog.total}
+                    page={extra.systemHealth.auditLog.page}
+                    pageSize={extra.systemHealth.auditLog.pageSize}
+                    actionFilter={auditAction}
+                    entityTypeFilter={auditEntityType}
+                    actionOptions={extra.systemHealth.auditByAction.map((a) => a.action)}
+                    onActionFilterChange={(v) => {
+                      setAuditAction(v);
+                      setAuditPage(1);
+                    }}
+                    onEntityTypeFilterChange={(v) => {
+                      setAuditEntityType(v);
+                      setAuditPage(1);
+                    }}
+                    onPageChange={setAuditPage}
+                  />
+                ) : (
+                  <div className="h-40 animate-pulse rounded-lg bg-muted" />
+                )}
+              </BentoCard>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

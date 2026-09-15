@@ -35,11 +35,11 @@ The system operates on a multi-tiered hierarchy. Below are the key roles and the
     * Access and view data strictly from the districts within their assigned Sub-Geography.
     * Oversee the performance and participation of schools under their jurisdiction.
 
-### 2.5 Schools (School Admin)
-* **Access Level:** School-specific
+### 2.5 Schools (School Admin / Instructor)
+* **Access Level:** School-specific — one school, or a cluster of schools for an instructor account assigned to several (via the `UserSchool` join table; legacy single-school accounts keep working off `User.schoolId`/`schoolName`).
 * **Responsibilities:**
     * Login/Register to access the School Dashboard.
-    * View school-specific analytics.
+    * View school-specific analytics (rolled up across every assigned school).
     * **CRUD Operations:** Create, Read, Update, and Delete student ideas/projects.
     * **Automation:** Upon creating a student idea, the system automatically generates a unique Team Login ID.
 

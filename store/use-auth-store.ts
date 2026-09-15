@@ -23,6 +23,8 @@ function sessionToUser(sessionUser: any): User | null {
     teamId: sessionUser.teamId ?? undefined,
     geographyId: sessionUser.geographyId ?? undefined,
     subGeographyId: sessionUser.subGeographyId ?? undefined,
+    subGeographyIds: sessionUser.subGeographyIds ?? undefined,
+    schoolIds: sessionUser.schoolIds ?? undefined,
   };
 }
 
