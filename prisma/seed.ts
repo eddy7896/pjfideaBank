@@ -71,6 +71,13 @@ async function main() {
     }),
   ]);
 
+  const schoolIdByName: Record<string, string> = {
+    'Springfield High': schools[0].id,
+    'Riverside Academy': schools[1].id,
+    'Oakwood School': schools[2].id,
+    'Maplewood Institute': schools[3].id,
+  };
+
   // Hash passwords for demo accounts
   const adminHash = await hashPassword('admin123');
   const springfieldHash = await hashPassword('school123');
@@ -94,7 +101,7 @@ async function main() {
     data: {
       id: 2,
       role: 'school',
-      schoolName: 'Springfield High',
+      schoolName: 'Springfield High', schoolId: schools[0].id,
       displayName: 'Springfield High Admin',
       email: 'school@springfield.edu',
       passwordHash: springfieldHash,
@@ -106,7 +113,7 @@ async function main() {
     data: {
       id: 3,
       role: 'school',
-      schoolName: 'Riverside Academy',
+      schoolName: 'Riverside Academy', schoolId: schools[1].id,
       displayName: 'Riverside Academy Admin',
       email: 'school@riverside.edu',
       passwordHash: riversideHash,
@@ -132,7 +139,7 @@ async function main() {
         id: 'TM-DEMO01',
         pin: 'pin001',
         name: 'Green Sparks',
-        schoolName: 'Springfield High',
+        schoolName: 'Springfield High', schoolId: schools[0].id,
         members: {
           create: [
             { id: 'mem-1', name: 'Alice Johnson', grade: '10', contactNumber: '555-1001', gender: 'Female' },
@@ -148,7 +155,7 @@ async function main() {
         id: 'TM-DEMO02',
         pin: 'pin002',
         name: 'Tech Pioneers',
-        schoolName: 'Springfield High',
+        schoolName: 'Springfield High', schoolId: schools[0].id,
         members: {
           create: [
             { id: 'mem-4', name: 'David Brown', grade: '11', contactNumber: '555-1004', gender: 'Male' },
@@ -163,7 +170,7 @@ async function main() {
         id: 'TM-DEMO03',
         pin: 'pin003',
         name: 'Code Wizards',
-        schoolName: 'Riverside Academy',
+        schoolName: 'Riverside Academy', schoolId: schools[1].id,
         members: {
           create: [
             { id: 'mem-6', name: 'Frank Miller', grade: '9', contactNumber: '555-1006', gender: 'Male' },
@@ -180,7 +187,7 @@ async function main() {
         id: 'TM-DEMO04',
         pin: 'pin004',
         name: 'SafeWalk Crew',
-        schoolName: 'Oakwood School',
+        schoolName: 'Oakwood School', schoolId: schools[2].id,
         members: {
           create: [
             { id: 'mem-10', name: 'Jack Wilson', grade: '8', contactNumber: '555-1010', gender: 'Male' },
@@ -195,7 +202,7 @@ async function main() {
         id: 'TM-DEMO05',
         pin: 'pin005',
         name: 'MindMatters',
-        schoolName: 'Maplewood Institute',
+        schoolName: 'Maplewood Institute', schoolId: schools[3].id,
         members: {
           create: [
             { id: 'mem-12', name: 'Luke Anderson', grade: '11', contactNumber: '555-1012', gender: 'Male' },
@@ -211,7 +218,7 @@ async function main() {
         id: 'TM-DEMO06',
         pin: 'pin006',
         name: 'AquaSavers',
-        schoolName: 'Riverside Academy',
+        schoolName: 'Riverside Academy', schoolId: schools[1].id,
         members: {
           create: [
             { id: 'mem-15', name: 'Olivia White', grade: '10', contactNumber: '555-1015', gender: 'Female' },
@@ -226,7 +233,7 @@ async function main() {
         id: 'TM-DEMO07',
         pin: 'pin007',
         name: 'PixelPaint',
-        schoolName: 'Oakwood School',
+        schoolName: 'Oakwood School', schoolId: schools[2].id,
         members: {
           create: [
             { id: 'mem-17', name: 'Quinn Martin', grade: '11', contactNumber: '555-1017', gender: 'Female' },
@@ -242,7 +249,7 @@ async function main() {
         id: 'TM-DEMO08',
         pin: 'pin008',
         name: 'VisionaryVR',
-        schoolName: 'Maplewood Institute',
+        schoolName: 'Maplewood Institute', schoolId: schools[3].id,
         members: {
           create: [
             { id: 'mem-20', name: 'Tina Nelson', grade: '10', contactNumber: '555-1020', gender: 'Female' },
@@ -257,7 +264,7 @@ async function main() {
         id: 'TM-DEMO09',
         pin: 'pin009',
         name: 'RouteOptimizers',
-        schoolName: 'Springfield High',
+        schoolName: 'Springfield High', schoolId: schools[0].id,
         members: {
           create: [
             { id: 'mem-22', name: 'Victor Lopez', grade: '12', contactNumber: '555-1022', gender: 'Male' },
@@ -273,7 +280,7 @@ async function main() {
         id: 'TM-DEMO10',
         pin: 'pin010',
         name: 'EqualAccess',
-        schoolName: 'Riverside Academy',
+        schoolName: 'Riverside Academy', schoolId: schools[1].id,
         members: {
           create: [
             { id: 'mem-25', name: 'Yara Green', grade: '9', contactNumber: '555-1025', gender: 'Female' },
@@ -289,7 +296,7 @@ async function main() {
         id: 'TM-DEMO11',
         pin: 'pin011',
         name: 'OrbitLab',
-        schoolName: 'Oakwood School',
+        schoolName: 'Oakwood School', schoolId: schools[2].id,
         members: {
           create: [
             { id: 'mem-28', name: 'Benjamin Cox', grade: '12', contactNumber: '555-1028', gender: 'Male' },
@@ -304,7 +311,7 @@ async function main() {
         id: 'TM-DEMO12',
         pin: 'pin012',
         name: 'GoalGetters',
-        schoolName: 'Maplewood Institute',
+        schoolName: 'Maplewood Institute', schoolId: schools[3].id,
         members: {
           create: [
             { id: 'mem-30', name: 'Dylan Foster', grade: '10', contactNumber: '555-1030', gender: 'Male' },
@@ -322,7 +329,7 @@ async function main() {
     prisma.idea.create({
       data: {
         id: '1',
-        schoolName: 'Springfield High',
+        schoolName: 'Springfield High', schoolId: schools[0].id,
         title: 'Solar Powered Desk Lamps',
         theme: 'February: Sustainability',
         teamId: 'TM-DEMO01',
@@ -330,14 +337,14 @@ async function main() {
         problemStatement: 'Classrooms lack natural light during winter months, forcing schools to rely on grid electricity. This increases energy costs and carbon footprint for under-funded schools.',
         targetAudience: 'Students and school administrators',
         status: 'Ideate',
-        lastUpdated: '2026-05-01',
+        lastUpdated: '2026-05-01T00:00:00.000Z',
         stageData: {},
       },
     }),
     prisma.idea.create({
       data: {
         id: '2',
-        schoolName: 'Riverside Academy',
+        schoolName: 'Riverside Academy', schoolId: schools[1].id,
         title: 'AI Homework Helper Chatbot',
         theme: 'March: EdTech',
         teamId: 'TM-DEMO03',
@@ -345,14 +352,14 @@ async function main() {
         problemStatement: 'Students often struggle with homework after school hours when teachers are unavailable. A guided AI tutor could provide hints and explanations without giving away answers.',
         targetAudience: 'Middle school students (ages 11-14)',
         status: 'Prototype',
-        lastUpdated: '2026-04-28',
+        lastUpdated: '2026-04-28T00:00:00.000Z',
         stageData: {},
       },
     }),
     prisma.idea.create({
       data: {
         id: '3',
-        schoolName: 'Oakwood School',
+        schoolName: 'Oakwood School', schoolId: schools[2].id,
         title: 'Neighborhood Safety Mapping App',
         theme: 'January: Local Problems',
         teamId: 'TM-DEMO04',
@@ -360,14 +367,14 @@ async function main() {
         problemStatement: 'Students walking to school face unsafe intersections and poorly lit areas. Parents need a community-sourced map of safe routes.',
         targetAudience: 'Parents and young students',
         status: 'Define',
-        lastUpdated: '2026-04-25',
+        lastUpdated: '2026-04-25T00:00:00.000Z',
         stageData: {},
       },
     }),
     prisma.idea.create({
       data: {
         id: '4',
-        schoolName: 'Maplewood Institute',
+        schoolName: 'Maplewood Institute', schoolId: schools[3].id,
         title: 'Mental Health Check-In Kiosk',
         theme: 'April: Health',
         teamId: 'TM-DEMO05',
@@ -375,14 +382,14 @@ async function main() {
         problemStatement: 'Teens hesitate to seek mental health help due to stigma. An anonymous check-in kiosk in school lobbies can prompt self-assessment and connect students with resources.',
         targetAudience: 'High school students (ages 14-18)',
         status: 'Test',
-        lastUpdated: '2026-05-03',
+        lastUpdated: '2026-05-03T00:00:00.000Z',
         stageData: {},
       },
     }),
     prisma.idea.create({
       data: {
         id: '5',
-        schoolName: 'Springfield High',
+        schoolName: 'Springfield High', schoolId: schools[0].id,
         title: 'Community Skill-Share Platform',
         theme: 'May: Community',
         teamId: 'TM-DEMO02',
@@ -390,14 +397,14 @@ async function main() {
         problemStatement: 'Local artisans and retirees have valuable skills but no platform to share them with younger generations. A matchmaking app could pair mentors with learners.',
         targetAudience: 'Community members of all ages',
         status: 'Empathize',
-        lastUpdated: '2026-05-02',
+        lastUpdated: '2026-05-02T00:00:00.000Z',
         stageData: {},
       },
     }),
     prisma.idea.create({
       data: {
         id: '6',
-        schoolName: 'Riverside Academy',
+        schoolName: 'Riverside Academy', schoolId: schools[1].id,
         title: 'Rainwater Harvesting Tracker',
         theme: 'June: Climate',
         teamId: 'TM-DEMO06',
@@ -405,14 +412,14 @@ async function main() {
         problemStatement: 'Schools waste thousands of gallons of rainwater annually. A sensor-based tracking system can measure collection and distribution to school gardens.',
         targetAudience: 'School facility managers and eco-clubs',
         status: 'Ideate',
-        lastUpdated: '2026-04-30',
+        lastUpdated: '2026-04-30T00:00:00.000Z',
         stageData: {},
       },
     }),
     prisma.idea.create({
       data: {
         id: '7',
-        schoolName: 'Oakwood School',
+        schoolName: 'Oakwood School', schoolId: schools[2].id,
         title: 'Interactive Mural Design Tool',
         theme: 'July: Arts',
         teamId: 'TM-DEMO07',
@@ -420,14 +427,14 @@ async function main() {
         problemStatement: 'School walls are blank and uninspiring. An AR tool that lets students design and preview murals before painting would increase engagement and reduce wasted paint.',
         targetAudience: 'Art students and school councils',
         status: 'Prototype',
-        lastUpdated: '2026-04-22',
+        lastUpdated: '2026-04-22T00:00:00.000Z',
         stageData: {},
       },
     }),
     prisma.idea.create({
       data: {
         id: '8',
-        schoolName: 'Maplewood Institute',
+        schoolName: 'Maplewood Institute', schoolId: schools[3].id,
         title: 'Future Careers VR Explorer',
         theme: 'August: Future of Work',
         teamId: 'TM-DEMO08',
@@ -435,14 +442,14 @@ async function main() {
         problemStatement: 'Students lack exposure to emerging careers in AI, biotech, and renewable energy. A VR experience simulating a day in these careers can inspire informed choices.',
         targetAudience: 'High school career counselors and students',
         status: 'Empathize',
-        lastUpdated: '2026-05-04',
+        lastUpdated: '2026-05-04T00:00:00.000Z',
         stageData: {},
       },
     }),
     prisma.idea.create({
       data: {
         id: '9',
-        schoolName: 'Springfield High',
+        schoolName: 'Springfield High', schoolId: schools[0].id,
         title: 'Smart School Bus Routing',
         theme: 'September: Transportation',
         teamId: 'TM-DEMO09',
@@ -450,14 +457,14 @@ async function main() {
         problemStatement: 'School buses follow outdated fixed routes, wasting fuel and time. An algorithm-based routing system could reduce travel time by 30% and cut emissions.',
         targetAudience: 'School transport departments',
         status: 'Define',
-        lastUpdated: '2026-04-27',
+        lastUpdated: '2026-04-27T00:00:00.000Z',
         stageData: {},
       },
     }),
     prisma.idea.create({
       data: {
         id: '10',
-        schoolName: 'Riverside Academy',
+        schoolName: 'Riverside Academy', schoolId: schools[1].id,
         title: 'Accessibility Audit Toolkit',
         theme: 'October: Social Justice',
         teamId: 'TM-DEMO10',
@@ -465,14 +472,14 @@ async function main() {
         problemStatement: 'Many public buildings fail to meet accessibility standards. A student-led audit toolkit with checklists and photo evidence can push for improvements.',
         targetAudience: 'Local government and disability advocates',
         status: 'Ideate',
-        lastUpdated: '2026-04-29',
+        lastUpdated: '2026-04-29T00:00:00.000Z',
         stageData: {},
       },
     }),
     prisma.idea.create({
       data: {
         id: '11',
-        schoolName: 'Oakwood School',
+        schoolName: 'Oakwood School', schoolId: schools[2].id,
         title: 'Mini Satellite Weather Station',
         theme: 'November: Space',
         teamId: 'TM-DEMO11',
@@ -480,14 +487,14 @@ async function main() {
         problemStatement: 'Rural areas lack accurate hyperlocal weather data. Student-built mini satellite ground stations can fill gaps left by national weather services.',
         targetAudience: 'Farmers and rural communities',
         status: 'Test',
-        lastUpdated: '2026-05-01',
+        lastUpdated: '2026-05-01T00:00:00.000Z',
         stageData: {},
       },
     }),
     prisma.idea.create({
       data: {
         id: '12',
-        schoolName: 'Maplewood Institute',
+        schoolName: 'Maplewood Institute', schoolId: schools[3].id,
         title: 'SDG Progress Dashboard',
         theme: 'December: Global Goals',
         teamId: 'TM-DEMO12',
@@ -495,20 +502,21 @@ async function main() {
         problemStatement: 'Students learn about the UN SDGs in theory but have no way to track local progress. A visual dashboard mapping community projects to SDGs can bridge this gap.',
         targetAudience: 'Teachers, students, and local NGOs',
         status: 'Empathize',
-        lastUpdated: '2026-05-03',
+        lastUpdated: '2026-05-03T00:00:00.000Z',
         stageData: {},
       },
     }),
   ]);
 
   // Create theme activities
+  const scheduledDate = (year: number, month: number, date: number) =>
+    new Date(Date.UTC(year, month - 1, date));
+
   await prisma.themeActivity.createMany({
     data: [
       {
         id: 'act-1',
-        date: 5,
-        month: 1,
-        year: 2026,
+        scheduledDate: scheduledDate(2026, 1, 5),
         title: 'Local Problem Identification Workshop',
         theme: 'January: Local Problems',
         schoolName: 'Oakwood School',
@@ -516,9 +524,7 @@ async function main() {
       },
       {
         id: 'act-2',
-        date: 12,
-        month: 2,
-        year: 2026,
+        scheduledDate: scheduledDate(2026, 2, 12),
         title: 'Sustainability Challenge',
         theme: 'February: Sustainability',
         schoolName: 'Springfield High',
@@ -526,9 +532,7 @@ async function main() {
       },
       {
         id: 'act-3',
-        date: 18,
-        month: 3,
-        year: 2026,
+        scheduledDate: scheduledDate(2026, 3, 18),
         title: 'EdTech Innovation Day',
         theme: 'March: EdTech',
         schoolName: 'Riverside Academy',
@@ -536,9 +540,7 @@ async function main() {
       },
       {
         id: 'act-4',
-        date: 9,
-        month: 4,
-        year: 2026,
+        scheduledDate: scheduledDate(2026, 4, 9),
         title: 'Health & Wellness Expo',
         theme: 'April: Health',
         schoolName: 'Maplewood Institute',
@@ -546,9 +548,7 @@ async function main() {
       },
       {
         id: 'act-5',
-        date: 20,
-        month: 5,
-        year: 2026,
+        scheduledDate: scheduledDate(2026, 5, 20),
         title: 'Community Connection Forum',
         theme: 'May: Community',
         schoolName: 'Springfield High',
@@ -556,9 +556,7 @@ async function main() {
       },
       {
         id: 'act-6',
-        date: 15,
-        month: 6,
-        year: 2026,
+        scheduledDate: scheduledDate(2026, 6, 15),
         title: 'Climate Action Projects',
         theme: 'June: Climate',
         schoolName: 'Riverside Academy',
@@ -566,9 +564,7 @@ async function main() {
       },
       {
         id: 'act-7',
-        date: 22,
-        month: 7,
-        year: 2026,
+        scheduledDate: scheduledDate(2026, 7, 22),
         title: 'Arts & Culture Showcase',
         theme: 'July: Arts',
         schoolName: 'Oakwood School',
@@ -576,9 +572,7 @@ async function main() {
       },
       {
         id: 'act-8',
-        date: 28,
-        month: 8,
-        year: 2026,
+        scheduledDate: scheduledDate(2026, 8, 28),
         title: 'Future Careers Conference',
         theme: 'August: Future of Work',
         schoolName: 'Maplewood Institute',
@@ -586,9 +580,7 @@ async function main() {
       },
       {
         id: 'act-9',
-        date: 10,
-        month: 9,
-        year: 2026,
+        scheduledDate: scheduledDate(2026, 9, 10),
         title: 'Transportation Solutions Sprint',
         theme: 'September: Transportation',
         schoolName: 'Springfield High',
@@ -596,9 +588,7 @@ async function main() {
       },
       {
         id: 'act-10',
-        date: 16,
-        month: 10,
-        year: 2026,
+        scheduledDate: scheduledDate(2026, 10, 16),
         title: 'Social Justice Awareness Week',
         theme: 'October: Social Justice',
         schoolName: 'Riverside Academy',
@@ -606,9 +596,7 @@ async function main() {
       },
       {
         id: 'act-11',
-        date: 8,
-        month: 11,
-        year: 2026,
+        scheduledDate: scheduledDate(2026, 11, 8),
         title: 'Space & STEM Exploration',
         theme: 'November: Space',
         schoolName: 'Oakwood School',
@@ -616,9 +604,7 @@ async function main() {
       },
       {
         id: 'act-12',
-        date: 3,
-        month: 12,
-        year: 2026,
+        scheduledDate: scheduledDate(2026, 12, 3),
         title: 'UN SDG Goals Forum',
         theme: 'December: Global Goals',
         schoolName: 'Maplewood Institute',
