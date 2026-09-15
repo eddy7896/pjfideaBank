@@ -3,6 +3,7 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import type { ThemeMonth } from "@/types";
+import { fetchWithRetry } from "@/lib/fetch-with-retry";
 
 interface ThemeStore {
   themes: ThemeMonth[];
@@ -22,7 +23,7 @@ export const useThemeStore = create<ThemeStore>()(
 
   loadThemes: async () => {
     try {
-      const res = await fetch("/api/themes", { credentials: "include" });
+      const res = await fetchWithRetry("/api/themes", { credentials: "include" });
       if (res.ok) {
         const data = (await res.json()) as Array<ThemeMonth & { id?: string; sortOrder?: number }>;
         set({ themes: data.map(({ id: _id, sortOrder: _o, ...t }) => t as ThemeMonth), isLoaded: true });

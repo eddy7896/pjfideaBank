@@ -6,21 +6,27 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import type { DefineData } from "@/types";
-import { X, Plus, AlertCircle } from "lucide-react";
+import { X, Plus, AlertCircle, FileClock } from "lucide-react";
+import { readDraft, clearDraft } from "@/lib/draft-storage";
+import { useDraftAutosave } from "@/hooks/use-draft-autosave";
 
 interface DefineFormProps {
   initialData?: DefineData;
   onSubmit: (data: DefineData) => void;
   isLoading?: boolean;
+  draftKey?: string;
 }
 
-export function DefineForm({ initialData, onSubmit, isLoading }: DefineFormProps) {
-  const [problemStatement, setProblemStatement] = useState(initialData?.problemStatement || "");
-  const [userPersona, setUserPersona] = useState(initialData?.userPersona || "");
-  const [needStatement, setNeedStatement] = useState(initialData?.needStatement || "");
-  const [insights, setInsights] = useState<string[]>(initialData?.insights || []);
+export function DefineForm({ initialData, onSubmit, isLoading, draftKey }: DefineFormProps) {
+  const draft = draftKey ? readDraft<DefineData>(draftKey) : null;
+  const [problemStatement, setProblemStatement] = useState(draft?.problemStatement ?? initialData?.problemStatement ?? "");
+  const [userPersona, setUserPersona] = useState(draft?.userPersona ?? initialData?.userPersona ?? "");
+  const [needStatement, setNeedStatement] = useState(draft?.needStatement ?? initialData?.needStatement ?? "");
+  const [insights, setInsights] = useState<string[]>(draft?.insights ?? initialData?.insights ?? []);
   const [newInsight, setNewInsight] = useState("");
   const [errors, setErrors] = useState<string[]>([]);
+
+  useDraftAutosave(draftKey, { problemStatement, userPersona, needStatement, insights });
 
   const validate = (): boolean => {
     const newErrors: string[] = [];
@@ -40,6 +46,7 @@ export function DefineForm({ initialData, onSubmit, isLoading }: DefineFormProps
         needStatement: needStatement.trim(),
         insights: insights.filter((i) => i.trim()).map((i) => i.trim()),
       });
+      if (draftKey) clearDraft(draftKey);
     }
   };
 
@@ -56,6 +63,12 @@ export function DefineForm({ initialData, onSubmit, isLoading }: DefineFormProps
 
   return (
     <div className="space-y-6">
+      {draft && (
+        <div className="flex items-center gap-2 rounded-lg border border-status-pending-border bg-status-pending-soft px-4 py-2.5 text-sm text-status-pending">
+          <FileClock className="h-4 w-4 shrink-0" />
+          Unsaved work from earlier was restored.
+        </div>
+      )}
       <div className="space-y-2">
         <Label htmlFor="problem" className="text-base font-semibold">
           How Might We (HMW) Statement

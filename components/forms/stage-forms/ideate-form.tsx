@@ -13,24 +13,30 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import type { IdeateData } from "@/types";
-import { X, Plus, AlertCircle } from "lucide-react";
+import { X, Plus, AlertCircle, FileClock } from "lucide-react";
+import { readDraft, clearDraft } from "@/lib/draft-storage";
+import { useDraftAutosave } from "@/hooks/use-draft-autosave";
 
 interface IdeateFormProps {
   initialData?: IdeateData;
   onSubmit: (data: IdeateData) => void;
   isLoading?: boolean;
+  draftKey?: string;
 }
 
-export function IdeateForm({ initialData, onSubmit, isLoading }: IdeateFormProps) {
+export function IdeateForm({ initialData, onSubmit, isLoading, draftKey }: IdeateFormProps) {
+  const draft = draftKey ? readDraft<IdeateData>(draftKey) : null;
   const [brainstormIdeas, setBrainstormIdeas] = useState<string[]>(
-    initialData?.brainstormIdeas || []
+    draft?.brainstormIdeas ?? initialData?.brainstormIdeas ?? []
   );
   const [newIdea, setNewIdea] = useState("");
-  const [selectedIdea, setSelectedIdea] = useState(initialData?.selectedIdea || "");
-  const [selectionReason, setSelectionReason] = useState(initialData?.selectionReason || "");
-  const [constraints, setConstraints] = useState<string[]>(initialData?.constraints || []);
+  const [selectedIdea, setSelectedIdea] = useState(draft?.selectedIdea ?? initialData?.selectedIdea ?? "");
+  const [selectionReason, setSelectionReason] = useState(draft?.selectionReason ?? initialData?.selectionReason ?? "");
+  const [constraints, setConstraints] = useState<string[]>(draft?.constraints ?? initialData?.constraints ?? []);
   const [newConstraint, setNewConstraint] = useState("");
   const [errors, setErrors] = useState<string[]>([]);
+
+  useDraftAutosave(draftKey, { brainstormIdeas, selectedIdea, selectionReason, constraints });
 
   const validate = (): boolean => {
     const newErrors: string[] = [];
@@ -49,6 +55,7 @@ export function IdeateForm({ initialData, onSubmit, isLoading }: IdeateFormProps
         selectionReason: selectionReason.trim(),
         constraints: constraints.filter((c) => c.trim()).map((c) => c.trim()),
       });
+      if (draftKey) clearDraft(draftKey);
     }
   };
 
@@ -79,6 +86,12 @@ export function IdeateForm({ initialData, onSubmit, isLoading }: IdeateFormProps
 
   return (
     <div className="space-y-6">
+      {draft && (
+        <div className="flex items-center gap-2 rounded-lg border border-status-pending-border bg-status-pending-soft px-4 py-2.5 text-sm text-status-pending">
+          <FileClock className="h-4 w-4 shrink-0" />
+          Unsaved work from earlier was restored.
+        </div>
+      )}
       <div className="rounded-xl border border-border/50 bg-card p-5">
         <h3 className="mb-4 text-base font-semibold">
           Brainstorm Ideas (min 3 required)

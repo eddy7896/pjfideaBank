@@ -5,20 +5,26 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import type { TestData } from "@/types";
-import { AlertCircle, AlertTriangle } from "lucide-react";
+import { AlertCircle, AlertTriangle, FileClock } from "lucide-react";
+import { readDraft, clearDraft } from "@/lib/draft-storage";
+import { useDraftAutosave } from "@/hooks/use-draft-autosave";
 
 interface TestFormProps {
   initialData?: TestData;
   onSubmit: (data: TestData) => void;
   isLoading?: boolean;
+  draftKey?: string;
 }
 
-export function TestForm({ initialData, onSubmit, isLoading }: TestFormProps) {
-  const [testPlan, setTestPlan] = useState(initialData?.testPlan || "");
-  const [results, setResults] = useState(initialData?.results || "");
-  const [passed, setPassed] = useState(initialData?.passed ?? true);
-  const [failureNotes, setFailureNotes] = useState(initialData?.failureNotes || "");
+export function TestForm({ initialData, onSubmit, isLoading, draftKey }: TestFormProps) {
+  const draft = draftKey ? readDraft<TestData>(draftKey) : null;
+  const [testPlan, setTestPlan] = useState(draft?.testPlan ?? initialData?.testPlan ?? "");
+  const [results, setResults] = useState(draft?.results ?? initialData?.results ?? "");
+  const [passed, setPassed] = useState(draft?.passed ?? initialData?.passed ?? true);
+  const [failureNotes, setFailureNotes] = useState(draft?.failureNotes ?? initialData?.failureNotes ?? "");
   const [errors, setErrors] = useState<string[]>([]);
+
+  useDraftAutosave(draftKey, { testPlan, results, passed, failureNotes });
 
   const validate = (): boolean => {
     const newErrors: string[] = [];
@@ -37,11 +43,18 @@ export function TestForm({ initialData, onSubmit, isLoading }: TestFormProps) {
         passed,
         failureNotes: !passed ? failureNotes.trim() : undefined,
       });
+      if (draftKey) clearDraft(draftKey);
     }
   };
 
   return (
     <div className="space-y-6">
+      {draft && (
+        <div className="flex items-center gap-2 rounded-lg border border-status-pending-border bg-status-pending-soft px-4 py-2.5 text-sm text-status-pending">
+          <FileClock className="h-4 w-4 shrink-0" />
+          Unsaved work from earlier was restored.
+        </div>
+      )}
       <div className="space-y-2">
         <Label htmlFor="plan" className="text-base font-semibold">
           Testing Plan

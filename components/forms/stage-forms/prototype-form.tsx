@@ -6,21 +6,27 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import type { PrototypeData, IterationEntry } from "@/types";
-import { X, Plus, AlertCircle } from "lucide-react";
+import { X, Plus, AlertCircle, FileClock } from "lucide-react";
+import { readDraft, clearDraft } from "@/lib/draft-storage";
+import { useDraftAutosave } from "@/hooks/use-draft-autosave";
 
 interface PrototypeFormProps {
   initialData?: PrototypeData;
   onSubmit: (data: PrototypeData) => void;
   isLoading?: boolean;
+  draftKey?: string;
 }
 
-export function PrototypeForm({ initialData, onSubmit, isLoading }: PrototypeFormProps) {
-  const [toolsRequired, setToolsRequired] = useState<string[]>(initialData?.toolsRequired || []);
+export function PrototypeForm({ initialData, onSubmit, isLoading, draftKey }: PrototypeFormProps) {
+  const draft = draftKey ? readDraft<PrototypeData>(draftKey) : null;
+  const [toolsRequired, setToolsRequired] = useState<string[]>(draft?.toolsRequired ?? initialData?.toolsRequired ?? []);
   const [newTool, setNewTool] = useState("");
-  const [steps, setSteps] = useState<string[]>(initialData?.steps || []);
+  const [steps, setSteps] = useState<string[]>(draft?.steps ?? initialData?.steps ?? []);
   const [newStep, setNewStep] = useState("");
-  const [iterations, setIterations] = useState<IterationEntry[]>(initialData?.iterations || []);
+  const [iterations, setIterations] = useState<IterationEntry[]>(draft?.iterations ?? initialData?.iterations ?? []);
   const [errors, setErrors] = useState<string[]>([]);
+
+  useDraftAutosave(draftKey, { toolsRequired, steps, iterations });
 
   const validate = (): boolean => {
     const newErrors: string[] = [];
@@ -37,6 +43,7 @@ export function PrototypeForm({ initialData, onSubmit, isLoading }: PrototypeFor
         steps: steps.filter((s) => s.trim()),
         iterations,
       });
+      if (draftKey) clearDraft(draftKey);
     }
   };
 
@@ -90,6 +97,12 @@ export function PrototypeForm({ initialData, onSubmit, isLoading }: PrototypeFor
 
   return (
     <div className="space-y-6">
+      {draft && (
+        <div className="flex items-center gap-2 rounded-lg border border-status-pending-border bg-status-pending-soft px-4 py-2.5 text-sm text-status-pending">
+          <FileClock className="h-4 w-4 shrink-0" />
+          Unsaved work from earlier was restored.
+        </div>
+      )}
       <div className="rounded-xl border border-border/50 bg-card p-5">
         <h3 className="mb-4 text-base font-semibold">Tools & Materials Required</h3>
         <div className="space-y-3">

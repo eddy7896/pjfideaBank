@@ -2,6 +2,7 @@
 
 import { create } from "zustand";
 import type { StudentTeam, TeamMember } from "@/types";
+import { fetchWithRetry } from "@/lib/fetch-with-retry";
 
 interface TeamState {
   teams: StudentTeam[];
@@ -36,7 +37,7 @@ export const useTeamStore = create<TeamState>((set, get) => ({
 
   loadTeams: async () => {
     try {
-      const res = await fetch("/api/teams", { credentials: "include" });
+      const res = await fetchWithRetry("/api/teams", { credentials: "include" });
       if (res.ok) {
         const data = await res.json();
         set({ teams: data, isLoaded: true });

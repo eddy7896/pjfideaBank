@@ -6,23 +6,29 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import type { EmpathizeData } from "@/types";
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, FileClock } from "lucide-react";
+import { readDraft, clearDraft } from "@/lib/draft-storage";
+import { useDraftAutosave } from "@/hooks/use-draft-autosave";
 
 interface EmpathizeFormProps {
   initialData?: EmpathizeData;
   onSubmit: (data: EmpathizeData) => void;
   isLoading?: boolean;
+  draftKey?: string;
 }
 
-export function EmpathizeForm({ initialData, onSubmit, isLoading }: EmpathizeFormProps) {
-  const [what, setWhat] = useState(initialData?.what || "");
-  const [when, setWhen] = useState(initialData?.when || "");
-  const [where, setWhere] = useState(initialData?.where || "");
-  const [who, setWho] = useState(initialData?.who || "");
-  const [how, setHow] = useState(initialData?.how || "");
-  const [whys, setWhys] = useState<string[]>(initialData?.whys || ["", "", "", "", ""]);
-  const [rootCause, setRootCause] = useState(initialData?.rootCause || "");
+export function EmpathizeForm({ initialData, onSubmit, isLoading, draftKey }: EmpathizeFormProps) {
+  const draft = draftKey ? readDraft<EmpathizeData>(draftKey) : null;
+  const [what, setWhat] = useState(draft?.what ?? initialData?.what ?? "");
+  const [when, setWhen] = useState(draft?.when ?? initialData?.when ?? "");
+  const [where, setWhere] = useState(draft?.where ?? initialData?.where ?? "");
+  const [who, setWho] = useState(draft?.who ?? initialData?.who ?? "");
+  const [how, setHow] = useState(draft?.how ?? initialData?.how ?? "");
+  const [whys, setWhys] = useState<string[]>(draft?.whys ?? initialData?.whys ?? ["", "", "", "", ""]);
+  const [rootCause, setRootCause] = useState(draft?.rootCause ?? initialData?.rootCause ?? "");
   const [errors, setErrors] = useState<string[]>([]);
+
+  useDraftAutosave(draftKey, { what, when, where, who, how, whys, rootCause });
 
   const validate = (): boolean => {
     const newErrors: string[] = [];
@@ -48,6 +54,7 @@ export function EmpathizeForm({ initialData, onSubmit, isLoading }: EmpathizeFor
         whys: whys.map((w) => w.trim()),
         rootCause: rootCause.trim(),
       });
+      if (draftKey) clearDraft(draftKey);
     }
   };
 
@@ -59,6 +66,12 @@ export function EmpathizeForm({ initialData, onSubmit, isLoading }: EmpathizeFor
 
   return (
     <div className="space-y-6">
+      {draft && (
+        <div className="flex items-center gap-2 rounded-lg border border-status-pending-border bg-status-pending-soft px-4 py-2.5 text-sm text-status-pending">
+          <FileClock className="h-4 w-4 shrink-0" />
+          Unsaved work from earlier was restored.
+        </div>
+      )}
       <div className="space-y-2">
         <Label htmlFor="what" className="text-base font-semibold">
           What is the problem?

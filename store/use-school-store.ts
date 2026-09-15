@@ -2,6 +2,7 @@
 
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
+import { fetchWithRetry } from "@/lib/fetch-with-retry";
 
 export type SchoolRow = {
   id: string;
@@ -45,7 +46,7 @@ export const useSchoolStore = create<SchoolState>()(
       isLoaded: false,
       loadSchools: async () => {
         try {
-          const res = await fetch("/api/schools", { credentials: "include" });
+          const res = await fetchWithRetry("/api/schools", { credentials: "include" });
           if (res.ok) {
             const data = (await res.json()) as SchoolRow[];
             set({ schools: data, isLoaded: true });

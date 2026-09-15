@@ -2,6 +2,7 @@
 
 import { create } from "zustand";
 import type { ThemeActivity } from "@/types";
+import { fetchWithRetry } from "@/lib/fetch-with-retry";
 
 interface ActivityState {
   activities: ThemeActivity[];
@@ -22,7 +23,7 @@ export const useActivityStore = create<ActivityState>((set, get) => ({
       if (month !== undefined) params.append("month", month.toString());
       if (year !== undefined) params.append("year", year.toString());
 
-      const res = await fetch(`/api/activities?${params}`);
+      const res = await fetchWithRetry(`/api/activities?${params}`);
       if (res.ok) {
         const data = await res.json();
         set({ activities: data, isLoaded: true });

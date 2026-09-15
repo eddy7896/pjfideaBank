@@ -39,6 +39,7 @@ const getNextStage = (current: DesignThinkingStatus): DesignThinkingStatus | nul
 
 const getFormComponent = (stage: DesignThinkingStatus, idea: Idea, onSubmit: any) => {
   const stageData = idea.stageData[stage];
+  const draftKey = `pijam-draft-${idea.id}-${stage}`;
 
   switch (stage) {
     case "Empathize":
@@ -46,6 +47,7 @@ const getFormComponent = (stage: DesignThinkingStatus, idea: Idea, onSubmit: any
         <EmpathizeForm
           initialData={stageData as any}
           onSubmit={onSubmit}
+          draftKey={draftKey}
         />
       );
     case "Define":
@@ -53,6 +55,7 @@ const getFormComponent = (stage: DesignThinkingStatus, idea: Idea, onSubmit: any
         <DefineForm
           initialData={stageData as any}
           onSubmit={onSubmit}
+          draftKey={draftKey}
         />
       );
     case "Ideate":
@@ -60,6 +63,7 @@ const getFormComponent = (stage: DesignThinkingStatus, idea: Idea, onSubmit: any
         <IdeateForm
           initialData={stageData as any}
           onSubmit={onSubmit}
+          draftKey={draftKey}
         />
       );
     case "Prototype":
@@ -67,6 +71,7 @@ const getFormComponent = (stage: DesignThinkingStatus, idea: Idea, onSubmit: any
         <PrototypeForm
           initialData={stageData as any}
           onSubmit={onSubmit}
+          draftKey={draftKey}
         />
       );
     case "Test":
@@ -74,6 +79,7 @@ const getFormComponent = (stage: DesignThinkingStatus, idea: Idea, onSubmit: any
         <TestForm
           initialData={stageData as any}
           onSubmit={onSubmit}
+          draftKey={draftKey}
         />
       );
     default:

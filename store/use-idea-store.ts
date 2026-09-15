@@ -11,6 +11,7 @@ import type {
   PrototypeData,
   TestData,
 } from "@/types";
+import { fetchWithRetry } from "@/lib/fetch-with-retry";
 
 type StageDataType =
   | EmpathizeData
@@ -46,7 +47,7 @@ export const useIdeaStore = create<IdeaState>((set, get) => ({
 
   loadIdeas: async () => {
     try {
-      const res = await fetch("/api/ideas", { credentials: "include" });
+      const res = await fetchWithRetry("/api/ideas", { credentials: "include" });
       if (res.ok) {
         const data = await res.json();
         set({ ideas: data, isLoaded: true });
