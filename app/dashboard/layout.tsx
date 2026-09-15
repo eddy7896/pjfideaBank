@@ -36,7 +36,9 @@ import { useActivityStore } from "@/store/use-activity-store";
 import { useSchoolStore } from "@/store/use-school-store";
 import { useThemeStore } from "@/store/use-theme-store";
 import { usePermissions } from "@/lib/permissions";
+import { fetchWithRetry } from "@/lib/fetch-with-retry";
 import { cn } from "@/lib/utils";
+import type { ThemeMonth } from "@/types";
 
 const roleIcons: Record<string, typeof ShieldCheck> = {
   "super-admin": ShieldCheck,
@@ -88,13 +90,39 @@ export default function DashboardLayout({
   }, [mounted, hydrated, isAuthenticated, router]);
 
   useEffect(() => {
-    if (mounted && isAuthenticated) {
-      loadTeams();
-      loadIdeas();
-      loadActivities();
-      loadSchools();
-      loadThemes();
-    }
+    if (!mounted || !isAuthenticated) return;
+
+    (async () => {
+      // One request for everything the shell needs, instead of 5 separate
+      // round-trips - matters on a slow/flaky connection where round-trip
+      // count costs as much as payload size. Falls back to the old
+      // per-store fetches if the aggregate endpoint itself fails, so a
+      // single bad response doesn't leave the dashboard stuck.
+      try {
+        const res = await fetchWithRetry("/api/dashboard/bootstrap", { credentials: "include" });
+        if (!res.ok) throw new Error(`bootstrap failed: ${res.status}`);
+        const data = await res.json();
+        useTeamStore.setState({ teams: data.teams, isLoaded: true });
+        useIdeaStore.setState({ ideas: data.ideas, isLoaded: true });
+        useActivityStore.setState({ activities: data.activities, isLoaded: true });
+        useSchoolStore.setState({ schools: data.schools, isLoaded: true });
+        useThemeStore.setState({
+          // Match loadThemes()'s own shape - id/sortOrder aren't part of
+          // the ThemeMonth type the rest of the app expects.
+          themes: (data.themes as Array<ThemeMonth & { id: string; sortOrder: number }>).map(
+            ({ id: _id, sortOrder: _sortOrder, ...t }) => t
+          ),
+          isLoaded: true,
+        });
+      } catch (error) {
+        console.error("Dashboard bootstrap failed, falling back to individual loads:", error);
+        loadTeams();
+        loadIdeas();
+        loadActivities();
+        loadSchools();
+        loadThemes();
+      }
+    })();
   }, [mounted, isAuthenticated, loadTeams, loadIdeas, loadActivities, loadSchools, loadThemes]);
 
   if (!mounted || !hydrated || !isAuthenticated || !currentUser || !dataLoaded) {

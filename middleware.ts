@@ -16,6 +16,7 @@ const PROTECTED_API = [
   "/api/admin",
   "/api/schools",
   "/api/themes",
+  "/api/dashboard",
 ];
 
 const PUBLIC_AUTH_API = ["/api/auth"];
@@ -55,5 +56,6 @@ export const config = {
     "/api/admin/:path*",
     "/api/schools/:path*",
     "/api/themes/:path*",
+    "/api/dashboard/:path*",
   ],
 };

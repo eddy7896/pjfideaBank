@@ -39,6 +39,7 @@ interface IdeaState {
   deleteIdea: (id: string) => Promise<boolean>;
   approveAdvance: (id: string) => Promise<boolean>;
   rejectAdvance: (id: string, reason?: string) => Promise<boolean>;
+  loadFullTimeline: (id: string) => Promise<void>;
 }
 
 export const useIdeaStore = create<IdeaState>((set, get) => ({
@@ -305,5 +306,23 @@ export const useIdeaStore = create<IdeaState>((set, get) => ({
       console.error("Failed to reject advance:", error);
     }
     return false;
+  },
+
+  // The list endpoint (GET /api/ideas) trims each idea's timeline to just
+  // {id, type, timestamp} - enough for hasPendingAdvance, not enough to
+  // render. The project detail page calls this once on mount to swap in
+  // the real, full timeline for the one idea it's actually showing.
+  loadFullTimeline: async (id) => {
+    try {
+      const res = await fetchWithRetry(`/api/ideas/${id}/timeline`, { credentials: "include" });
+      if (res.ok) {
+        const timeline = (await res.json()) as TimelineEvent[];
+        set((state) => ({
+          ideas: state.ideas.map((idea) => (idea.id === id ? { ...idea, timeline } : idea)),
+        }));
+      }
+    } catch (error) {
+      console.error("Failed to load full timeline:", error);
+    }
   },
 }));

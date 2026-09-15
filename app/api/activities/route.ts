@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { prisma } from '@/lib/prisma';
 import { requireSession } from '@/lib/auth/session';
+import { applyActivityScoping } from '@/lib/db/scoping';
 import { audit } from '@/lib/audit';
 
 const CreateSchema = z.object({
@@ -21,41 +22,7 @@ export async function GET(_request: NextRequest) {
   const { user } = gate;
 
   try {
-    let where: any = {};
-    if (user.role === 'super-admin' || user.role === 'program-lead') {
-      where = {};
-    } else if (user.role === 'school') {
-      where = { OR: [{ schoolName: null }, { schoolName: user.schoolName }] };
-    } else if (user.role === 'geography-lead' || user.role === 'teacher-trainer' || user.role === 'sed-department') {
-      let schoolGeoWhere: any = {};
-      if (user.role === 'geography-lead') {
-        if (user.subGeographyIds && user.subGeographyIds.length > 0) {
-          schoolGeoWhere = { subGeographyId: { in: user.subGeographyIds } };
-        } else {
-          schoolGeoWhere = { subGeography: { geographyId: user.geographyId } };
-        }
-      } else if (user.role === 'teacher-trainer') {
-        schoolGeoWhere = { subGeographyId: user.subGeographyId };
-      } else if (user.role === 'sed-department') {
-        schoolGeoWhere = { subGeography: { geographyId: user.geographyId } };
-      }
-
-      const schools = await prisma.school.findMany({
-        where: schoolGeoWhere,
-        select: { name: true },
-      });
-      const schoolNames = schools.map((s) => s.name);
-
-      where = {
-        OR: [
-          { schoolName: null },
-          { schoolName: { in: schoolNames } }
-        ]
-      };
-    } else {
-      where = { schoolName: null };
-    }
-
+    const where = await applyActivityScoping(user);
     const activities = await prisma.themeActivity.findMany({ where });
     return NextResponse.json(activities);
   } catch (error) {

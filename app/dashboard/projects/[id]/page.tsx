@@ -1,6 +1,6 @@
 "use client";
 
-import { use, useState } from "react";
+import { use, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   ArrowLeft,
@@ -45,7 +45,7 @@ export default function ProjectDetailPage({
 }) {
   const { id } = use(params);
   const router = useRouter();
-  const { ideas, updateStageData, advanceStage, addComment, updateIdea, deleteIdea, approveAdvance, rejectAdvance } = useIdeaStore();
+  const { ideas, updateStageData, advanceStage, addComment, updateIdea, deleteIdea, approveAdvance, rejectAdvance, loadFullTimeline } = useIdeaStore();
   const { canEditIdea, canApproveAdvance, hasPendingAdvance, currentUser } = usePermissions();
   const [isGateModalOpen, setIsGateModalOpen] = useState(false);
   const [isReviewOpen, setIsReviewOpen] = useState(false);
@@ -60,6 +60,14 @@ export default function ProjectDetailPage({
   });
 
   const idea = ideas.find((i) => i.id === id);
+
+  // The list endpoint trims timeline to {id, type, timestamp} for payload
+  // size. This is the one page that renders full event content/author -
+  // fetch and swap in the real thing once, on mount.
+  useEffect(() => {
+    loadFullTimeline(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id]);
 
   if (!idea || !currentUser) {
     return (
@@ -94,7 +102,11 @@ export default function ProjectDetailPage({
             toast.success(`Moved to ${nextStage} stage`);
           }
           setIsGateModalOpen(false);
+          // loadIdeas() re-fetches the trimmed list shape - re-hydrate this
+          // idea's full timeline afterward so the new stage_change/
+          // form_submitted event content doesn't disappear from view.
           await useIdeaStore.getState().loadIdeas();
+          await loadFullTimeline(idea.id);
         } else {
           toast.error("Failed to advance stage");
         }
@@ -113,8 +125,14 @@ export default function ProjectDetailPage({
   const handleReject = async () => {
     const reason = window.prompt("Reason for rejection (optional)") ?? undefined;
     const ok = await rejectAdvance(idea.id, reason);
-    if (ok) toast.success("Advance rejected");
-    else toast.error("Failed to reject");
+    if (ok) {
+      toast.success("Advance rejected");
+      // rejectAdvance falls back to the trimmed list endpoint internally -
+      // re-hydrate this idea's full timeline so the rejection note stays visible.
+      await loadFullTimeline(idea.id);
+    } else {
+      toast.error("Failed to reject");
+    }
   };
 
   const pending = hasPendingAdvance(idea);

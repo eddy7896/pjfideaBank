@@ -7,6 +7,17 @@ import { hashPassword } from '@/lib/auth-utils';
 import { audit } from '@/lib/audit';
 import { rateLimit, ipFromRequest } from '@/lib/ratelimit';
 
+// List views (kanban, dashboard) only ever need enough timeline data to
+// derive pending-advance status (see lib/permissions.ts hasPendingAdvance) —
+// not full event content/author. The full timeline is fetched separately by
+// the project detail page via GET /api/ideas/[id]/timeline. Keeping this
+// trimmed here is a real payload-size win on a slow connection once an
+// idea has accumulated a long history of comments and stage changes.
+export const IDEA_LIST_TIMELINE_INCLUDE = {
+  select: { id: true, type: true, timestamp: true },
+  orderBy: { timestamp: 'asc' as const },
+};
+
 const CreateSchema = z.object({
   id: z.string().min(1),
   title: z.string().min(1).max(200),
@@ -30,7 +41,7 @@ export async function GET(_request: NextRequest) {
     const scopedWhere = applyIdeaScoping(gate.user);
     const ideas = await prisma.idea.findMany({
       where: scopedWhere,
-      include: { timeline: true },
+      include: { timeline: IDEA_LIST_TIMELINE_INCLUDE },
     });
     return NextResponse.json(ideas);
   } catch (error) {

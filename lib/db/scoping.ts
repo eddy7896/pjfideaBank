@@ -1,3 +1,4 @@
+import { prisma } from "@/lib/prisma";
 import type { SessionUser } from "@/lib/auth/session";
 
 /**
@@ -92,4 +93,88 @@ export function applyTeamScoping(user: SessionUser, baseWhere: any = {}) {
   }
 
   return where;
+}
+
+/**
+ * Scoping for the School model itself. Extracted from app/api/schools so
+ * it can be reused by the dashboard bootstrap endpoint without a second
+ * copy of this switch drifting out of sync.
+ */
+export function applySchoolScoping(user: SessionUser): any {
+  switch (user.role) {
+    case "super-admin":
+    case "program-lead":
+      return {};
+
+    case "geography-lead":
+      if (user.subGeographyIds && user.subGeographyIds.length > 0) {
+        return { subGeographyId: { in: user.subGeographyIds } };
+      }
+      return user.geographyId
+        ? { subGeography: { geographyId: user.geographyId } }
+        : { id: "__none__" };
+
+    case "sed-department":
+      return user.geographyId
+        ? { subGeography: { geographyId: user.geographyId } }
+        : { id: "__none__" };
+
+    case "teacher-trainer":
+      return user.subGeographyId
+        ? { subGeographyId: user.subGeographyId }
+        : { id: "__none__" };
+
+    case "school":
+    case "student":
+      return user.schoolName ? { name: user.schoolName } : { id: "__none__" };
+
+    default:
+      return { id: "__none__" };
+  }
+}
+
+/**
+ * Scoping for ThemeActivity. Global (schoolName: null) activities are
+ * always visible; school-specific ones are filtered by the same
+ * geography/district territory used everywhere else. Async because
+ * resolving a geo/district territory to activities requires an
+ * intermediate School lookup — there's no direct FK from ThemeActivity
+ * to School to join through.
+ */
+export async function applyActivityScoping(user: SessionUser): Promise<any> {
+  if (user.role === "super-admin" || user.role === "program-lead") {
+    return {};
+  }
+
+  if (user.role === "school") {
+    return { OR: [{ schoolName: null }, { schoolName: user.schoolName }] };
+  }
+
+  if (
+    user.role === "geography-lead" ||
+    user.role === "teacher-trainer" ||
+    user.role === "sed-department"
+  ) {
+    let schoolGeoWhere: any = {};
+    if (user.role === "geography-lead") {
+      schoolGeoWhere =
+        user.subGeographyIds && user.subGeographyIds.length > 0
+          ? { subGeographyId: { in: user.subGeographyIds } }
+          : { subGeography: { geographyId: user.geographyId } };
+    } else if (user.role === "teacher-trainer") {
+      schoolGeoWhere = { subGeographyId: user.subGeographyId };
+    } else {
+      schoolGeoWhere = { subGeography: { geographyId: user.geographyId } };
+    }
+
+    const schools = await prisma.school.findMany({
+      where: schoolGeoWhere,
+      select: { name: true },
+    });
+    const schoolNames = schools.map((s) => s.name);
+
+    return { OR: [{ schoolName: null }, { schoolName: { in: schoolNames } }] };
+  }
+
+  return { schoolName: null };
 }
