@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef } from "react";
-import { motion, useMotionValue, useSpring, useTransform, type MotionValue } from "framer-motion";
+import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { cn } from "@/lib/utils";
 
 /**
@@ -30,8 +30,6 @@ export function TiltCard({
   const springConfig = { stiffness: 220, damping: 20 };
   const rotateX = useSpring(useTransform(mouseY, [0, 1], [10, -10]), springConfig);
   const rotateY = useSpring(useTransform(mouseX, [0, 1], [-10, 10]), springConfig);
-  const glowX = useTransform(mouseX, [0, 1], ["0%", "100%"]);
-  const glowY = useTransform(mouseY, [0, 1], ["0%", "100%"]);
 
   const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
     if (prefersReducedMotion || !ref.current) return;
@@ -56,26 +54,9 @@ export function TiltCard({
         rotateY: prefersReducedMotion ? 0 : rotateY,
         transformStyle: "preserve-3d",
       }}
-      className={cn("group relative", className)}
+      className={cn("relative", className)}
     >
-      <TiltGlow x={glowX} y={glowY} />
       {children}
     </motion.div>
-  );
-}
-
-function TiltGlow({ x, y }: { x: MotionValue<string>; y: MotionValue<string> }) {
-  return (
-    <motion.div
-      aria-hidden
-      className="pointer-events-none absolute inset-0 rounded-[inherit] opacity-0 transition-opacity duration-300 group-hover:opacity-100"
-      style={{
-        background: useTransform(
-          [x, y],
-          ([latestX, latestY]) =>
-            `radial-gradient(280px circle at ${latestX} ${latestY}, oklch(0.68 0.09 227 / 0.15), transparent 70%)`
-        ),
-      }}
-    />
   );
 }

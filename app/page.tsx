@@ -4,7 +4,6 @@ import Link from "next/link";
 import Image from "next/image";
 import { Bricolage_Grotesque } from "next/font/google";
 import { motion } from "framer-motion";
-import { ArrowRight, Sparkles } from "lucide-react";
 import { ScrollRevealHeadline } from "@/components/landing/scroll-reveal-headline";
 import { StatCounter } from "@/components/landing/stat-counter";
 import { TiltCard } from "@/components/landing/tilt-card";
@@ -84,10 +83,9 @@ export default function LandingPage() {
             </Link>
             <Link
               href="/login"
-              className="inline-flex h-9 items-center gap-2 rounded-lg bg-[#5BA4C7] px-4 text-sm font-medium text-white transition-colors hover:bg-[#4C92B5]"
+              className="inline-flex h-9 items-center rounded-lg bg-[#5BA4C7] px-4 text-sm font-medium text-white transition-colors hover:bg-[#4C92B5]"
             >
               Sign In
-              <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
         </div>
@@ -96,15 +94,14 @@ export default function LandingPage() {
       {/* Hero */}
       <section className="relative overflow-hidden pb-20 pt-20 lg:pb-28 lg:pt-28">
         <div className="mx-auto max-w-5xl px-4 text-center sm:px-6 lg:px-8">
-          <motion.div
+          <motion.p
             initial="hidden"
             animate="visible"
             variants={fadeUp}
-            className="mx-auto mb-8 inline-flex w-fit items-center gap-2 rounded-full border border-[#5BA4C7]/25 bg-[#5BA4C7]/8 px-4 py-2"
+            className="mb-6 font-mono text-xs font-semibold uppercase tracking-[0.15em] text-[#5BA4C7]"
           >
-            <Sparkles className="h-4 w-4 text-[#5BA4C7]" />
-            <span className="text-sm font-semibold text-[#5BA4C7]">Pi Jam Foundation · Design Thinking for Schools</span>
-          </motion.div>
+            Pi Jam Foundation · Design Thinking for Schools
+          </motion.p>
 
           <ScrollRevealHeadline
             text="IDEAS BECOME INNOVATIONS"
@@ -132,10 +129,9 @@ export default function LandingPage() {
           >
             <Link
               href="/login"
-              className="inline-flex h-12 items-center justify-center gap-2 rounded-lg bg-[#5BA4C7] px-8 text-base font-semibold text-white transition-all hover:bg-[#4C92B5] active:scale-[0.98]"
+              className="inline-flex h-12 items-center justify-center rounded-lg bg-[#5BA4C7] px-8 text-base font-semibold text-white transition-all hover:bg-[#4C92B5] active:scale-[0.98]"
             >
               Explore the Platform
-              <ArrowRight className="h-4 w-4" />
             </Link>
             <a
               href="#pipeline"
@@ -243,7 +239,7 @@ export default function LandingPage() {
             </h2>
           </motion.div>
 
-          <div className="grid gap-5 md:grid-cols-3">
+          <div className="divide-y divide-[#DFE4EA] border-y border-[#DFE4EA]">
             {[
               {
                 title: "Onboard your school",
@@ -274,14 +270,14 @@ export default function LandingPage() {
               >
                 <Link
                   href={path.href}
-                  className="group flex h-full flex-col rounded-2xl border border-[#DFE4EA] bg-white p-7 transition-colors hover:border-[#5BA4C7]/40"
+                  className="flex flex-col items-start justify-between gap-2 py-6 transition-colors hover:bg-[#F0F3F6] sm:flex-row sm:items-center sm:gap-8 sm:px-4"
                 >
-                  <h3 className="text-lg font-bold text-[#161B22]">{path.title}</h3>
-                  <p className="mt-2 flex-1 text-sm leading-relaxed text-[#56606B]">{path.desc}</p>
-                  <span className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-[#5BA4C7] transition-transform group-hover:translate-x-1">
-                    {path.cta}
-                    <ArrowRight className="h-4 w-4" />
-                  </span>
+                  <span className="font-mono text-xs font-semibold text-[#56606B]">0{i + 1}</span>
+                  <div className="flex-1">
+                    <h3 className="text-lg font-bold text-[#161B22]">{path.title}</h3>
+                    <p className="mt-1 text-sm leading-relaxed text-[#56606B]">{path.desc}</p>
+                  </div>
+                  <span className="text-sm font-semibold text-[#5BA4C7]">{path.cta}</span>
                 </Link>
               </motion.div>
             ))}
@@ -302,10 +298,9 @@ export default function LandingPage() {
             href="https://thepijam.org"
             target="_blank"
             rel="noopener noreferrer"
-            className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-[#5BA4C7] hover:gap-3 transition-all"
+            className="mt-5 inline-block text-sm font-semibold text-[#5BA4C7] underline decoration-[#5BA4C7]/40 underline-offset-4 hover:decoration-[#5BA4C7]"
           >
             Learn more about Pi Jam
-            <ArrowRight className="h-4 w-4" />
           </a>
         </div>
       </section>
