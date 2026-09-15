@@ -5,8 +5,20 @@ import Image from "next/image";
 import { Bricolage_Grotesque } from "next/font/google";
 import { motion } from "framer-motion";
 import { ScrollRevealHeadline } from "@/components/landing/scroll-reveal-headline";
+import { TypewriterHeadline } from "@/components/landing/typewriter-headline";
 import { StatCounter } from "@/components/landing/stat-counter";
 import { TiltCard } from "@/components/landing/tilt-card";
+
+// Grounded in real idea titles from the platform (see prisma/seed.ts) —
+// each line is "the problem a team started with" -> "what they shipped".
+const HERO_EXAMPLES = [
+  "A dark study table becomes Solar Powered Desk Lamps",
+  "A stuck homework question becomes an AI Homework Helper Chatbot",
+  "An unlit street becomes a Neighborhood Safety Mapping App",
+  "A quiet classroom becomes a Mental Health Check-In Kiosk",
+  "A dry monsoon tank becomes a Rainwater Harvesting Tracker",
+  "A missed school bus becomes Smart School Bus Routing",
+] as const;
 
 // Brand-register display face — scoped to this page only via the
 // .variable class below, never touches the product surface's font-sans.
@@ -108,17 +120,18 @@ export default function LandingPage() {
             className="font-display text-[11vw] font-bold uppercase leading-[0.95] tracking-tight text-[#161B22] sm:text-[8vw] lg:text-[5.5rem]"
           />
 
-          <motion.p
+          <motion.div
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true }}
             variants={fadeUp}
-            className="mx-auto mt-8 max-w-2xl text-lg leading-relaxed text-[#56606B]"
+            className="mx-auto mt-8 flex min-h-[3.5em] max-w-3xl items-start justify-center px-2 sm:min-h-[2.5em]"
           >
-            A student notices something broken in their own neighborhood. Five structured
-            stages later, it&apos;s a tested prototype with real feedback attached — not a
-            worksheet, a working record of how the idea actually got there.
-          </motion.p>
+            <TypewriterHeadline
+              phrases={HERO_EXAMPLES}
+              className="text-lg leading-relaxed text-[#56606B] sm:text-xl"
+            />
+          </motion.div>
 
           <motion.div
             initial="hidden"

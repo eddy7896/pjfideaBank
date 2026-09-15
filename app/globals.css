@@ -234,6 +234,11 @@
     --gender-unspecified: #B4A6D9;
 }
 
+@keyframes blink-caret {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
