@@ -8,7 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { FormField, fieldDescribedBy } from "./form-field";
 import { IdeabankButton } from "./button";
 import { StageBadge } from "./stage-badge";
-import { IDEA_CATEGORIES, IDEA_STAGES, type IdeaStage } from "@/lib/ideabank/types";
+import { PROBLEM_CATEGORIES, IDEA_STAGES, type IdeaStage } from "@/lib/ideabank/types";
 import {
   readShareDraft,
   writeShareDraft,
@@ -132,8 +132,8 @@ export function ShareWizard() {
           once documented.
         </p>
         <div className="mt-7 flex flex-col justify-center gap-3 sm:flex-row">
-          <IdeabankButton href="/explore" variant="secondary">
-            Back to Explore Ideas
+          <IdeabankButton href="/problems" variant="secondary">
+            Back to Problem Bank
           </IdeabankButton>
           <IdeabankButton onClick={handleStartOver}>Share another idea</IdeabankButton>
         </div>
@@ -203,7 +203,7 @@ export function ShareWizard() {
                 className="h-12 rounded-[14px] border border-[#DED8D3] bg-white px-4 text-base text-[#111111] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4282A4]"
               >
                 <option value="">Choose a category</option>
-                {IDEA_CATEGORIES.map((c) => (
+                {PROBLEM_CATEGORIES.map((c) => (
                   <option key={c} value={c}>
                     {c}
                   </option>

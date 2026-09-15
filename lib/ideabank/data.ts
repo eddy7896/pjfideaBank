@@ -1,376 +1,261 @@
-import type { Idea } from "./types";
+import type { Problem } from "./types";
 
 /**
- * Demonstration content for the Ideabank frontend. These are illustrative
- * examples, not real student submissions — no student names, schools, or
- * validated outcomes are implied. See app/share for how a real idea would
- * be documented through the guided form.
+ * The Problem Bank: real-flavoured example problems across sectors, meant
+ * to give a student somewhere to start noticing and thinking. These are
+ * demonstration prompts, not finished ideas or other students' work — no
+ * solutions, stages, or costs are attached here. Once a student picks a
+ * problem (or notices their own), they document and track their actual
+ * idea through the Share an Idea flow / dashboard, not in this catalog.
  */
-export const IDEAS: Idea[] = [
+export const PROBLEMS: Problem[] = [
   {
     id: "1",
-    slug: "school-tap-water-saver",
-    title: "School Tap Water Saver",
-    summary: "A simple lever attachment that stops taps in the school washroom from being left running.",
+    slug: "taps-left-running-in-the-school-washroom",
+    title: "Taps Left Running in the School Washroom",
+    summary: "Washroom taps are routinely left running between recess periods, with no one nearby to notice.",
     category: "Water & Sanitation",
-    tags: ["water", "school life", "low-cost"],
-    stage: "Prototyping",
+    tags: ["water", "school life", "waste"],
     problem:
       "Taps in the washroom block are routinely left running between recess periods, with no one nearby to notice until a teacher happens to pass by.",
     affectedUsers: "Students and staff who share the washroom block, and the school's water bill.",
     context: "Observed over two weeks near the primary-wing washroom, mostly between the first and second recess.",
-    proposedSolution:
-      "A spring-loaded lever fitted over the existing tap handle that needs continuous light pressure to stay open, so it closes on its own when let go.",
-    materials: [
-      { name: "Tap-handle lever bracket", costRupees: 60 },
-      { name: "Small tension spring", costRupees: 15 },
-      { name: "Rubber grip sleeve", costRupees: 10 },
+    promptQuestions: [
+      "Is it forgetfulness, a broken handle, or something about how the tap is designed?",
+      "Would a fix need to change student behaviour, or just the tap itself?",
+      "How would you notice a running tap without someone having to watch for it?",
     ],
-    estimatedCost: 85,
-    prototypeSteps: [
-      "Measured the standard tap handle across three washrooms to find a common bracket size.",
-      "Built a cardboard mock-up of the lever to check the pressure needed felt natural for younger students.",
-      "Swapped the mock-up for a bent-wire prototype with a scavenged spring.",
-    ],
-    testingNotes:
-      "Ten test uses by classmates: two found the spring tension too stiff for smaller hands, which is being adjusted for the next version.",
-    improvements: null,
     image: "water-tap",
     createdAt: "2026-06-02",
   },
   {
     id: "2",
-    slug: "frost-alert-for-water-pipes",
-    title: "Frost Alert for Water Pipes",
-    summary: "A low-cost sensor that warns a hostel caretaker before exposed pipes freeze overnight.",
+    slug: "exposed-pipes-freezing-overnight",
+    title: "Exposed Pipes Freezing Overnight",
+    summary: "Exposed water pipes along a hostel wall have cracked twice in the last two winters.",
     category: "Water & Sanitation",
-    tags: ["water", "winter", "sensors"],
-    stage: "Ideating",
+    tags: ["water", "winter", "maintenance"],
     problem:
       "Exposed water pipes along the hostel's outer wall have cracked twice in the last two winters after overnight temperatures dropped sharply.",
     affectedUsers: "Hostel students and the caretaker responsible for the water supply.",
     context: "Hill-region hostel where morning temperatures in January regularly fall near freezing.",
-    proposedSolution:
-      "A basic temperature sensor near the exposed pipe run that lights an indicator in the caretaker's room once it nears freezing, so the tap can be left dripping overnight.",
-    materials: [
-      { name: "Temperature sensor module", costRupees: 120 },
-      { name: "Indicator LED and wiring", costRupees: 40 },
+    promptQuestions: [
+      "What actually causes the crack — ice forming, or pressure building up somewhere specific?",
+      "Could the caretaker be warned in time to act, rather than finding out after it's cracked?",
+      "Is insulation, warning, or re-routing the pipe the more realistic first experiment?",
     ],
-    estimatedCost: 160,
-    prototypeSteps: [
-      "Logged outdoor temperature by hand at 6 a.m. for a week to confirm the risk window.",
-      "Sketched the circuit and identified an affordable sensor module.",
-    ],
-    testingNotes: null,
-    improvements: null,
     image: "frost-pipe",
     createdAt: "2026-05-20",
   },
   {
     id: "3",
-    slug: "safer-blind-road-bends",
-    title: "Safer Blind Road Bends",
-    summary: "A convex mirror and painted marker placement guide for the sharp bend outside the school gate.",
+    slug: "a-blind-bend-outside-the-school-gate",
+    title: "A Blind Bend Outside the School Gate",
+    summary: "A sharp road bend outside the school gate has no visibility around the corner.",
     category: "Community & Safety",
     tags: ["road safety", "community", "visibility"],
-    stage: "Tested",
     problem:
       "The road bend just outside the school gate has no visibility around the corner, and two near-miss incidents were reported by parents this term.",
     affectedUsers: "Students walking or cycling to school, and vehicles turning onto the main road.",
     context: "Morning and afternoon school-gate traffic, observed over three days at drop-off and pick-up times.",
-    proposedSolution:
-      "A convex mirror mounted at the bend, paired with a bright painted marker on the wall so approaching cyclists know to slow down before the blind spot.",
-    materials: [
-      { name: "Convex traffic mirror", costRupees: 450 },
-      { name: "Mounting pole and clamps", costRupees: 200 },
-      { name: "Reflective paint", costRupees: 150 },
+    promptQuestions: [
+      "Whose attention actually needs to be caught — the pedestrian, the driver, or both?",
+      "What's already at that corner that a fix would need to work around?",
+      "Could you test whether people even slow down differently with a low-cost prototype, before asking for anything permanent?",
     ],
-    estimatedCost: 800,
-    prototypeSteps: [
-      "Mapped sightlines at the bend with chalk marks from different approach angles.",
-      "Tested a hand-held mirror at the proposed height to confirm the angle actually covers the blind spot.",
-      "Proposed placement to the school administration with a simple diagram.",
-    ],
-    testingNotes:
-      "After installation, five cyclists were observed slowing down noticeably earlier at the bend compared to the pre-mirror baseline count.",
-    improvements:
-      "Next version adds a second smaller mirror for the pedestrian side, which the first version didn't cover well.",
     image: "road-bend",
     createdAt: "2026-04-11",
   },
   {
     id: "4",
-    slug: "classroom-ventilation-indicator",
-    title: "Classroom Ventilation Indicator",
-    summary: "A simple colour-changing card that shows when a classroom needs its windows opened.",
+    slug: "classrooms-that-get-stuffy-by-midday",
+    title: "Classrooms That Get Stuffy by Midday",
+    summary: "Classrooms with windows kept shut for the fan noise feel stuffy by the third period.",
     category: "School & Learning",
-    tags: ["classroom", "air quality", "low-cost"],
-    stage: "Prototyping",
+    tags: ["classroom", "air quality"],
     problem:
       "By the third period, classrooms with windows kept shut for the fan noise feel noticeably stuffy, but there's no easy way to notice this early.",
     affectedUsers: "Students and teachers in enclosed classrooms during long back-to-back periods.",
     context: "Mid-morning periods in classrooms without cross-ventilation, most noticeable in the block furthest from the corridor breeze.",
-    proposedSolution:
-      "A humidity-sensitive card taped near the blackboard that visibly changes colour once the room's air gets stale, as a quiet reminder to open a window.",
-    materials: [
-      { name: "Humidity-sensitive indicator strips", costRupees: 30 },
-      { name: "Laminated card backing", costRupees: 10 },
+    promptQuestions: [
+      "Is the actual problem the air itself, or that nobody notices until it's already uncomfortable?",
+      "What would a signal for 'time to open a window' need to look or sound like in a classroom?",
+      "Could a very simple, no-power indicator work as well as an electronic one here?",
     ],
-    estimatedCost: 40,
-    prototypeSteps: [
-      "Tried three different indicator strip types to see which changed colour reliably indoors.",
-      "Placed the first card in one classroom for a week and logged colour changes against period timings.",
-    ],
-    testingNotes: null,
-    improvements: null,
     image: "classroom-air",
     createdAt: "2026-06-18",
   },
   {
     id: "5",
-    slug: "low-cost-apple-sorting-aid",
-    title: "Low-Cost Apple Sorting Aid",
-    summary: "A gravity-fed wooden chute that sorts apples into two size grades for a family orchard.",
+    slug: "sorting-a-fruit-harvest-by-hand-takes-hours",
+    title: "Sorting a Fruit Harvest by Hand Takes Hours",
+    summary: "Sorting apples by size by hand after harvest takes a family several extra hours each day.",
     category: "Agriculture & Food",
-    tags: ["agriculture", "post-harvest", "family business"],
-    stage: "Prototyping",
+    tags: ["agriculture", "post-harvest"],
     problem:
       "Sorting apples by size by hand after harvest takes a family several extra hours each day during peak season.",
     affectedUsers: "A family running a small orchard, sorting fruit before it goes to the local market.",
-    context: "Harvest season in an apple-growing hill district, observed during a weekend visit to a relative's orchard.",
-    proposedSolution:
-      "A wooden chute with a narrowing gap partway down, so smaller apples fall through first and larger ones continue to a second collection tray.",
-    materials: [
-      { name: "Plywood sheet", costRupees: 350 },
-      { name: "Wooden battens for the frame", costRupees: 150 },
-      { name: "Cloth-lined collection trays", costRupees: 100 },
+    context: "Harvest season in an apple-growing hill district.",
+    promptQuestions: [
+      "What's the actual bottleneck — the sorting decision, or the physical handling of each fruit?",
+      "Could gravity or a simple gap do the sorting instead of a person checking each one?",
+      "How would you test a rough version without risking a real harvest?",
     ],
-    estimatedCost: 600,
-    prototypeSteps: [
-      "Built a small cardboard version to test the gap width against a sample of apples of different sizes.",
-      "Scaled the design up to plywood once the gap width sorted correctly nine times out of ten.",
-    ],
-    testingNotes:
-      "Sorted a 40-apple sample: 36 landed in the correct size tray, three borderline apples need a slightly wider gap.",
-    improvements: null,
     image: "apple-sorter",
     createdAt: "2026-05-05",
   },
   {
     id: "6",
-    slug: "bird-sound-observation-station",
-    title: "Bird Sound Observation Station",
-    summary: "A notebook-and-recording station by the school pond to log which birds visit and when.",
+    slug: "no-one-is-tracking-which-birds-visit-the-pond",
+    title: "No One's Tracking Which Birds Visit the Pond",
+    summary: "Bird activity around the school pond changes across the year, but nothing is recorded.",
     category: "Environment & Climate",
-    tags: ["biodiversity", "observation", "school life"],
-    stage: "Observed",
+    tags: ["biodiversity", "observation"],
     problem:
       "Students had no easy way to notice how bird activity around the school pond changes across the year, so it went unrecorded.",
     affectedUsers: "The school's environment club and any student curious about the pond's ecosystem.",
     context: "The school pond area during early morning and late afternoon, when bird activity is highest.",
-    proposedSolution:
-      "A weatherproof logbook and a basic phone-recorder station where students on duty note bird calls and sightings each week.",
-    materials: [
-      { name: "Weatherproof logbook", costRupees: 80 },
-      { name: "Laminated identification chart", costRupees: 50 },
+    promptQuestions: [
+      "Who would actually keep a record going every week, and what makes that easy or hard for them?",
+      "What's the simplest way to record a sighting that still gives you useful data later?",
+      "Would a phone recording, a written note, or something else give the most reliable record?",
     ],
-    estimatedCost: 130,
-    prototypeSteps: [],
-    testingNotes: null,
-    improvements: null,
     image: "bird-station",
     createdAt: "2026-07-01",
   },
   {
     id: "7",
-    slug: "wheelchair-ramp-slope-gauge",
-    title: "Wheelchair Ramp Slope Gauge",
-    summary: "A pocket-sized gauge to quickly check whether a temporary ramp is within a safe slope.",
+    slug: "event-ramps-set-up-without-checking-the-slope",
+    title: "Event Ramps Set Up Without Checking the Slope",
+    summary: "Temporary ramps built quickly for school events are often too steep for wheelchair access.",
     category: "Accessibility & Inclusion",
-    tags: ["accessibility", "ramps", "quick-check"],
-    stage: "Ideating",
+    tags: ["accessibility", "ramps"],
     problem:
       "Temporary ramps set up for school events are often too steep, but no one on the setup team has an easy way to check the slope.",
     affectedUsers: "Students and visitors using wheelchairs or crutches during school events.",
     context: "Annual day and sports day setups, where ramps are built quickly from available planks.",
-    proposedSolution:
-      "A small printed protractor-and-string gauge that setup volunteers can hold against the ramp to read the slope angle in seconds.",
-    materials: [
-      { name: "Laminated protractor card", costRupees: 25 },
-      { name: "String and small weight", costRupees: 10 },
+    promptQuestions: [
+      "What's the actual safe slope limit, and who on the setup team needs to know it?",
+      "Could the check happen in seconds, using tools already lying around?",
+      "How would you make the check something people actually remember to do under time pressure?",
     ],
-    estimatedCost: 35,
-    prototypeSteps: [
-      "Researched the commonly recommended maximum ramp slope for wheelchair access.",
-      "Sketched a simple string-and-weight gauge design that needs no batteries.",
-    ],
-    testingNotes: null,
-    improvements: null,
     image: "ramp-gauge",
     createdAt: "2026-06-25",
   },
   {
     id: "8",
-    slug: "shared-tiffin-cooling-rack",
-    title: "Shared Tiffin Cooling Rack",
-    summary: "A ventilated rack that keeps lunch tiffins from going soggy in a crowded, un-refrigerated lunchroom.",
+    slug: "lunch-tiffins-go-soggy-in-the-shared-trolley",
+    title: "Lunch Tiffins Go Soggy in the Shared Trolley",
+    summary: "Tiffins stacked together in the lunchroom trolley trap steam, leaving food soggy.",
     category: "School & Learning",
-    tags: ["lunchroom", "food", "low-cost"],
-    stage: "Tested",
+    tags: ["lunchroom", "food"],
     problem:
       "Tiffins stacked together in the lunchroom trolley trap steam, leaving food soggy by the time students eat.",
     affectedUsers: "Students who bring lunch from home and store it in the shared lunchroom trolley.",
     context: "The lunchroom storage trolley between morning drop-off and the lunch period.",
-    proposedSolution:
-      "A slatted wooden rack insert for the existing trolley that keeps tiffins spaced apart so steam can escape instead of collecting.",
-    materials: [
-      { name: "Wooden slats", costRupees: 200 },
-      { name: "Corner brackets", costRupees: 60 },
+    promptQuestions: [
+      "Is the problem the stacking, the trapped steam, or both?",
+      "What would need to change about the trolley itself versus how tiffins are placed in it?",
+      "How would you know if a fix actually worked, beyond someone saying food 'seems better'?",
     ],
-    estimatedCost: 260,
-    prototypeSteps: [
-      "Measured the trolley shelves to design a rack that fits without modification.",
-      "Built a single-shelf version first to test spacing before making the full rack.",
-    ],
-    testingNotes:
-      "Over one week, students using the rack reported food arriving noticeably less soggy than the previous stacked arrangement.",
-    improvements:
-      "The next version will round the slat edges after a few students mentioned catching tiffin straps on them.",
     image: "tiffin-rack",
     createdAt: "2026-03-14",
   },
   {
     id: "9",
-    slug: "drip-line-from-waste-bottles",
-    title: "Drip Line from Waste Bottles",
-    summary: "A low-cost drip irrigation line for the school kitchen garden, built from used plastic bottles.",
+    slug: "the-kitchen-garden-dries-out-between-waterings",
+    title: "The Kitchen Garden Dries Out Between Waterings",
+    summary: "The school kitchen garden dries out quickly in summer and hand-watering is inconsistent.",
     category: "Agriculture & Food",
-    tags: ["water", "gardening", "reuse"],
-    stage: "Prototyping",
+    tags: ["water", "gardening"],
     problem:
       "The school kitchen garden dries out quickly in summer and hand-watering with a can is inconsistent across beds.",
     affectedUsers: "The gardening club and whoever is on watering duty each week.",
     context: "The kitchen garden beds during the dry pre-monsoon months.",
-    proposedSolution:
-      "A gravity-fed drip line made from a row of punctured plastic bottles connected by tubing, releasing water slowly along each bed.",
-    materials: [
-      { name: "Used 1-litre bottles (collected)", costRupees: 0 },
-      { name: "Flexible tubing", costRupees: 120 },
-      { name: "Tubing connectors", costRupees: 40 },
+    promptQuestions: [
+      "Is the inconsistency about how much water each bed gets, or how often?",
+      "What materials are already lying around that could carry water slowly and evenly?",
+      "How would you measure whether one bed is actually getting drier than another?",
     ],
-    estimatedCost: 160,
-    prototypeSteps: [
-      "Tested puncture hole sizes on a single bottle to find a drip rate that didn't empty too fast.",
-      "Connected three bottles along one bed as a first working section.",
-    ],
-    testingNotes: null,
-    improvements: null,
     image: "drip-line",
     createdAt: "2026-05-28",
   },
   {
     id: "10",
-    slug: "corridor-noise-traffic-light",
-    title: "Corridor Noise Traffic Light",
-    summary: "A red-amber-green light that gives classes a visible cue about corridor noise levels between periods.",
+    slug: "corridor-noise-spills-into-classes-still-in-session",
+    title: "Corridor Noise Spills Into Classes Still in Session",
+    summary: "Corridor noise between periods spills into classes that are still finishing a lesson.",
     category: "School & Learning",
-    tags: ["classroom", "noise", "behaviour"],
-    stage: "Ideating",
+    tags: ["classroom", "noise"],
     problem:
       "Corridor noise between periods spills into classes that are still finishing a lesson, and there's no shared signal for when it's too loud.",
     affectedUsers: "Teachers and students in classrooms nearest the main corridor junction.",
     context: "The five-minute gaps between periods, near the corridor junction outside three classrooms.",
-    proposedSolution:
-      "A simple sound-level indicator mounted in the corridor that lights amber and then red as noise rises, giving students a visible, non-verbal cue.",
-    materials: [
-      { name: "Sound sensor module", costRupees: 150 },
-      { name: "Three-colour LED indicator", costRupees: 50 },
+    promptQuestions: [
+      "Is this a noise problem, or a 'nobody realises class isn't over yet' problem?",
+      "What would a fair, visible threshold for 'too loud' actually look like?",
+      "Would students respond better to a rule, or to something they can see changing in real time?",
     ],
-    estimatedCost: 200,
-    prototypeSteps: [
-      "Recorded corridor noise levels across a week to set rough thresholds for amber and red.",
-    ],
-    testingNotes: null,
-    improvements: null,
     image: "noise-light",
     createdAt: "2026-07-08",
   },
   {
     id: "11",
-    slug: "rainwater-first-flush-diverter",
-    title: "Rainwater First-Flush Diverter",
-    summary: "A simple pipe fitting that discards the dirty first rainfall of the season before it reaches the storage tank.",
+    slug: "first-monsoon-rain-washes-roof-dust-into-the-tank",
+    title: "The First Monsoon Rain Washes Roof Dust Into the Tank",
+    summary: "The school's rainwater tank collects visibly dusty water at the start of each monsoon.",
     category: "Water & Sanitation",
     tags: ["water", "monsoon", "harvesting"],
-    stage: "Tested",
     problem:
       "The school's rainwater tank collected visibly dusty water at the start of each monsoon, from roof dust washed off in the first rain.",
     affectedUsers: "Whoever uses the harvested water, and the tank cleaning schedule.",
     context: "The roof downpipe feeding the rainwater storage tank, checked at the start of the monsoon season.",
-    proposedSolution:
-      "A T-shaped pipe fitting with a removable chamber that catches and holds back the first few litres of each rainfall before clean water flows to the tank.",
-    materials: [
-      { name: "PVC T-fitting and pipe", costRupees: 250 },
-      { name: "Removable end cap", costRupees: 60 },
+    promptQuestions: [
+      "How much of the 'first flush' actually needs to be diverted before the water runs clean?",
+      "Could the diverted water be put to some other use instead of wasted?",
+      "How would you test this on a small scale before touching the real downpipe?",
     ],
-    estimatedCost: 310,
-    prototypeSteps: [
-      "Measured roof area to estimate how much first-flush volume to divert.",
-      "Built a small-scale version on a test pipe before fitting it to the real downpipe.",
-    ],
-    testingNotes:
-      "Across two rainfalls, water reaching the tank after the diverter was visibly clearer than the previous season's samples.",
-    improvements: "A finer mesh at the inlet is planned after some leaf debris still got through.",
     image: "rain-diverter",
     createdAt: "2026-02-20",
   },
   {
     id: "12",
-    slug: "compost-corner-odour-baffle",
-    title: "Compost Corner Odour Baffle",
-    summary: "A layered cover for the school's compost bin that cuts down odour without slowing decomposition.",
+    slug: "the-compost-corner-smells-during-humid-weeks",
+    title: "The Compost Corner Smells During Humid Weeks",
+    summary: "The school's compost corner develops a strong smell during humid weeks.",
     category: "Environment & Climate",
-    tags: ["composting", "waste", "low-cost"],
-    stage: "Prototyping",
+    tags: ["composting", "waste"],
     problem:
       "The compost corner near the canteen developed a strong smell during humid weeks, leading to complaints from nearby classrooms.",
     affectedUsers: "Classrooms near the compost corner and the canteen staff who manage kitchen waste.",
     context: "The compost bin area, most noticeable during humid weeks after kitchen waste additions.",
-    proposedSolution:
-      "A removable layered cover of dry leaves and jute matting placed over fresh waste additions, reducing smell while still allowing airflow.",
-    materials: [
-      { name: "Jute matting", costRupees: 90 },
-      { name: "Wooden frame for the cover", costRupees: 120 },
+    promptQuestions: [
+      "Is the smell from the waste itself, trapped gas, or how often it's turned?",
+      "What's already available on-site (leaves, sawdust, mats) that could help without buying anything?",
+      "How would you compare smell 'before and after' in a way that's more than just opinion?",
     ],
-    estimatedCost: 210,
-    prototypeSteps: [
-      "Compared smell levels with and without a dry-leaf layer over three days each.",
-      "Built a lightweight frame so the cover can be lifted off easily for adding waste.",
-    ],
-    testingNotes: null,
-    improvements: null,
     image: "compost-baffle",
     createdAt: "2026-06-10",
   },
 ];
 
-export function getIdeaBySlug(slug: string): Idea | undefined {
-  return IDEAS.find((idea) => idea.slug === slug);
+export function getProblemBySlug(slug: string): Problem | undefined {
+  return PROBLEMS.find((problem) => problem.slug === slug);
 }
 
-export function getRelatedIdeas(idea: Idea, limit = 3): Idea[] {
-  return IDEAS.filter(
-    (other) => other.id !== idea.id && other.category === idea.category
+export function getRelatedProblems(problem: Problem, limit = 3): Problem[] {
+  return PROBLEMS.filter(
+    (other) => other.id !== problem.id && other.category === problem.category
   ).slice(0, limit);
 }
 
-export const FEATURED_IDEA_SLUGS = [
-  "school-tap-water-saver",
-  "frost-alert-for-water-pipes",
-  "safer-blind-road-bends",
-  "classroom-ventilation-indicator",
-  "low-cost-apple-sorting-aid",
-  "bird-sound-observation-station",
+export const FEATURED_PROBLEM_SLUGS = [
+  "taps-left-running-in-the-school-washroom",
+  "exposed-pipes-freezing-overnight",
+  "a-blind-bend-outside-the-school-gate",
+  "classrooms-that-get-stuffy-by-midday",
+  "sorting-a-fruit-harvest-by-hand-takes-hours",
+  "no-one-is-tracking-which-birds-visit-the-pond",
 ];
 
-export const FEATURED_STORY_SLUG = "safer-blind-road-bends";
+export const FEATURED_STORY_SLUG = "a-blind-bend-outside-the-school-gate";

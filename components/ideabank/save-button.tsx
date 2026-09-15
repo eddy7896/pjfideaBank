@@ -3,7 +3,7 @@
 import { useSyncExternalStore } from "react";
 import { Bookmark } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { isIdeaSaved, toggleSavedIdea, subscribeSavedIdeas } from "@/lib/ideabank/storage";
+import { isProblemSaved, toggleSavedProblem, subscribeSavedProblems } from "@/lib/ideabank/storage";
 
 interface SaveButtonProps {
   slug: string;
@@ -18,18 +18,18 @@ function alwaysFalse() {
 
 export function SaveButton({ slug, title, variant = "icon", className }: SaveButtonProps) {
   const saved = useSyncExternalStore(
-    subscribeSavedIdeas,
-    () => isIdeaSaved(slug),
+    subscribeSavedProblems,
+    () => isProblemSaved(slug),
     alwaysFalse
   );
 
   function handleClick(e: React.MouseEvent) {
     e.preventDefault();
     e.stopPropagation();
-    toggleSavedIdea(slug);
+    toggleSavedProblem(slug);
   }
 
-  const label = saved ? `Remove ${title} from saved ideas` : `Save ${title} for later`;
+  const label = saved ? `Remove ${title} from saved problems` : `Save ${title} for later`;
 
   if (variant === "labelled") {
     return (
@@ -46,7 +46,7 @@ export function SaveButton({ slug, title, variant = "icon", className }: SaveBut
         )}
       >
         <Bookmark className="h-4 w-4" aria-hidden="true" fill={saved ? "currentColor" : "none"} />
-        {saved ? "Saved" : "Save idea"}
+        {saved ? "Saved" : "Save problem"}
       </button>
     );
   }

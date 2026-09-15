@@ -10,17 +10,16 @@ import { IdeabankButton } from "@/components/ideabank/button";
 import { SectionIntro } from "@/components/ideabank/section-intro";
 import { SearchField } from "@/components/ideabank/search-field";
 import { CategoryChip } from "@/components/ideabank/category-chip";
-import { IdeaCard } from "@/components/ideabank/idea-card";
+import { ProblemCard } from "@/components/ideabank/problem-card";
 import { LearningStep } from "@/components/ideabank/learning-step";
 import { HeroCollage } from "@/components/ideabank/hero-collage";
 import { PurposeStatement } from "@/components/ideabank/purpose-statement";
 import { TeacherResourcePanels } from "@/components/ideabank/teacher-resources";
 import { ScrollReveal } from "@/components/ideabank/scroll-reveal";
-import { StageBadge } from "@/components/ideabank/stage-badge";
 import { IdeaIllustration, CATEGORY_ICONS } from "@/components/ideabank/illustration";
 import { DoodleSpark, DoodleUnderline, DoodleArrow } from "@/components/ideabank/doodle";
-import { IDEAS, FEATURED_IDEA_SLUGS, FEATURED_STORY_SLUG } from "@/lib/ideabank/data";
-import { IDEA_CATEGORIES } from "@/lib/ideabank/types";
+import { PROBLEMS, FEATURED_PROBLEM_SLUGS, FEATURED_STORY_SLUG } from "@/lib/ideabank/data";
+import { PROBLEM_CATEGORIES } from "@/lib/ideabank/types";
 
 const TOPIC_CHIPS = ["Water", "Agriculture", "Environment", "Accessibility", "School Life", "Community"];
 
@@ -73,13 +72,13 @@ export default function HomePage() {
   const router = useRouter();
   const [query, setQuery] = useState("");
 
-  const featuredIdeas = FEATURED_IDEA_SLUGS.map((slug) => IDEAS.find((i) => i.slug === slug)!).filter(Boolean);
-  const storyIdea = IDEAS.find((i) => i.slug === FEATURED_STORY_SLUG)!;
+  const featuredProblems = FEATURED_PROBLEM_SLUGS.map((slug) => PROBLEMS.find((p) => p.slug === slug)!).filter(Boolean);
+  const storyProblem = PROBLEMS.find((p) => p.slug === FEATURED_STORY_SLUG)!;
 
   function submitSearch() {
     const params = new URLSearchParams();
     if (query.trim()) params.set("q", query.trim());
-    router.push(`/explore${params.toString() ? `?${params.toString()}` : ""}`);
+    router.push(`/problems${params.toString() ? `?${params.toString()}` : ""}`);
   }
 
   return (
@@ -102,12 +101,12 @@ export default function HomePage() {
             </h1>
 
             <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-[#3D3D3D] sm:text-xl">
-              Explore everyday challenges, learn from young creators, and turn your own
-              questions into ideas worth building.
+              Pick a real problem from the bank, or notice your own — then document and track
+              your idea through every iteration, from first observation to a tested prototype.
             </p>
 
             <div className="mt-9 flex flex-col items-center justify-center gap-4 sm:flex-row">
-              <IdeabankButton href="/explore">Explore Ideas</IdeabankButton>
+              <IdeabankButton href="/problems">Explore Problems</IdeabankButton>
               <IdeabankButton href="/dashboard" variant="secondary">
                 Share an Idea
               </IdeabankButton>
@@ -122,14 +121,19 @@ export default function HomePage() {
         {/* Search and discovery entry */}
         <section className="px-5 pb-20 sm:px-8 lg:px-12">
           <div className="mx-auto max-w-2xl">
-            <SearchField value={query} onChange={setQuery} onSubmit={submitSearch} />
+            <SearchField
+              value={query}
+              onChange={setQuery}
+              onSubmit={submitSearch}
+              placeholder="Search problems by sector or keyword…"
+            />
             <div className="mt-5 flex flex-wrap justify-center gap-2.5">
               {TOPIC_CHIPS.map((topic) => (
                 <CategoryChip
                   key={topic}
                   label={topic}
                   onClick={() =>
-                    router.push(`/explore?category=${encodeURIComponent(TOPIC_TO_CATEGORY[topic])}`)
+                    router.push(`/problems?category=${encodeURIComponent(TOPIC_TO_CATEGORY[topic])}`)
                   }
                 />
               ))}
@@ -143,30 +147,30 @@ export default function HomePage() {
             <PurposeStatement />
             <p className="mx-auto mt-6 max-w-xl text-[17px] leading-relaxed text-[#3D3D3D]">
               Ideabank is a place to write down what you noticed, sketch what you tried, and
-              share how it changed after testing — so the next student doesn&apos;t have to
-              start from nothing.
+              track how your idea changed after testing — a repository of your own work, not a
+              catalogue of everyone else&apos;s.
             </p>
           </div>
         </section>
 
-        {/* Featured ideas */}
+        {/* Featured problems */}
         <section className="px-5 py-20 sm:px-8 lg:px-12">
           <div className="mx-auto max-w-[1240px]">
             <SectionIntro
-              eyebrow="From the bank"
-              heading="A few ideas to start with"
-              description="Demonstration examples showing how an idea moves from a noticed problem toward a tested prototype."
+              eyebrow="From the problem bank"
+              heading="A few problems to start with"
+              description="Real, everyday problems across sectors — pick one, or let it point you toward your own."
             />
             <div className="mt-12 grid grid-cols-1 gap-7 sm:grid-cols-2 lg:grid-cols-3">
-              {featuredIdeas.map((idea, i) => (
-                <ScrollReveal key={idea.id} delay={(i % 3) * 0.08}>
-                  <IdeaCard idea={idea} />
+              {featuredProblems.map((problem, i) => (
+                <ScrollReveal key={problem.id} delay={(i % 3) * 0.08}>
+                  <ProblemCard problem={problem} />
                 </ScrollReveal>
               ))}
             </div>
             <div className="mt-12 text-center">
-              <IdeabankButton href="/explore" variant="secondary">
-                See all ideas
+              <IdeabankButton href="/problems" variant="secondary">
+                See the whole problem bank
                 <ArrowRight className="h-4 w-4" aria-hidden="true" />
               </IdeabankButton>
             </div>
@@ -179,7 +183,7 @@ export default function HomePage() {
             <SectionIntro
               eyebrow="How it works"
               heading="A journey, not a straight line"
-              description="Every idea in the bank moves through the same four honest stages."
+              description="Every idea you track moves through the same four honest stages."
             />
             <div className="relative mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
               {LEARNING_STEPS.map((step, i) => (
@@ -194,17 +198,17 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* Browse by theme */}
+        {/* Browse by sector */}
         <section className="border-y border-[#DED8D3] bg-[#F4F2F1] px-5 py-20 sm:px-8 lg:px-12">
           <div className="mx-auto max-w-[1240px]">
-            <SectionIntro eyebrow="Browse" heading="Explore by theme" />
+            <SectionIntro eyebrow="Browse" heading="Problems by sector" />
             <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {IDEA_CATEGORIES.map((category, i) => {
+              {PROBLEM_CATEGORIES.map((category, i) => {
                 const Icon = CATEGORY_ICONS[category];
                 return (
                   <ScrollReveal key={category} delay={(i % 3) * 0.06}>
                     <Link
-                      href={`/explore?category=${encodeURIComponent(category)}`}
+                      href={`/problems?category=${encodeURIComponent(category)}`}
                       className="group flex h-full flex-col rounded-[22px] border border-[#DED8D3] bg-white p-6 transition-all hover:-translate-y-1 hover:border-[#4282A4] hover:shadow-[0_12px_32px_-16px_rgba(17,17,17,0.25)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4282A4]"
                     >
                       <span className="flex h-12 w-12 items-center justify-center rounded-full bg-[#EDF7FA] text-[#15425B]">
@@ -215,7 +219,7 @@ export default function HomePage() {
                         {CATEGORY_DESCRIPTIONS[category]}
                       </p>
                       <span className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-[#4282A4]">
-                        Browse ideas
+                        Browse problems
                         <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" aria-hidden="true" />
                       </span>
                     </Link>
@@ -226,43 +230,40 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* Featured idea story */}
+        {/* Featured problem story */}
         <section className="px-5 py-20 sm:px-8 lg:px-12">
           <div className="mx-auto grid max-w-[1240px] grid-cols-1 items-center gap-10 lg:grid-cols-[1.1fr_1fr] lg:gap-16">
             <ScrollReveal>
-              <IdeaIllustration imageKey={storyIdea.image} className="aspect-[4/3] w-full" iconClassName="h-20 w-20" />
+              <IdeaIllustration imageKey={storyProblem.image} className="aspect-[4/3] w-full" iconClassName="h-20 w-20" />
             </ScrollReveal>
             <ScrollReveal delay={0.1}>
               <p className="text-sm font-semibold uppercase tracking-[0.12em] text-[#4282A4]">
-                {storyIdea.category}
+                {storyProblem.category}
               </p>
               <h2 className="mt-3 text-[clamp(1.75rem,3.5vw,2.5rem)] font-bold leading-tight text-[#111111] font-heading">
-                {storyIdea.title}
+                {storyProblem.title}
               </h2>
-              <div className="mt-2">
-                <StageBadge stage={storyIdea.stage} />
-              </div>
 
               <dl className="mt-6 flex flex-col gap-4">
                 <div>
-                  <dt className="text-sm font-semibold text-[#111111]">Observation</dt>
-                  <dd className="mt-1 text-[15px] leading-relaxed text-[#3D3D3D]">{storyIdea.problem}</dd>
+                  <dt className="text-sm font-semibold text-[#111111]">The problem</dt>
+                  <dd className="mt-1 text-[15px] leading-relaxed text-[#3D3D3D]">{storyProblem.problem}</dd>
                 </div>
                 <div>
-                  <dt className="text-sm font-semibold text-[#111111]">Proposed approach</dt>
-                  <dd className="mt-1 text-[15px] leading-relaxed text-[#3D3D3D]">{storyIdea.proposedSolution}</dd>
+                  <dt className="text-sm font-semibold text-[#111111]">Who&apos;s affected</dt>
+                  <dd className="mt-1 text-[15px] leading-relaxed text-[#3D3D3D]">{storyProblem.affectedUsers}</dd>
                 </div>
                 <div>
-                  <dt className="text-sm font-semibold text-[#111111]">Next experiment</dt>
+                  <dt className="text-sm font-semibold text-[#111111]">A question to start with</dt>
                   <dd className="mt-1 text-[15px] leading-relaxed text-[#3D3D3D]">
-                    {storyIdea.improvements ?? "Testing notes and next steps are still being documented."}
+                    {storyProblem.promptQuestions[0]}
                   </dd>
                 </div>
               </dl>
 
               <div className="mt-7">
-                <IdeabankButton href={`/ideas/${storyIdea.slug}`}>
-                  Explore the idea
+                <IdeabankButton href={`/problems/${storyProblem.slug}`}>
+                  Think it through
                   <ArrowRight className="h-4 w-4" aria-hidden="true" />
                 </IdeabankButton>
               </div>

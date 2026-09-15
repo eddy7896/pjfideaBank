@@ -7,32 +7,32 @@ import { readDraft, writeDraft, clearDraft } from "@/lib/draft-storage";
  * backend exists; every call site depends only on this interface.
  */
 
-const SAVED_IDEAS_KEY = "ideabank:saved-ideas";
+const SAVED_PROBLEMS_KEY = "ideabank:saved-problems";
 const SHARE_DRAFT_KEY = "ideabank:share-draft";
 
-export function getSavedIdeaSlugs(): string[] {
-  return readDraft<string[]>(SAVED_IDEAS_KEY) ?? [];
+export function getSavedProblemSlugs(): string[] {
+  return readDraft<string[]>(SAVED_PROBLEMS_KEY) ?? [];
 }
 
-export function isIdeaSaved(slug: string): boolean {
-  return getSavedIdeaSlugs().includes(slug);
+export function isProblemSaved(slug: string): boolean {
+  return getSavedProblemSlugs().includes(slug);
 }
 
 type Listener = () => void;
-const savedIdeasListeners = new Set<Listener>();
+const savedProblemsListeners = new Set<Listener>();
 
 /** For useSyncExternalStore — lets SaveButton instances re-render when any of them toggles a save. */
-export function subscribeSavedIdeas(listener: Listener): () => void {
-  savedIdeasListeners.add(listener);
-  return () => savedIdeasListeners.delete(listener);
+export function subscribeSavedProblems(listener: Listener): () => void {
+  savedProblemsListeners.add(listener);
+  return () => savedProblemsListeners.delete(listener);
 }
 
-export function toggleSavedIdea(slug: string): boolean {
-  const current = getSavedIdeaSlugs();
+export function toggleSavedProblem(slug: string): boolean {
+  const current = getSavedProblemSlugs();
   const isSaved = current.includes(slug);
   const next = isSaved ? current.filter((s) => s !== slug) : [...current, slug];
-  writeDraft(SAVED_IDEAS_KEY, next);
-  savedIdeasListeners.forEach((listener) => listener());
+  writeDraft(SAVED_PROBLEMS_KEY, next);
+  savedProblemsListeners.forEach((listener) => listener());
   return !isSaved;
 }
 

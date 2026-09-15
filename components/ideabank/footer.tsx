@@ -2,7 +2,7 @@ import Link from "next/link";
 import { IdeabankLogo } from "./logo";
 
 const EXPLORE_LINKS = [
-  { href: "/explore", label: "Explore Ideas" },
+  { href: "/problems", label: "Problem Bank" },
   { href: "/dashboard", label: "Share an Idea" },
   { href: "/#how-it-works", label: "How It Works" },
   { href: "/#for-teachers", label: "For Teachers" },
@@ -16,8 +16,8 @@ export function IdeabankFooter() {
           <div className="max-w-sm">
             <IdeabankLogo />
             <p className="mt-4 text-sm leading-relaxed text-[#3D3D3D]">
-              Ideabank is a place for students and teachers to notice problems, explore
-              ideas, and document how prototypes grow through iteration.
+              Ideabank is a place for students and teachers to notice problems, and track how
+              their own idea grows through observation, prototyping, and testing.
             </p>
           </div>
 

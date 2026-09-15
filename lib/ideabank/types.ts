@@ -1,4 +1,4 @@
-export type IdeaCategory =
+export type ProblemCategory =
   | "Water & Sanitation"
   | "Agriculture & Food"
   | "Environment & Climate"
@@ -6,7 +6,7 @@ export type IdeaCategory =
   | "School & Learning"
   | "Community & Safety";
 
-export const IDEA_CATEGORIES: IdeaCategory[] = [
+export const PROBLEM_CATEGORIES: ProblemCategory[] = [
   "Water & Sanitation",
   "Agriculture & Food",
   "Environment & Climate",
@@ -15,32 +15,33 @@ export const IDEA_CATEGORIES: IdeaCategory[] = [
   "Community & Safety",
 ];
 
+/**
+ * Development stage of a student's own tracked idea (used by the Share an
+ * Idea flow) — not a property of a Problem Bank entry, since a problem
+ * hasn't been picked up by anyone yet.
+ */
 export type IdeaStage = "Observed" | "Ideating" | "Prototyping" | "Tested";
 
 export const IDEA_STAGES: IdeaStage[] = ["Observed", "Ideating", "Prototyping", "Tested"];
 
-export interface IdeaMaterial {
-  name: string;
-  costRupees: number | null;
-}
-
-export interface Idea {
+/**
+ * A problem in the Problem Bank is an unsolved starting point, not a
+ * finished idea — there's no proposed solution, materials, or stage,
+ * because those belong to a specific team's tracked idea (documented via
+ * the real Share an Idea / dashboard flow), not to the shared catalog.
+ */
+export interface Problem {
   id: string;
   slug: string;
   title: string;
   summary: string;
-  category: IdeaCategory;
+  category: ProblemCategory;
   tags: string[];
-  stage: IdeaStage;
   problem: string;
   affectedUsers: string;
   context: string;
-  proposedSolution: string;
-  materials: IdeaMaterial[];
-  estimatedCost: number | null;
-  prototypeSteps: string[];
-  testingNotes: string | null;
-  improvements: string | null;
+  /** A few starter questions to help a student begin thinking through it. */
+  promptQuestions: string[];
   image: string;
   createdAt: string;
 }

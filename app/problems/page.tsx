@@ -2,20 +2,20 @@ import { Suspense } from "react";
 import type { Metadata } from "next";
 import { IdeabankHeader } from "@/components/ideabank/header";
 import { IdeabankFooter } from "@/components/ideabank/footer";
-import { ExploreView } from "@/components/ideabank/explore-view";
+import { ProblemBankView } from "@/components/ideabank/problem-bank-view";
 
 export const metadata: Metadata = {
-  title: "Explore Ideas — Ideabank by PiJam",
-  description: "Search and filter student and teacher ideas by category, stage, and material cost.",
+  title: "Problem Bank — Ideabank by PiJam",
+  description: "Browse real, everyday problems across sectors to notice, think about, and turn into your own tracked idea.",
 };
 
-export default function ExplorePage() {
+export default function ProblemsPage() {
   return (
     <div className="min-h-screen bg-white">
       <IdeabankHeader />
       <main id="main-content">
-        <Suspense fallback={<ExploreFallback />}>
-          <ExploreView />
+        <Suspense fallback={<ProblemsFallback />}>
+          <ProblemBankView />
         </Suspense>
       </main>
       <IdeabankFooter />
@@ -23,7 +23,7 @@ export default function ExplorePage() {
   );
 }
 
-function ExploreFallback() {
+function ProblemsFallback() {
   return (
     <div className="mx-auto max-w-[1240px] px-5 py-12 sm:px-8 lg:px-12">
       <div className="h-10 w-64 animate-pulse rounded-full bg-[#F4F2F1]" />
