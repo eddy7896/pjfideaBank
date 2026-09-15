@@ -382,7 +382,7 @@ export default function DashboardLayout({
       )}
 
       {/* Main Content Area */}
-      <main className="flex-1 md:pl-64 pt-16 md:pt-0">
+      <main id="main-content" className="flex-1 md:pl-64 pt-16 md:pt-0">
         {children}
       </main>
       <Toaster richColors position="top-right" />

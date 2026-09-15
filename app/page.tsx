@@ -1,335 +1,314 @@
 "use client";
 
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
-import Image from "next/image";
-import { Bricolage_Grotesque } from "next/font/google";
-import { motion } from "framer-motion";
-import { ScrollRevealHeadline } from "@/components/landing/scroll-reveal-headline";
-import { TypewriterHeadline } from "@/components/landing/typewriter-headline";
-import { StatCounter } from "@/components/landing/stat-counter";
-import { TiltCard } from "@/components/landing/tilt-card";
+import { ArrowRight } from "lucide-react";
+import { IdeabankHeader } from "@/components/ideabank/header";
+import { IdeabankFooter } from "@/components/ideabank/footer";
+import { IdeabankButton } from "@/components/ideabank/button";
+import { SectionIntro } from "@/components/ideabank/section-intro";
+import { SearchField } from "@/components/ideabank/search-field";
+import { CategoryChip } from "@/components/ideabank/category-chip";
+import { IdeaCard } from "@/components/ideabank/idea-card";
+import { LearningStep } from "@/components/ideabank/learning-step";
+import { HeroCollage } from "@/components/ideabank/hero-collage";
+import { PurposeStatement } from "@/components/ideabank/purpose-statement";
+import { TeacherResourcePanels } from "@/components/ideabank/teacher-resources";
+import { ScrollReveal } from "@/components/ideabank/scroll-reveal";
+import { StageBadge } from "@/components/ideabank/stage-badge";
+import { IdeaIllustration, CATEGORY_ICONS } from "@/components/ideabank/illustration";
+import { DoodleSpark, DoodleUnderline, DoodleArrow } from "@/components/ideabank/doodle";
+import { IDEAS, FEATURED_IDEA_SLUGS, FEATURED_STORY_SLUG } from "@/lib/ideabank/data";
+import { IDEA_CATEGORIES } from "@/lib/ideabank/types";
 
-// Grounded in real idea titles from the platform (see prisma/seed.ts) —
-// each line is "the problem a team started with" -> "what they shipped".
-const HERO_EXAMPLES = [
-  "A dark study table becomes Solar Powered Desk Lamps",
-  "A stuck homework question becomes an AI Homework Helper Chatbot",
-  "An unlit street becomes a Neighborhood Safety Mapping App",
-  "A quiet classroom becomes a Mental Health Check-In Kiosk",
-  "A dry monsoon tank becomes a Rainwater Harvesting Tracker",
-  "A missed school bus becomes Smart School Bus Routing",
-] as const;
+const TOPIC_CHIPS = ["Water", "Agriculture", "Environment", "Accessibility", "School Life", "Community"];
 
-// Brand-register display face — scoped to this page only via the
-// .variable class below, never touches the product surface's font-sans.
-const bricolage = Bricolage_Grotesque({
-  subsets: ["latin"],
-  variable: "--font-display",
-});
-
-const PIPELINE = [
-  {
-    stage: "Empathize",
-    verb: "Notice the problem",
-    detail:
-      "Who's affected, when, where, how. Then five whys, one after another, until you hit the real cause instead of the obvious one.",
-    example: "Neighborhood Safety Mapping App",
-  },
-  {
-    stage: "Define",
-    verb: "Name it precisely",
-    detail:
-      "One How-Might-We sentence. A real persona, not a demographic. A need statement specific enough to actually fail.",
-    example: "Mental Health Check-In Kiosk",
-  },
-  {
-    stage: "Ideate",
-    verb: "Generate, then choose",
-    detail:
-      "Brainstorm without judging it. Pick one. Write down why — and what constraints it has to work inside.",
-    example: "Community Skill-Share Platform",
-  },
-  {
-    stage: "Prototype",
-    verb: "Build the rough version",
-    detail:
-      "List the tools. Log every iteration: what changed, what broke, what got learned from the breaking.",
-    example: "Solar Powered Desk Lamps",
-  },
-  {
-    stage: "Test",
-    verb: "Put it in front of people",
-    detail:
-      "Real users, real feedback. Pass moves forward. Fail sends it back to Prototype — on purpose, not as a setback.",
-    example: "AI Homework Helper Chatbot",
-  },
-] as const;
-
-const fadeUp = {
-  hidden: { opacity: 0, y: 24 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] as const } },
+const TOPIC_TO_CATEGORY: Record<string, string> = {
+  Water: "Water & Sanitation",
+  Agriculture: "Agriculture & Food",
+  Environment: "Environment & Climate",
+  Accessibility: "Accessibility & Inclusion",
+  "School Life": "School & Learning",
+  Community: "Community & Safety",
 };
 
-export default function LandingPage() {
+const LEARNING_STEPS = [
+  {
+    number: "01",
+    hindi: "सोचो",
+    english: "Think",
+    description: "Notice patterns and ask useful questions about what isn't working around you.",
+  },
+  {
+    number: "02",
+    hindi: "समझो",
+    english: "Understand",
+    description: "Listen to the people affected and understand the problem from their side of it.",
+  },
+  {
+    number: "03",
+    hindi: "बनाओ",
+    english: "Build",
+    description: "Sketch, experiment, and put together a rough first version worth testing.",
+  },
+  {
+    number: "04",
+    hindi: "बदलो",
+    english: "Change",
+    description: "Test it with real people, learn from what breaks, and improve it.",
+  },
+];
+
+const CATEGORY_DESCRIPTIONS: Record<string, string> = {
+  "Water & Sanitation": "Leaks, access, quality, and everyday water use around school and home.",
+  "Agriculture & Food": "Growing, storing, and handling food, from kitchen gardens to family farms.",
+  "Environment & Climate": "Weather, waste, biodiversity, and the systems around us changing.",
+  "Accessibility & Inclusion": "Making spaces and tools work for people of every ability.",
+  "School & Learning": "The everyday friction of classrooms, corridors, and school routines.",
+  "Community & Safety": "Shared spaces, roads, and the small things that keep a neighbourhood safe.",
+};
+
+export default function HomePage() {
+  const router = useRouter();
+  const [query, setQuery] = useState("");
+
+  const featuredIdeas = FEATURED_IDEA_SLUGS.map((slug) => IDEAS.find((i) => i.slug === slug)!).filter(Boolean);
+  const storyIdea = IDEAS.find((i) => i.slug === FEATURED_STORY_SLUG)!;
+
+  function submitSearch() {
+    const params = new URLSearchParams();
+    if (query.trim()) params.set("q", query.trim());
+    router.push(`/explore${params.toString() ? `?${params.toString()}` : ""}`);
+  }
+
   return (
-    <div className={`${bricolage.variable} min-h-screen bg-[#FAFBFC] text-[#161B22]`}>
-      {/* Navbar */}
-      <header className="sticky top-0 z-50 border-b border-[#DFE4EA] bg-[#FAFBFC]">
-        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-          <Link href="/" className="flex items-center">
-            <Image
-              src="/pijam logo.jpeg"
-              alt="Pi Jam Logo"
-              width={150}
-              height={60}
-              className="rounded-lg"
-              priority
-            />
-          </Link>
-          <div className="flex items-center gap-3">
-            <Link
-              href="/pijam"
-              className="inline-flex h-9 items-center gap-2 rounded-lg border border-[#DFE4EA] bg-white px-4 text-sm font-medium text-[#161B22] transition-colors hover:bg-[#F0F3F6]"
-            >
-              Staff Portal
-            </Link>
-            <Link
-              href="/login"
-              className="inline-flex h-9 items-center rounded-lg bg-[#5BA4C7] px-4 text-sm font-medium text-white transition-colors hover:bg-[#4C92B5]"
-            >
-              Sign In
-            </Link>
-          </div>
-        </div>
-      </header>
+    <div className="min-h-screen bg-white">
+      <IdeabankHeader />
 
-      {/* Hero */}
-      <section className="relative overflow-hidden pb-20 pt-20 lg:pb-28 lg:pt-28">
-        <div className="mx-auto max-w-5xl px-4 text-center sm:px-6 lg:px-8">
-          <motion.p
-            initial="hidden"
-            animate="visible"
-            variants={fadeUp}
-            className="mb-6 font-mono text-xs font-semibold uppercase tracking-[0.15em] text-[#5BA4C7]"
-          >
-            Pi Jam Foundation · Design Thinking for Schools
-          </motion.p>
-
-          <ScrollRevealHeadline
-            text="IDEAS BECOME INNOVATIONS"
-            className="font-display text-[11vw] font-bold uppercase leading-[0.95] tracking-tight text-[#161B22] sm:text-[8vw] lg:text-[5.5rem]"
-          />
-
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={fadeUp}
-            className="mx-auto mt-8 flex min-h-[3.5em] max-w-3xl items-start justify-center px-2 sm:min-h-[2.5em]"
-          >
-            <TypewriterHeadline
-              phrases={HERO_EXAMPLES}
-              className="text-lg leading-relaxed text-[#56606B] sm:text-xl"
-            />
-          </motion.div>
-
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={fadeUp}
-            className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row"
-          >
-            <Link
-              href="/login"
-              className="inline-flex h-12 items-center justify-center rounded-lg bg-[#5BA4C7] px-8 text-base font-semibold text-white transition-all hover:bg-[#4C92B5] active:scale-[0.98]"
-            >
-              Explore the Platform
-            </Link>
-            <a
-              href="#pipeline"
-              className="inline-flex h-12 items-center justify-center gap-2 rounded-lg border border-[#DFE4EA] bg-white px-8 text-base font-semibold text-[#161B22] transition-colors hover:bg-[#F0F3F6]"
-            >
-              See the Five Stages
-            </a>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Bridge line */}
-      <section className="border-y border-[#DFE4EA] bg-white py-12">
-        <div className="mx-auto max-w-3xl px-4 text-center sm:px-6 lg:px-8">
-          <p className="text-xl font-medium leading-snug text-[#161B22]">
-            Every real solution starts as something a student noticed —
-            <span className="text-[#5BA4C7]"> not a lesson plan.</span>
-          </p>
-        </div>
-      </section>
-
-      {/* Pipeline */}
-      <section id="pipeline" className="py-24 lg:py-32">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
-            variants={fadeUp}
-            className="mx-auto mb-16 max-w-2xl text-center"
-          >
-            <h2 className="font-display text-4xl font-bold tracking-tight text-[#161B22] sm:text-5xl">
-              Five stages. One real problem, start to finish.
-            </h2>
-            <p className="mt-4 text-lg text-[#56606B]">
-              The same structured pipeline every idea on this platform actually moves
-              through — not a metaphor, the literal workflow.
+      <main id="main-content">
+        {/* Hero */}
+        <section className="relative overflow-hidden px-5 pb-8 pt-16 sm:px-8 sm:pt-20 lg:px-12 lg:pt-24">
+          <div className="mx-auto max-w-[1240px] text-center">
+            <p className="mb-5 text-sm font-semibold uppercase tracking-[0.14em] text-[#4282A4]">
+              Ideabank by PiJam
             </p>
-          </motion.div>
 
-          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-5">
-            {PIPELINE.map((step, i) => (
-              <motion.div
-                key={step.stage}
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true, margin: "-80px" }}
-                variants={fadeUp}
-                transition={{ delay: i * 0.08 }}
-                style={{ perspective: "800px" }}
-              >
-                <TiltCard
-                  className="flex h-full flex-col rounded-2xl border p-6"
-                  style={{
-                    borderColor: `var(--stage-${step.stage.toLowerCase()}-border)`,
-                    backgroundColor: `var(--stage-${step.stage.toLowerCase()}-soft)`,
-                  }}
-                >
-                  <span className="font-mono text-xs font-semibold tracking-wide text-[#56606B]">
-                    0{i + 1}
-                  </span>
-                  <h3
-                    className="mt-3 text-lg font-bold"
-                    style={{ color: `var(--stage-${step.stage.toLowerCase()})` }}
-                  >
-                    {step.stage}
-                  </h3>
-                  <p className="mt-1 text-sm font-semibold text-[#161B22]">{step.verb}</p>
-                  <p className="mt-3 flex-1 text-sm leading-relaxed text-[#56606B]">
-                    {step.detail}
-                  </p>
-                  <p className="mt-4 border-t border-black/10 pt-3 text-xs text-[#56606B]">
-                    e.g. <span className="font-medium text-[#161B22]">{step.example}</span>
-                  </p>
-                </TiltCard>
-              </motion.div>
-            ))}
+            <h1 className="relative mx-auto max-w-4xl text-[clamp(2.375rem,6vw,4rem)] font-bold leading-[1.1] tracking-tight text-[#111111] font-heading">
+              Small observations.
+              <br />
+              Ideas that make a difference.
+              <DoodleSpark className="absolute -right-2 top-0 hidden sm:block lg:-right-8" />
+            </h1>
+
+            <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-[#3D3D3D] sm:text-xl">
+              Explore everyday challenges, learn from young creators, and turn your own
+              questions into ideas worth building.
+            </p>
+
+            <div className="mt-9 flex flex-col items-center justify-center gap-4 sm:flex-row">
+              <IdeabankButton href="/explore">Explore Ideas</IdeabankButton>
+              <IdeabankButton href="/share" variant="secondary">
+                Share an Idea
+              </IdeabankButton>
+            </div>
+
+            <div className="mt-14">
+              <HeroCollage />
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Stats — honest, structural facts about the platform itself */}
-      <section className="border-y border-[#DFE4EA] bg-white py-20">
-        <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-3 gap-8">
-            <StatCounter value={5} label="Design Thinking Stages" />
-            <StatCounter value={7} label="Roles, One Workspace" />
-            <StatCounter value={36} label="States & UTs Mapped" />
+        {/* Search and discovery entry */}
+        <section className="px-5 pb-20 sm:px-8 lg:px-12">
+          <div className="mx-auto max-w-2xl">
+            <SearchField value={query} onChange={setQuery} onSubmit={submitSearch} />
+            <div className="mt-5 flex flex-wrap justify-center gap-2.5">
+              {TOPIC_CHIPS.map((topic) => (
+                <CategoryChip
+                  key={topic}
+                  label={topic}
+                  onClick={() =>
+                    router.push(`/explore?category=${encodeURIComponent(TOPIC_TO_CATEGORY[topic])}`)
+                  }
+                />
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Paths in */}
-      <section className="py-24 lg:py-32">
-        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
-            variants={fadeUp}
-            className="mx-auto mb-14 max-w-2xl text-center"
-          >
-            <h2 className="font-display text-4xl font-bold tracking-tight text-[#161B22] sm:text-5xl">
-              Three ways in
+        {/* Purpose statement */}
+        <section className="border-y border-[#DED8D3] bg-[#F4F2F1] px-5 py-16 sm:px-8 sm:py-20 lg:px-12">
+          <div className="mx-auto max-w-4xl text-center">
+            <PurposeStatement />
+            <p className="mx-auto mt-6 max-w-xl text-[17px] leading-relaxed text-[#3D3D3D]">
+              Ideabank is a place to write down what you noticed, sketch what you tried, and
+              share how it changed after testing — so the next student doesn&apos;t have to
+              start from nothing.
+            </p>
+          </div>
+        </section>
+
+        {/* Featured ideas */}
+        <section className="px-5 py-20 sm:px-8 lg:px-12">
+          <div className="mx-auto max-w-[1240px]">
+            <SectionIntro
+              eyebrow="From the bank"
+              heading="A few ideas to start with"
+              description="Demonstration examples showing how an idea moves from a noticed problem toward a tested prototype."
+            />
+            <div className="mt-12 grid grid-cols-1 gap-7 sm:grid-cols-2 lg:grid-cols-3">
+              {featuredIdeas.map((idea, i) => (
+                <ScrollReveal key={idea.id} delay={(i % 3) * 0.08}>
+                  <IdeaCard idea={idea} />
+                </ScrollReveal>
+              ))}
+            </div>
+            <div className="mt-12 text-center">
+              <IdeabankButton href="/explore" variant="secondary">
+                See all ideas
+                <ArrowRight className="h-4 w-4" aria-hidden="true" />
+              </IdeabankButton>
+            </div>
+          </div>
+        </section>
+
+        {/* Learning journey */}
+        <section id="how-it-works" className="scroll-mt-20 px-5 py-20 sm:px-8 lg:px-12">
+          <div className="mx-auto max-w-[1240px]">
+            <SectionIntro
+              eyebrow="How it works"
+              heading="A journey, not a straight line"
+              description="Every idea in the bank moves through the same four honest stages."
+            />
+            <div className="relative mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+              {LEARNING_STEPS.map((step, i) => (
+                <ScrollReveal key={step.number} delay={i * 0.08} className="relative">
+                  <LearningStep {...step} />
+                  {i < LEARNING_STEPS.length - 1 && (
+                    <DoodleArrow className="pointer-events-none absolute -right-8 top-1/2 hidden -translate-y-1/2 lg:block" />
+                  )}
+                </ScrollReveal>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Browse by theme */}
+        <section className="border-y border-[#DED8D3] bg-[#F4F2F1] px-5 py-20 sm:px-8 lg:px-12">
+          <div className="mx-auto max-w-[1240px]">
+            <SectionIntro eyebrow="Browse" heading="Explore by theme" />
+            <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {IDEA_CATEGORIES.map((category, i) => {
+                const Icon = CATEGORY_ICONS[category];
+                return (
+                  <ScrollReveal key={category} delay={(i % 3) * 0.06}>
+                    <Link
+                      href={`/explore?category=${encodeURIComponent(category)}`}
+                      className="group flex h-full flex-col rounded-[22px] border border-[#DED8D3] bg-white p-6 transition-all hover:-translate-y-1 hover:border-[#4282A4] hover:shadow-[0_12px_32px_-16px_rgba(17,17,17,0.25)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4282A4]"
+                    >
+                      <span className="flex h-12 w-12 items-center justify-center rounded-full bg-[#EDF7FA] text-[#15425B]">
+                        <Icon className="h-6 w-6" aria-hidden="true" />
+                      </span>
+                      <h3 className="mt-4 text-lg font-semibold text-[#111111]">{category}</h3>
+                      <p className="mt-1.5 flex-1 text-sm leading-relaxed text-[#3D3D3D]">
+                        {CATEGORY_DESCRIPTIONS[category]}
+                      </p>
+                      <span className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-[#4282A4]">
+                        Browse ideas
+                        <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" aria-hidden="true" />
+                      </span>
+                    </Link>
+                  </ScrollReveal>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+
+        {/* Featured idea story */}
+        <section className="px-5 py-20 sm:px-8 lg:px-12">
+          <div className="mx-auto grid max-w-[1240px] grid-cols-1 items-center gap-10 lg:grid-cols-[1.1fr_1fr] lg:gap-16">
+            <ScrollReveal>
+              <IdeaIllustration imageKey={storyIdea.image} className="aspect-[4/3] w-full" iconClassName="h-20 w-20" />
+            </ScrollReveal>
+            <ScrollReveal delay={0.1}>
+              <p className="text-sm font-semibold uppercase tracking-[0.12em] text-[#4282A4]">
+                {storyIdea.category}
+              </p>
+              <h2 className="mt-3 text-[clamp(1.75rem,3.5vw,2.5rem)] font-bold leading-tight text-[#111111] font-heading">
+                {storyIdea.title}
+              </h2>
+              <div className="mt-2">
+                <StageBadge stage={storyIdea.stage} />
+              </div>
+
+              <dl className="mt-6 flex flex-col gap-4">
+                <div>
+                  <dt className="text-sm font-semibold text-[#111111]">Observation</dt>
+                  <dd className="mt-1 text-[15px] leading-relaxed text-[#3D3D3D]">{storyIdea.problem}</dd>
+                </div>
+                <div>
+                  <dt className="text-sm font-semibold text-[#111111]">Proposed approach</dt>
+                  <dd className="mt-1 text-[15px] leading-relaxed text-[#3D3D3D]">{storyIdea.proposedSolution}</dd>
+                </div>
+                <div>
+                  <dt className="text-sm font-semibold text-[#111111]">Next experiment</dt>
+                  <dd className="mt-1 text-[15px] leading-relaxed text-[#3D3D3D]">
+                    {storyIdea.improvements ?? "Testing notes and next steps are still being documented."}
+                  </dd>
+                </div>
+              </dl>
+
+              <div className="mt-7">
+                <IdeabankButton href={`/ideas/${storyIdea.slug}`}>
+                  Explore the idea
+                  <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                </IdeabankButton>
+              </div>
+            </ScrollReveal>
+          </div>
+        </section>
+
+        {/* Teacher support */}
+        <section id="for-teachers" className="scroll-mt-20 border-y border-[#DED8D3] bg-[#F4F2F1] px-5 py-20 sm:px-8 lg:px-12">
+          <div className="mx-auto max-w-[1240px]">
+            <div className="mx-auto max-w-2xl text-center">
+              <DoodleUnderline className="mx-auto mb-4 w-24" />
+              <h2 className="text-[clamp(1.875rem,4vw,3rem)] font-bold leading-[1.15] tracking-tight text-[#111111] font-heading">
+                Make room for the next good question.
+              </h2>
+              <p className="mt-4 text-lg leading-relaxed text-[#3D3D3D]">
+                Practical starting points for bringing observation and iteration into a
+                regular class period.
+              </p>
+            </div>
+
+            <div className="mx-auto mt-12 max-w-3xl">
+              <TeacherResourcePanels />
+            </div>
+          </div>
+        </section>
+
+        {/* Closing CTA */}
+        <section className="px-5 py-20 sm:px-8 lg:px-12">
+          <div className="mx-auto max-w-[1240px] overflow-hidden rounded-[32px] bg-[#15425B] px-8 py-16 text-center sm:px-16 sm:py-20">
+            <h2 className="text-[clamp(1.875rem,4.5vw,3.25rem)] font-bold leading-[1.1] tracking-tight text-white font-heading">
+              What did you notice today?
             </h2>
-          </motion.div>
-
-          <div className="divide-y divide-[#DFE4EA] border-y border-[#DFE4EA]">
-            {[
-              {
-                title: "Onboard your school",
-                desc: "Register your school and start logging student teams and their ideas.",
-                href: "/onboard",
-                cta: "Register a school",
-              },
-              {
-                title: "Join as Pi Jam staff",
-                desc: "Teacher Trainers and Geography Leads register through the staff portal.",
-                href: "/pijam",
-                cta: "Staff registration",
-              },
-              {
-                title: "Already have an account",
-                desc: "Sign in as a school admin, staff member, or a student team with your PIN.",
-                href: "/login",
-                cta: "Sign in",
-              },
-            ].map((path, i) => (
-              <motion.div
-                key={path.title}
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true, margin: "-80px" }}
-                variants={fadeUp}
-                transition={{ delay: i * 0.08 }}
-              >
-                <Link
-                  href={path.href}
-                  className="flex flex-col items-start justify-between gap-2 py-6 transition-colors hover:bg-[#F0F3F6] sm:flex-row sm:items-center sm:gap-8 sm:px-4"
-                >
-                  <span className="font-mono text-xs font-semibold text-[#56606B]">0{i + 1}</span>
-                  <div className="flex-1">
-                    <h3 className="text-lg font-bold text-[#161B22]">{path.title}</h3>
-                    <p className="mt-1 text-sm leading-relaxed text-[#56606B]">{path.desc}</p>
-                  </div>
-                  <span className="text-sm font-semibold text-[#5BA4C7]">{path.cta}</span>
-                </Link>
-              </motion.div>
-            ))}
+            <p className="mx-auto mt-5 max-w-lg text-lg leading-relaxed text-white/85">
+              A small observation could be the beginning of your next project.
+            </p>
+            <div className="mt-9">
+              <IdeabankButton href="/share" variant="cyan">
+                Share an Idea
+              </IdeabankButton>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      </main>
 
-      {/* About */}
-      <section className="border-t border-[#DFE4EA] bg-white py-20">
-        <div className="mx-auto max-w-3xl px-4 text-center sm:px-6 lg:px-8">
-          <h3 className="font-display text-2xl font-bold text-[#161B22]">About Pi Jam Foundation</h3>
-          <p className="mt-4 leading-relaxed text-[#56606B]">
-            Pi Jam Foundation builds ecosystems for future-ready problem solvers, using
-            computational thinking and design-driven education to change how students
-            approach the problems actually in front of them.
-          </p>
-          <a
-            href="https://thepijam.org"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mt-5 inline-block text-sm font-semibold text-[#5BA4C7] underline decoration-[#5BA4C7]/40 underline-offset-4 hover:decoration-[#5BA4C7]"
-          >
-            Learn more about Pi Jam
-          </a>
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="bg-[#FAFBFC] py-12">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <p className="text-center text-sm text-[#56606B]">
-            © 2026 Pi Jam Idea Bank. Developed by Pi Jam Foundation. Visit{" "}
-            <a href="https://thepijam.org" target="_blank" rel="noopener noreferrer" className="text-[#5BA4C7] hover:underline">
-              thepijam.org
-            </a>{" "}
-            for more.
-          </p>
-        </div>
-      </footer>
+      <IdeabankFooter />
     </div>
   );
 }

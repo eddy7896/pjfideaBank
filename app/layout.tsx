@@ -1,13 +1,23 @@
 import type { Metadata } from "next";
-import { Public_Sans, JetBrains_Mono } from "next/font/google";
+import { Inter, DM_Sans, Noto_Sans_Devanagari, JetBrains_Mono } from "next/font/google";
 import { MotionConfig } from "framer-motion";
 import "./globals.css";
 import { AuthSessionProvider } from "@/components/providers/session-provider";
 import { ThemeProvider } from "@/components/theme-provider";
 
-const publicSans = Public_Sans({
+const inter = Inter({
   subsets: ["latin"],
   variable: "--font-sans",
+});
+
+const dmSans = DM_Sans({
+  subsets: ["latin"],
+  variable: "--font-heading",
+});
+
+const notoDevanagari = Noto_Sans_Devanagari({
+  subsets: ["devanagari"],
+  variable: "--font-devanagari",
 });
 
 const jetbrainsMono = JetBrains_Mono({
@@ -16,15 +26,16 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Pi Jam Idea Bank — Project Dashboard",
+  title: "Ideabank by PiJam — Small observations, ideas that make a difference",
   description:
-    "Track and manage student project ideas using the Design Thinking framework. A thematic calendar-driven repository for schools and educators.",
+    "Explore everyday problems, learn from young creators, and turn your own observations into ideas worth building. A student and teacher idea-sharing platform from PiJam.",
   keywords: [
+    "Ideabank",
+    "PiJam",
+    "Student Ideas",
     "Design Thinking",
-    "Student Projects",
     "Education",
-    "Pi Jam",
-    "Idea Bank",
+    "Innovation",
   ],
 };
 
@@ -36,8 +47,14 @@ export default function RootLayout({
   return (
     <html lang="en" className="bg-background" suppressHydrationWarning>
       <body
-        className={`${publicSans.variable} ${jetbrainsMono.variable} min-h-screen bg-background font-sans antialiased`}
+        className={`${inter.variable} ${dmSans.variable} ${notoDevanagari.variable} ${jetbrainsMono.variable} min-h-screen bg-background font-sans antialiased`}
       >
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:rounded-full focus:bg-primary focus:px-5 focus:py-2.5 focus:text-sm focus:font-semibold focus:text-primary-foreground"
+        >
+          Skip to content
+        </a>
         <ThemeProvider>
           <MotionConfig reducedMotion="user">
             <AuthSessionProvider>{children}</AuthSessionProvider>
