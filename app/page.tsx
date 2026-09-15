@@ -2,45 +2,68 @@
 
 import Link from "next/link";
 import Image from "next/image";
+import { Bricolage_Grotesque } from "next/font/google";
 import { motion } from "framer-motion";
-import {
-  BookOpen,
-  Users,
-  Target,
-  ArrowRight,
-  Zap,
-  CheckCircle2,
-} from "lucide-react";
-import { AnimatedBackground } from "@/components/landing/animated-background";
-import { HeroIllustration } from "@/components/landing/hero-illustration";
+import { ArrowRight, Sparkles } from "lucide-react";
+import { ScrollRevealHeadline } from "@/components/landing/scroll-reveal-headline";
+import { StatCounter } from "@/components/landing/stat-counter";
+import { TiltCard } from "@/components/landing/tilt-card";
+
+// Brand-register display face — scoped to this page only via the
+// .variable class below, never touches the product surface's font-sans.
+const bricolage = Bricolage_Grotesque({
+  subsets: ["latin"],
+  variable: "--font-display",
+});
+
+const PIPELINE = [
+  {
+    stage: "Empathize",
+    verb: "Notice the problem",
+    detail:
+      "Who's affected, when, where, how. Then five whys, one after another, until you hit the real cause instead of the obvious one.",
+    example: "Neighborhood Safety Mapping App",
+  },
+  {
+    stage: "Define",
+    verb: "Name it precisely",
+    detail:
+      "One How-Might-We sentence. A real persona, not a demographic. A need statement specific enough to actually fail.",
+    example: "Mental Health Check-In Kiosk",
+  },
+  {
+    stage: "Ideate",
+    verb: "Generate, then choose",
+    detail:
+      "Brainstorm without judging it. Pick one. Write down why — and what constraints it has to work inside.",
+    example: "Community Skill-Share Platform",
+  },
+  {
+    stage: "Prototype",
+    verb: "Build the rough version",
+    detail:
+      "List the tools. Log every iteration: what changed, what broke, what got learned from the breaking.",
+    example: "Solar Powered Desk Lamps",
+  },
+  {
+    stage: "Test",
+    verb: "Put it in front of people",
+    detail:
+      "Real users, real feedback. Pass moves forward. Fail sends it back to Prototype — on purpose, not as a setback.",
+    example: "AI Homework Helper Chatbot",
+  },
+] as const;
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 24 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] as const } },
+};
 
 export default function LandingPage() {
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1,
-        delayChildren: 0.1,
-      },
-    },
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.6 },
-    },
-  };
-
   return (
-    <div className="min-h-screen bg-background relative">
-      <AnimatedBackground />
-
+    <div className={`${bricolage.variable} min-h-screen bg-[#FAFBFC] text-[#161B22]`}>
       {/* Navbar */}
-      <header className="sticky top-0 z-50 border-b border-border bg-background">
+      <header className="sticky top-0 z-50 border-b border-[#DFE4EA] bg-[#FAFBFC]">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
           <Link href="/" className="flex items-center">
             <Image
@@ -55,13 +78,13 @@ export default function LandingPage() {
           <div className="flex items-center gap-3">
             <Link
               href="/pijam"
-              className="inline-flex h-9 items-center gap-2 rounded-lg border border-border bg-card px-4 text-sm font-medium text-foreground transition-all hover:bg-muted"
+              className="inline-flex h-9 items-center gap-2 rounded-lg border border-[#DFE4EA] bg-white px-4 text-sm font-medium text-[#161B22] transition-colors hover:bg-[#F0F3F6]"
             >
               Staff Portal
             </Link>
             <Link
               href="/login"
-              className="inline-flex h-9 items-center gap-2 rounded-lg bg-primary px-4 text-sm font-medium text-primary-foreground transition-all hover:bg-primary/90"
+              className="inline-flex h-9 items-center gap-2 rounded-lg bg-[#5BA4C7] px-4 text-sm font-medium text-white transition-colors hover:bg-[#4C92B5]"
             >
               Sign In
               <ArrowRight className="h-4 w-4" />
@@ -70,336 +93,233 @@ export default function LandingPage() {
         </div>
       </header>
 
-      {/* Hero Section */}
-      <section className="relative pt-20 pb-32 lg:pt-32 lg:pb-40 overflow-hidden">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      {/* Hero */}
+      <section className="relative overflow-hidden pb-20 pt-20 lg:pb-28 lg:pt-28">
+        <div className="mx-auto max-w-5xl px-4 text-center sm:px-6 lg:px-8">
           <motion.div
-            className="grid lg:grid-cols-2 gap-12 items-center"
             initial="hidden"
             animate="visible"
-            variants={containerVariants}
+            variants={fadeUp}
+            className="mx-auto mb-8 inline-flex w-fit items-center gap-2 rounded-full border border-[#5BA4C7]/25 bg-[#5BA4C7]/8 px-4 py-2"
           >
-            {/* Left Column - Text */}
-            <div className="flex flex-col justify-center">
-              <motion.div
-                variants={itemVariants}
-                initial="hidden"
-                animate="visible"
-                className="inline-flex w-fit items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-2 mb-6"
-              >
-                <Zap className="h-4 w-4 text-primary" />
-                <span className="text-sm font-semibold text-primary">By Pi Jam Foundation</span>
-              </motion.div>
-
-              <motion.h1
-                variants={itemVariants}
-                initial="hidden"
-                animate="visible"
-                className="text-5xl sm:text-6xl font-heading font-bold tracking-tight text-foreground leading-tight"
-              >
-                The Idea Bank for Problem Solvers
-              </motion.h1>
-
-              <motion.p
-                variants={itemVariants}
-                initial="hidden"
-                animate="visible"
-                className="mt-6 text-lg text-muted-foreground leading-relaxed"
-              >
-                A collaborative repository where students identify real-world problems, develop solutions, and create measurable impact. Built for schools that nurture computational thinking and design-driven innovation.
-              </motion.p>
-
-              <motion.div
-                variants={itemVariants}
-                initial="hidden"
-                animate="visible"
-                className="mt-8 flex flex-col sm:flex-row gap-4"
-              >
-                <Link
-                  href="/login"
-                  className="inline-flex h-12 items-center justify-center gap-2 rounded-lg bg-primary px-8 text-base font-semibold text-primary-foreground transition-all hover:bg-primary/90"
-                >
-                  Explore Platform
-                  <ArrowRight className="h-4 w-4" />
-                </Link>
-                <a
-                  href="#features"
-                  className="inline-flex h-12 items-center justify-center gap-2 rounded-lg border border-border bg-card px-8 text-base font-semibold text-foreground transition-all hover:bg-muted"
-                >
-                  Learn More
-                </a>
-              </motion.div>
-
-              <motion.div
-                variants={itemVariants}
-                initial="hidden"
-                animate="visible"
-                className="mt-10 flex flex-col gap-3"
-              >
-                {[
-                  "Identify and document real problems",
-                  "Collaborate on innovative solutions",
-                  "Track impact across schools",
-                ].map((feature) => (
-                  <div key={feature} className="flex items-center gap-3">
-                    <CheckCircle2 className="h-5 w-5 text-primary flex-shrink-0" />
-                    <span className="text-foreground font-medium">{feature}</span>
-                  </div>
-                ))}
-              </motion.div>
-            </div>
-
-            {/* Right Column - Illustration */}
-            <motion.div
-              variants={itemVariants}
-              initial="hidden"
-              animate="visible"
-              className="hidden lg:block"
-            >
-              <HeroIllustration />
-            </motion.div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Features Section */}
-      <section id="features" className="relative py-24">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <motion.div
-            className="text-center mb-16"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true, margin: "-100px" }}
-          >
-            <h2 className="text-4xl font-heading font-bold text-foreground mb-4">What is Idea Bank?</h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              A centralized platform for schools to foster innovation, collaboration, and problem-solving
-            </p>
+            <Sparkles className="h-4 w-4 text-[#5BA4C7]" />
+            <span className="text-sm font-semibold text-[#5BA4C7]">Pi Jam Foundation · Design Thinking for Schools</span>
           </motion.div>
 
-          <div className="grid md:grid-cols-3 gap-8">
-            {[
-              {
-                icon: BookOpen,
-                title: "Identify & Document",
-                desc: "Students identify real-world problems and document them with context, research, and solutions."
-              },
-              {
-                icon: Users,
-                title: "Collaborate & Build",
-                desc: "Teams develop prototypes together. Track progress, share resources, iterate on feedback."
-              },
-              {
-                icon: Target,
-                title: "Create Impact",
-                desc: "Transform ideas into projects that solve community problems. Measure and scale success."
-              }
-            ].map((feature, i) => (
-              <motion.div
-                key={feature.title}
-                className="rounded-2xl border border-border/50 bg-card p-8 hover:border-primary/30 transition-all cursor-pointer group"
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: i * 0.1 }}
-                viewport={{ once: true, margin: "-100px" }}
-                whileHover={{ y: -8 }}
-              >
-                <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors mb-6">
-                  <feature.icon className="h-6 w-6 text-primary" />
-                </div>
-                <h3 className="text-xl font-heading font-bold text-foreground mb-3">{feature.title}</h3>
-                <p className="text-muted-foreground leading-relaxed">{feature.desc}</p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* How It Works */}
-      <section className="relative py-24 bg-card border-t border-border/50">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <motion.div
-            className="text-center mb-16"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true, margin: "-100px" }}
-          >
-            <h2 className="text-4xl font-heading font-bold text-foreground mb-4">How It Works</h2>
-            <p className="text-lg text-muted-foreground">Design thinking approach to problem solving</p>
-          </motion.div>
-
-          <div className="grid md:grid-cols-4 gap-6">
-            {[
-              { num: "1", title: "Observe", desc: "Identify community challenges" },
-              { num: "2", title: "Define", desc: "Document problem statements" },
-              { num: "3", title: "Ideate", desc: "Brainstorm solutions" },
-              { num: "4", title: "Build", desc: "Prototype and test" }
-            ].map((step, i) => (
-              <motion.div
-                key={step.num}
-                className="relative"
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: i * 0.1 }}
-                viewport={{ once: true, margin: "-100px" }}
-              >
-                <div className="rounded-2xl border border-border bg-background p-6 text-center h-full flex flex-col items-center justify-center">
-                  <motion.div
-                    className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-primary text-sm font-bold text-white mb-4"
-                    whileHover={{ scale: 1.1 }}
-                  >
-                    {step.num}
-                  </motion.div>
-                  <h4 className="text-lg font-heading font-bold text-foreground mb-2">{step.title}</h4>
-                  <p className="text-sm text-muted-foreground">{step.desc}</p>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Stats Section */}
-      <section className="relative py-24 bg-primary text-primary-foreground overflow-hidden">
-        <div className="absolute inset-0 opacity-5">
-          <motion.div
-            className="absolute inset-0"
-            animate={{
-              background: [
-                "radial-gradient(circle at 0% 0%, rgba(255,255,255,0.1) 0%, transparent 50%)",
-                "radial-gradient(circle at 100% 100%, rgba(255,255,255,0.1) 0%, transparent 50%)",
-              ],
-            }}
-            transition={{ duration: 8, repeat: Infinity }}
+          <ScrollRevealHeadline
+            text="IDEAS BECOME INNOVATIONS"
+            className="font-display text-[11vw] font-bold uppercase leading-[0.95] tracking-tight text-[#161B22] sm:text-[8vw] lg:text-[5.5rem]"
           />
-        </div>
 
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-10">
-          <motion.div
-            className="text-center mb-16"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true, margin: "-100px" }}
+          <motion.p
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={fadeUp}
+            className="mx-auto mt-8 max-w-2xl text-lg leading-relaxed text-[#56606B]"
           >
-            <h2 className="text-4xl font-heading font-bold mb-4">Building the Future</h2>
-            <p className="text-primary-foreground/80 text-lg">Pi Jam Idea Bank is growing to support schools across India</p>
-          </motion.div>
+            A student notices something broken in their own neighborhood. Five structured
+            stages later, it&apos;s a tested prototype with real feedback attached — not a
+            worksheet, a working record of how the idea actually got there.
+          </motion.p>
 
-          <div className="grid grid-cols-2 gap-8 md:gap-16 text-center">
-            {[
-              { value: "500+", label: "Ideas Shared" },
-              { value: "50+", label: "Schools Connected" },
-            ].map((stat, i) => (
-              <motion.div
-                key={stat.value}
-                initial={{ opacity: 0, scale: 0.9 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.8, delay: i * 0.1 }}
-                viewport={{ once: true, margin: "-100px" }}
-              >
-                <div className="text-5xl md:text-6xl font-heading font-bold tracking-tight mb-2">{stat.value}</div>
-                <div className="text-lg text-primary-foreground/80 font-medium">{stat.label}</div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* About Pi Jam */}
-      <section className="relative py-24">
-        <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
           <motion.div
-            className="rounded-2xl border border-border/50 bg-card p-10 md:p-12"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true, margin: "-100px" }}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={fadeUp}
+            className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row"
           >
-            <div className="flex items-start gap-4 mb-6">
-              <BookOpen className="h-8 w-8 text-primary flex-shrink-0 mt-1" />
-              <div>
-                <h3 className="text-2xl font-heading font-bold text-foreground mb-4">About Pi Jam Foundation</h3>
-                <p className="text-muted-foreground leading-relaxed mb-4">
-                  Pi Jam Foundation is dedicated to building ecosystems that enable future-ready problem solvers. We believe in the power of computational thinking and design-driven education to transform how students approach challenges.
-                </p>
-                <p className="text-muted-foreground leading-relaxed mb-6">
-                  Idea Bank is our platform for democratizing problem identification and solution development across schools, enabling students to learn by doing, collaborate with peers, and create measurable impact.
-                </p>
-                <a
-                  href="https://thepijam.org"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 text-primary font-semibold hover:gap-3 transition-all"
-                >
-                  Learn more about Pi Jam
-                  <ArrowRight className="h-4 w-4" />
-                </a>
-              </div>
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="relative py-24 border-t border-border/50">
-        <div className="mx-auto max-w-4xl px-4 text-center sm:px-6 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true, margin: "-100px" }}
-          >
-            <h2 className="text-4xl font-heading font-bold tracking-tight text-foreground mb-6">
-              Ready to start solving problems?
-            </h2>
-            <p className="text-xl text-muted-foreground mb-10">
-              Join schools across India building the next generation of problem solvers
-            </p>
             <Link
               href="/login"
-              className="inline-flex h-14 items-center gap-2 rounded-lg bg-primary px-10 text-base font-semibold text-white transition-all hover:bg-primary/90"
+              className="inline-flex h-12 items-center justify-center gap-2 rounded-lg bg-[#5BA4C7] px-8 text-base font-semibold text-white transition-all hover:bg-[#4C92B5] active:scale-[0.98]"
             >
-              Explore Idea Bank
-              <ArrowRight className="h-5 w-5" />
+              Explore the Platform
+              <ArrowRight className="h-4 w-4" />
             </Link>
+            <a
+              href="#pipeline"
+              className="inline-flex h-12 items-center justify-center gap-2 rounded-lg border border-[#DFE4EA] bg-white px-8 text-base font-semibold text-[#161B22] transition-colors hover:bg-[#F0F3F6]"
+            >
+              See the Five Stages
+            </a>
           </motion.div>
+        </div>
+      </section>
+
+      {/* Bridge line */}
+      <section className="border-y border-[#DFE4EA] bg-white py-12">
+        <div className="mx-auto max-w-3xl px-4 text-center sm:px-6 lg:px-8">
+          <p className="text-xl font-medium leading-snug text-[#161B22]">
+            Every real solution starts as something a student noticed —
+            <span className="text-[#5BA4C7]"> not a lesson plan.</span>
+          </p>
+        </div>
+      </section>
+
+      {/* Pipeline */}
+      <section id="pipeline" className="py-24 lg:py-32">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-100px" }}
+            variants={fadeUp}
+            className="mx-auto mb-16 max-w-2xl text-center"
+          >
+            <h2 className="font-display text-4xl font-bold tracking-tight text-[#161B22] sm:text-5xl">
+              Five stages. One real problem, start to finish.
+            </h2>
+            <p className="mt-4 text-lg text-[#56606B]">
+              The same structured pipeline every idea on this platform actually moves
+              through — not a metaphor, the literal workflow.
+            </p>
+          </motion.div>
+
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-5">
+            {PIPELINE.map((step, i) => (
+              <motion.div
+                key={step.stage}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, margin: "-80px" }}
+                variants={fadeUp}
+                transition={{ delay: i * 0.08 }}
+                style={{ perspective: "800px" }}
+              >
+                <TiltCard
+                  className="flex h-full flex-col rounded-2xl border p-6"
+                  style={{
+                    borderColor: `var(--stage-${step.stage.toLowerCase()}-border)`,
+                    backgroundColor: `var(--stage-${step.stage.toLowerCase()}-soft)`,
+                  }}
+                >
+                  <span className="font-mono text-xs font-semibold tracking-wide text-[#56606B]">
+                    0{i + 1}
+                  </span>
+                  <h3
+                    className="mt-3 text-lg font-bold"
+                    style={{ color: `var(--stage-${step.stage.toLowerCase()})` }}
+                  >
+                    {step.stage}
+                  </h3>
+                  <p className="mt-1 text-sm font-semibold text-[#161B22]">{step.verb}</p>
+                  <p className="mt-3 flex-1 text-sm leading-relaxed text-[#56606B]">
+                    {step.detail}
+                  </p>
+                  <p className="mt-4 border-t border-black/10 pt-3 text-xs text-[#56606B]">
+                    e.g. <span className="font-medium text-[#161B22]">{step.example}</span>
+                  </p>
+                </TiltCard>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Stats — honest, structural facts about the platform itself */}
+      <section className="border-y border-[#DFE4EA] bg-white py-20">
+        <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-3 gap-8">
+            <StatCounter value={5} label="Design Thinking Stages" />
+            <StatCounter value={7} label="Roles, One Workspace" />
+            <StatCounter value={36} label="States & UTs Mapped" />
+          </div>
+        </div>
+      </section>
+
+      {/* Paths in */}
+      <section className="py-24 lg:py-32">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-100px" }}
+            variants={fadeUp}
+            className="mx-auto mb-14 max-w-2xl text-center"
+          >
+            <h2 className="font-display text-4xl font-bold tracking-tight text-[#161B22] sm:text-5xl">
+              Three ways in
+            </h2>
+          </motion.div>
+
+          <div className="grid gap-5 md:grid-cols-3">
+            {[
+              {
+                title: "Onboard your school",
+                desc: "Register your school and start logging student teams and their ideas.",
+                href: "/onboard",
+                cta: "Register a school",
+              },
+              {
+                title: "Join as Pi Jam staff",
+                desc: "Teacher Trainers and Geography Leads register through the staff portal.",
+                href: "/pijam",
+                cta: "Staff registration",
+              },
+              {
+                title: "Already have an account",
+                desc: "Sign in as a school admin, staff member, or a student team with your PIN.",
+                href: "/login",
+                cta: "Sign in",
+              },
+            ].map((path, i) => (
+              <motion.div
+                key={path.title}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, margin: "-80px" }}
+                variants={fadeUp}
+                transition={{ delay: i * 0.08 }}
+              >
+                <Link
+                  href={path.href}
+                  className="group flex h-full flex-col rounded-2xl border border-[#DFE4EA] bg-white p-7 transition-colors hover:border-[#5BA4C7]/40"
+                >
+                  <h3 className="text-lg font-bold text-[#161B22]">{path.title}</h3>
+                  <p className="mt-2 flex-1 text-sm leading-relaxed text-[#56606B]">{path.desc}</p>
+                  <span className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-[#5BA4C7] transition-transform group-hover:translate-x-1">
+                    {path.cta}
+                    <ArrowRight className="h-4 w-4" />
+                  </span>
+                </Link>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* About */}
+      <section className="border-t border-[#DFE4EA] bg-white py-20">
+        <div className="mx-auto max-w-3xl px-4 text-center sm:px-6 lg:px-8">
+          <h3 className="font-display text-2xl font-bold text-[#161B22]">About Pi Jam Foundation</h3>
+          <p className="mt-4 leading-relaxed text-[#56606B]">
+            Pi Jam Foundation builds ecosystems for future-ready problem solvers, using
+            computational thinking and design-driven education to change how students
+            approach the problems actually in front of them.
+          </p>
+          <a
+            href="https://thepijam.org"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-[#5BA4C7] hover:gap-3 transition-all"
+          >
+            Learn more about Pi Jam
+            <ArrowRight className="h-4 w-4" />
+          </a>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-border/40 bg-card py-12">
+      <footer className="bg-[#FAFBFC] py-12">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="grid md:grid-cols-3 gap-8 mb-8">
-            <div>
-              <h4 className="font-semibold text-foreground mb-4">Pi Jam Idea Bank</h4>
-              <p className="text-sm text-muted-foreground">A repository of ideas and solutions for problem-solving education</p>
-            </div>
-            <div>
-              <h4 className="font-semibold text-foreground mb-4">Resources</h4>
-              <ul className="space-y-2 text-sm">
-                <li><a href="https://thepijam.org" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary transition">Pi Jam Foundation</a></li>
-                <li><a href="#" className="text-muted-foreground hover:text-primary transition">Documentation</a></li>
-                <li>
-                  <Link href="/pijam" className="text-muted-foreground hover:text-primary transition inline-flex items-center gap-1.5">
-                    Staff Portal
-                    <span className="text-[10px] bg-primary/10 text-primary px-1.5 py-0.5 rounded font-bold">Internal</span>
-                  </Link>
-                </li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-semibold text-foreground mb-4">Contact</h4>
-              <p className="text-sm text-muted-foreground">Support for schools and educators</p>
-            </div>
-          </div>
-          <div className="border-t border-border/50 pt-8">
-            <p className="text-sm text-muted-foreground text-center">
-              © 2026 Pi Jam Idea Bank. Developed by Pi Jam Foundation. Visit <a href="https://thepijam.org" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">thepijam.org</a> for more.
-            </p>
-          </div>
+          <p className="text-center text-sm text-[#56606B]">
+            © 2026 Pi Jam Idea Bank. Developed by Pi Jam Foundation. Visit{" "}
+            <a href="https://thepijam.org" target="_blank" rel="noopener noreferrer" className="text-[#5BA4C7] hover:underline">
+              thepijam.org
+            </a>{" "}
+            for more.
+          </p>
         </div>
       </footer>
     </div>
