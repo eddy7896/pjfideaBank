@@ -1,5 +1,10 @@
 import type { Idea, StudentTeam, User } from "@/types";
 
+type SchoolGeoRef = {
+  name: string;
+  subGeography?: { geography?: { name: string } | null } | null;
+};
+
 export interface AnalyticsData {
   totalSchools: number;
   totalIdeas: number;
@@ -181,4 +186,64 @@ export function computeAnalytics(
     teamSizeDistribution,
     studentsByGrade,
   };
+}
+
+/**
+ * Real submission trend, bucketed by day from Idea.createdAt. Replaces any
+ * placeholder/random trend data — every point here is an actual count.
+ */
+export function computeIdeasByDay(
+  ideas: Idea[],
+  days = 14
+): { date: string; label: string; count: number }[] {
+  const buckets: { date: string; label: string; count: number }[] = [];
+  const dayMs = 24 * 60 * 60 * 1000;
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  for (let i = days - 1; i >= 0; i--) {
+    const d = new Date(today.getTime() - i * dayMs);
+    buckets.push({
+      date: d.toISOString().slice(0, 10),
+      label: d.toLocaleDateString("en-US", { month: "short", day: "numeric" }),
+      count: 0,
+    });
+  }
+
+  const indexByDate = new Map(buckets.map((b, i) => [b.date, i]));
+  for (const idea of ideas) {
+    if (!idea.createdAt) continue;
+    const key = idea.createdAt.slice(0, 10);
+    const idx = indexByDate.get(key);
+    if (idx !== undefined) buckets[idx].count++;
+  }
+
+  return buckets;
+}
+
+/**
+ * Rolls ideas up from school -> district -> state, for roles whose domain
+ * spans multiple states (super-admin, program-lead). Schools with no
+ * resolved subGeography/geography are omitted rather than guessed at.
+ */
+export function computeIdeasByGeography(
+  ideas: Idea[],
+  schools: SchoolGeoRef[]
+): { geographyName: string; count: number }[] {
+  const schoolToState = new Map<string, string>();
+  for (const school of schools) {
+    const stateName = school.subGeography?.geography?.name;
+    if (stateName) schoolToState.set(school.name, stateName);
+  }
+
+  const countByState: Record<string, number> = {};
+  for (const idea of ideas) {
+    const state = schoolToState.get(idea.schoolName);
+    if (!state) continue;
+    countByState[state] = (countByState[state] || 0) + 1;
+  }
+
+  return Object.entries(countByState)
+    .map(([geographyName, count]) => ({ geographyName, count }))
+    .sort((a, b) => b.count - a.count);
 }

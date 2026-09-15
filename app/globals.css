@@ -75,6 +75,14 @@
     --color-status-reject: var(--status-reject);
     --color-status-reject-soft: var(--status-reject-soft);
     --color-status-reject-border: var(--status-reject-border);
+
+    /* Gender-breakdown categorical palette — a separate semantic channel from
+       stage/status, used only in the analytics demographic chart. Validated
+       for CVD-safe adjacent-pair separation (see dataviz skill). */
+    --color-gender-male: var(--gender-male);
+    --color-gender-female: var(--gender-female);
+    --color-gender-nonbinary: var(--gender-nonbinary);
+    --color-gender-unspecified: var(--gender-unspecified);
 }
 
 :root {
@@ -141,6 +149,13 @@
     --sidebar-accent-foreground: #161B22;
     --sidebar-border: #DFE4EA;
     --sidebar-ring: #5BA4C7;
+
+    /* Gender-breakdown categorical — light. Validated against dataviz skill's
+       CVD/contrast checks (adjacent pairs, normal-vision floor, WCAG). */
+    --gender-male: #3D6FB5;
+    --gender-female: #C2477A;
+    --gender-nonbinary: #4B8F6B;
+    --gender-unspecified: #8B7BAE;
 }
 
 .dark {
@@ -205,6 +220,13 @@
     --sidebar-accent-foreground: #EAECEF;
     --sidebar-border: #2D3540;
     --sidebar-ring: #6EB5D6;
+
+    /* Gender-breakdown categorical — dark, brightened to match the rest of
+       the dark palette's treatment. */
+    --gender-male: #7DA3DE;
+    --gender-female: #E37AA6;
+    --gender-nonbinary: #7DBF9A;
+    --gender-unspecified: #B4A6D9;
 }
 
 @layer base {

@@ -4,7 +4,6 @@ import { useState } from "react";
 import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { THEME_MONTHS } from "@/lib/constants";
 import type { ThemeMonth } from "@/types";
 
 interface Activity {
@@ -18,6 +17,7 @@ interface Activity {
 
 interface GoogleStyleCalendarProps {
   activities?: Activity[];
+  themes?: ThemeMonth[];
   onAddActivity?: (date: number, month: number, year: number) => void;
   isAdmin?: boolean;
 }
@@ -30,6 +30,7 @@ const MONTH_NAMES = [
 
 export function GoogleStyleCalendar({
   activities = [],
+  themes = [],
   onAddActivity,
   isAdmin = false,
 }: GoogleStyleCalendarProps) {
@@ -42,7 +43,7 @@ export function GoogleStyleCalendar({
   const daysInMonth = lastDay.getDate();
   const startingDayOfWeek = firstDay.getDay();
 
-  const monthTheme = THEME_MONTHS[currentMonth];
+  const monthTheme = themes.find((t) => t.month === MONTH_NAMES[currentMonth]);
 
   const prevMonth = () => {
     if (currentMonth === 0) {
@@ -142,7 +143,7 @@ export function GoogleStyleCalendar({
               <div
                 key={idx}
                 className={`min-h-24 border-r border-b border-border/20 p-2 text-xs ${
-                  day ? "bg-white hover:bg-muted/30" : "bg-muted/10"
+                  day ? "bg-card hover:bg-muted/30" : "bg-muted/10"
                 } transition-colors`}
               >
                 {day && (

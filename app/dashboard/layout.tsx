@@ -269,32 +269,33 @@ export default function DashboardLayout({
           )}
 
           {currentUser.role !== "school" && currentUser.role !== "student" && (
-            <>
-              <Link
-                href="/dashboard/schools"
-                className={cn(
-                  "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold transition-all active:scale-[0.98]",
-                  pathname === "/dashboard/schools"
-                    ? "bg-primary text-primary-foreground shadow-md shadow-primary/20"
-                    : "text-muted-foreground hover:bg-primary/5 hover:text-primary"
-                )}
-              >
-                <School className="h-4 w-4" />
-                Schools
-              </Link>
-              <Link
-                href="/dashboard/analytics"
-                className={cn(
-                  "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold transition-all active:scale-[0.98]",
-                  pathname === "/dashboard/analytics"
-                    ? "bg-primary text-primary-foreground shadow-md shadow-primary/20"
-                    : "text-muted-foreground hover:bg-primary/5 hover:text-primary"
-                )}
-              >
-                <BarChart3 className="h-4 w-4" />
-                Analytics
-              </Link>
-            </>
+            <Link
+              href="/dashboard/schools"
+              className={cn(
+                "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold transition-all active:scale-[0.98]",
+                pathname === "/dashboard/schools"
+                  ? "bg-primary text-primary-foreground shadow-md shadow-primary/20"
+                  : "text-muted-foreground hover:bg-primary/5 hover:text-primary"
+              )}
+            >
+              <School className="h-4 w-4" />
+              Schools
+            </Link>
+          )}
+
+          {currentUser.role !== "student" && (
+            <Link
+              href="/dashboard/analytics"
+              className={cn(
+                "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold transition-all active:scale-[0.98]",
+                pathname === "/dashboard/analytics"
+                  ? "bg-primary text-primary-foreground shadow-md shadow-primary/20"
+                  : "text-muted-foreground hover:bg-primary/5 hover:text-primary"
+              )}
+            >
+              <BarChart3 className="h-4 w-4" />
+              Analytics
+            </Link>
           )}
 
           <Link

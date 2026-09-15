@@ -149,7 +149,7 @@ export default function CalendarPage() {
             <h2 className="text-xl font-semibold">Activities Calendar</h2>
             {isAdmin && <p className="text-xs text-muted-foreground">Click dates to add activities</p>}
           </div>
-          <GoogleStyleCalendar activities={activities} onAddActivity={isAdmin ? handleAddActivity : undefined} isAdmin={isAdmin} />
+          <GoogleStyleCalendar activities={activities} themes={themes} onAddActivity={isAdmin ? handleAddActivity : undefined} isAdmin={isAdmin} />
         </div>
 
         {activities.length > 0 && isAdmin && (

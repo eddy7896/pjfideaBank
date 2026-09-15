@@ -1,466 +1,508 @@
 "use client";
 
+import { useMemo } from "react";
+import { motion } from "framer-motion";
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import {
+  AreaChart,
+  Area,
   BarChart,
   Bar,
-  PieChart,
-  Pie,
   Cell,
   XAxis,
   YAxis,
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  LineChart,
-  Line,
 } from "recharts";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
 import { useAuthStore } from "@/store/use-auth-store";
 import { useIdeaStore } from "@/store/use-idea-store";
 import { useTeamStore } from "@/store/use-team-store";
-import { computeAnalytics } from "@/lib/analytics";
-import { Users, Lightbulb, School, Users2, TrendingUp, ArrowUp, ArrowDown } from "lucide-react";
+import { useSchoolStore } from "@/store/use-school-store";
+import {
+  computeAnalytics,
+  computeIdeasByDay,
+  computeIdeasByGeography,
+} from "@/lib/analytics";
+import { Users, Lightbulb, School as SchoolIcon, Users2, Info } from "lucide-react";
+import { cn } from "@/lib/utils";
+import type { Role } from "@/types";
 
-const STATUS_COLORS: Record<string, string> = {
-  Empathize: "#fbbf24",
-  Define: "#60a5fa",
-  Ideate: "#8b5cf6",
-  Prototype: "#ec4899",
-  Test: "#10b981",
+const STAGE_VAR: Record<string, string> = {
+  Empathize: "var(--stage-empathize)",
+  Define: "var(--stage-define)",
+  Ideate: "var(--stage-ideate)",
+  Prototype: "var(--stage-prototype)",
+  Test: "var(--stage-test)",
 };
 
-const GENDER_COLORS: Record<string, string> = {
-  Female: "#ec4899",
-  Male: "#3b82f6",
-  "Non-binary": "#8b5cf6",
-  "Prefer not to say": "#94a3b8",
+const GENDER_VAR: Record<string, string> = {
+  Male: "var(--gender-male)",
+  Female: "var(--gender-female)",
+  "Non-binary": "var(--gender-nonbinary)",
+  "Prefer not to say": "var(--gender-unspecified)",
 };
+
+const ROLE_COPY: Partial<
+  Record<Role, { headline: string; subtitle: string; scopeNote?: string }>
+> = {
+  "super-admin": {
+    headline: "System Overview",
+    subtitle: "Every school, every state — full platform visibility.",
+  },
+  "program-lead": {
+    headline: "Program Overview",
+    subtitle: "Global roll-up across every geography.",
+  },
+  "geography-lead": {
+    headline: "State Overview",
+    subtitle: "Schools and projects across your assigned state.",
+  },
+  "teacher-trainer": {
+    headline: "District Overview",
+    subtitle: "Schools and projects in your assigned district.",
+  },
+  "sed-department": {
+    headline: "Regional Monitoring",
+    subtitle: "Advanced-stage projects in your state.",
+    scopeNote:
+      "You're viewing Prototype and Test-stage projects only — the ones ready for department review.",
+  },
+  school: {
+    headline: "School Overview",
+    subtitle: "Your school's projects and teams.",
+  },
+};
+
+function CustomTooltip({
+  active,
+  payload,
+  label,
+  valueLabel = "Ideas",
+}: {
+  active?: boolean;
+  payload?: { value: number; payload?: Record<string, unknown> }[];
+  label?: string;
+  valueLabel?: string;
+}) {
+  if (!active || !payload?.length) return null;
+  return (
+    <div className="rounded-lg border border-border bg-card px-3 py-2 text-xs shadow-md">
+      <p className="font-semibold text-foreground">{label}</p>
+      <p className="text-muted-foreground">
+        {valueLabel}: <span className="font-semibold text-foreground">{payload[0].value}</span>
+      </p>
+    </div>
+  );
+}
+
+function BentoCard({
+  title,
+  description,
+  colSpan = 1,
+  className,
+  children,
+  index = 0,
+}: {
+  title?: string;
+  description?: string;
+  colSpan?: 1 | 2 | 3 | 4;
+  className?: string;
+  children: React.ReactNode;
+  index?: number;
+}) {
+  const spanClass = {
+    1: "lg:col-span-1",
+    2: "lg:col-span-2",
+    3: "lg:col-span-3",
+    4: "lg:col-span-4",
+  }[colSpan];
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, delay: index * 0.04, ease: [0.16, 1, 0.3, 1] }}
+    >
+      <Card className={cn("h-full border-border shadow-sm", spanClass, className)}>
+        {(title || description) && (
+          <CardHeader className="pb-2">
+            {title && <CardTitle className="text-sm font-semibold">{title}</CardTitle>}
+            {description && (
+              <CardDescription className="text-xs">{description}</CardDescription>
+            )}
+          </CardHeader>
+        )}
+        <CardContent>{children}</CardContent>
+      </Card>
+    </motion.div>
+  );
+}
+
+function StatTile({
+  label,
+  value,
+  icon: Icon,
+  index,
+}: {
+  label: string;
+  value: number | string;
+  icon: React.ComponentType<{ className?: string }>;
+  index: number;
+}) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, delay: index * 0.04, ease: [0.16, 1, 0.3, 1] }}
+      className="rounded-2xl border border-border bg-card p-5 shadow-sm"
+    >
+      <div className="flex items-center justify-between">
+        <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+          {label}
+        </p>
+        <Icon className="h-4 w-4 text-muted-foreground" />
+      </div>
+      <p className="mt-2 text-3xl font-bold tabular-nums tracking-tight text-foreground">
+        {value}
+      </p>
+    </motion.div>
+  );
+}
+
+function RankedList({
+  rows,
+  emptyLabel,
+}: {
+  rows: { label: string; count: number }[];
+  emptyLabel: string;
+}) {
+  const max = Math.max(1, ...rows.map((r) => r.count));
+  if (rows.length === 0) {
+    return <p className="py-6 text-center text-sm text-muted-foreground">{emptyLabel}</p>;
+  }
+  return (
+    <div className="space-y-3">
+      {rows.map((row) => (
+        <div key={row.label} className="space-y-1">
+          <div className="flex items-center justify-between text-xs">
+            <span className="truncate font-medium text-foreground">{row.label}</span>
+            <span className="tabular-nums font-semibold text-foreground">{row.count}</span>
+          </div>
+          <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
+            <div
+              className="h-full rounded-full bg-primary transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]"
+              style={{ width: `${(row.count / max) * 100}%` }}
+            />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function GenderBar({
+  breakdown,
+}: {
+  breakdown: { Male: number; Female: number; "Non-binary": number; "Prefer not to say": number };
+}) {
+  const segments = (
+    ["Female", "Male", "Non-binary", "Prefer not to say"] as const
+  ).map((key) => ({ key, value: breakdown[key] }));
+  const total = segments.reduce((sum, s) => sum + s.value, 0);
+
+  if (total === 0) {
+    return <p className="py-6 text-center text-sm text-muted-foreground">No students yet.</p>;
+  }
+
+  return (
+    <div className="space-y-4">
+      <div className="flex h-3 w-full overflow-hidden rounded-full bg-muted">
+        {segments
+          .filter((s) => s.value > 0)
+          .map((s) => (
+            <div
+              key={s.key}
+              className="h-full first:rounded-l-full last:rounded-r-full"
+              style={{
+                width: `${(s.value / total) * 100}%`,
+                backgroundColor: GENDER_VAR[s.key],
+                marginRight: "2px",
+              }}
+            />
+          ))}
+      </div>
+      <div className="grid grid-cols-2 gap-2">
+        {segments.map((s) => (
+          <div key={s.key} className="flex items-center gap-2 text-xs">
+            <span
+              className="h-2 w-2 shrink-0 rounded-full"
+              style={{ backgroundColor: GENDER_VAR[s.key] }}
+            />
+            <span className="truncate text-muted-foreground">{s.key}</span>
+            <span className="ml-auto tabular-nums font-semibold text-foreground">
+              {s.value}
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 export default function AnalyticsPage() {
   const { currentUser } = useAuthStore();
   const { ideas } = useIdeaStore();
   const { teams } = useTeamStore();
+  const { schools } = useSchoolStore();
 
-  const allowedRoles = ["super-admin", "program-lead", "geography-lead", "teacher-trainer", "sed-department"];
+  const allowedRoles: Role[] = [
+    "super-admin",
+    "program-lead",
+    "geography-lead",
+    "teacher-trainer",
+    "sed-department",
+    "school",
+  ];
+
+  const analytics = useMemo(() => computeAnalytics(ideas, teams, []), [ideas, teams]);
+  const trend = useMemo(() => computeIdeasByDay(ideas, 14), [ideas]);
+  const geography = useMemo(
+    () => computeIdeasByGeography(ideas, schools),
+    [ideas, schools]
+  );
+
   if (!currentUser || !allowedRoles.includes(currentUser.role)) {
     return (
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-        <div className="text-center py-12">
-          <p className="text-muted-foreground">You do not have permission to view this analytics dashboard.</p>
+        <div className="py-12 text-center">
+          <p className="text-muted-foreground">
+            You do not have permission to view this analytics dashboard.
+          </p>
         </div>
       </div>
     );
   }
 
-  const analytics = computeAnalytics(ideas, teams, []);
+  const role = currentUser.role;
+  const copy = ROLE_COPY[role] ?? { headline: "Overview", subtitle: "" };
+  const isSingleSchool = role === "school";
+  const showGeographyRollup = role === "super-admin" || role === "program-lead";
 
-  const statusChartData = Object.entries(analytics.ideasByStatus)
-    .map(([status, count]) => ({
-      name: status,
-      count,
-      fill: STATUS_COLORS[status],
-    }))
-    .filter((item) => item.count > 0);
-
-  const genderChartData = [
-    { name: "Female", value: analytics.studentsByGender.Female, fill: GENDER_COLORS["Female"] },
-    { name: "Male", value: analytics.studentsByGender.Male, fill: GENDER_COLORS["Male"] },
-    { name: "Non-binary", value: analytics.studentsByGender["Non-binary"], fill: GENDER_COLORS["Non-binary"] },
-    { name: "Prefer not to say", value: analytics.studentsByGender["Prefer not to say"], fill: GENDER_COLORS["Prefer not to say"] },
-  ].filter((item) => item.value > 0);
-
-  const timelineData = Array.from({ length: 7 }, (_, i) => ({
-    day: `Day ${7 - i}`,
-    ideas: Math.floor(Math.random() * 15) + 5,
-  })).reverse();
-
-  const recentActivity = [
-    { type: "idea", title: "New idea submitted", desc: "Solar Powered Desk Lamps", time: "2m ago" },
-    { type: "team", title: "New team created", desc: "Green Sparks - Springfield High", time: "15m ago" },
-    { type: "status", title: "Project advanced", desc: "AI Homework Helper → Prototype", time: "1h ago" },
-    { type: "student", title: "New student registered", desc: "Springfield High", time: "3h ago" },
-  ];
-
-  const activityIcons: Record<string, React.ReactNode> = {
-    idea: <Lightbulb className="h-4 w-4 text-yellow-500" />,
-    team: <Users2 className="h-4 w-4 text-muted-foreground" />,
-    status: <TrendingUp className="h-4 w-4 text-muted-foreground" />,
-    student: <Users className="h-4 w-4 text-muted-foreground" />,
-  };
+  const stageChartData = Object.entries(analytics.ideasByStatus).map(([status, count]) => ({
+    status,
+    count,
+  }));
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
       <div className="space-y-8">
         {/* Header */}
         <div>
-          <h1 className="text-3xl font-semibold tracking-tight">Analytics Dashboard</h1>
-          <p className="text-muted-foreground mt-1">
-            {currentUser.role === "super-admin" && "Welcome back, Admin! Here's a global overview of Ideabank."}
-            {currentUser.role === "program-lead" && "Global program overview and geographical roll-ups."}
-            {currentUser.role === "geography-lead" && "State overview for your assigned region."}
-            {currentUser.role === "teacher-trainer" && "District overview for your assigned region."}
-            {currentUser.role === "sed-department" && "State Education Department regional monitoring dashboard."}
-          </p>
+          <h1 className="text-3xl font-bold tracking-tight text-foreground">{copy.headline}</h1>
+          <p className="mt-1 text-muted-foreground">{copy.subtitle}</p>
+          {copy.scopeNote && (
+            <div className="mt-3 flex items-start gap-2 rounded-xl border border-status-pending-border bg-status-pending-soft px-4 py-3 text-sm text-status-pending">
+              <Info className="mt-0.5 h-4 w-4 shrink-0" />
+              <p>{copy.scopeNote}</p>
+            </div>
+          )}
         </div>
 
-        {/* KPI Cards with Trends */}
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
-          <Card className="border-border/20">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium">Total Schools</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-baseline justify-between">
-                <p className="text-2xl font-semibold">{analytics.totalSchools}</p>
-                <span className="text-xs text-status-approve flex items-center gap-1">
-                  <ArrowUp className="h-3 w-3" /> 12.5%
-                </span>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="border-border/20">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium">Total Ideas</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-baseline justify-between">
-                <p className="text-2xl font-semibold">{analytics.totalIdeas}</p>
-                <span className="text-xs text-status-approve flex items-center gap-1">
-                  <ArrowUp className="h-3 w-3" /> 8.3%
-                </span>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="border-border/20">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium">Total Teams</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-baseline justify-between">
-                <p className="text-2xl font-semibold">{analytics.totalTeams}</p>
-                <span className="text-xs text-status-approve flex items-center gap-1">
-                  <ArrowUp className="h-3 w-3" /> 15.7%
-                </span>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="border-border/20">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium">Total Students</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-baseline justify-between">
-                <p className="text-2xl font-semibold">{analytics.totalStudents}</p>
-                <span className="text-xs text-status-approve flex items-center gap-1">
-                  <ArrowUp className="h-3 w-3" /> 10.1%
-                </span>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="border-border/20">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium">Female %</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-baseline justify-between">
-                <p className="text-2xl font-semibold">{analytics.genderRatio}%</p>
-                <span className="text-xs text-status-reject flex items-center gap-1">
-                  <ArrowDown className="h-3 w-3" /> 18.2%
-                </span>
-              </div>
-            </CardContent>
-          </Card>
+        {/* KPI strip */}
+        <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+          {!isSingleSchool && (
+            <StatTile label="Schools" value={analytics.totalSchools} icon={SchoolIcon} index={0} />
+          )}
+          <StatTile label="Ideas" value={analytics.totalIdeas} icon={Lightbulb} index={1} />
+          <StatTile label="Teams" value={analytics.totalTeams} icon={Users2} index={2} />
+          <StatTile label="Students" value={analytics.totalStudents} icon={Users} index={3} />
         </div>
 
-        {/* Main Charts Grid */}
-        <div className="grid gap-6 lg:grid-cols-3">
-          {/* Ideas Overview (Line Chart) */}
-          <Card className="border-border/20 lg:col-span-2">
-            <CardHeader>
-              <CardTitle>Ideas Overview</CardTitle>
-              <CardDescription className="text-xs">Last 7 days</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
-                <LineChart data={timelineData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-                  <XAxis dataKey="day" stroke="#94a3b8" style={{ fontSize: "12px" }} />
-                  <YAxis stroke="#94a3b8" style={{ fontSize: "12px" }} />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: "#ffffff",
-                      border: "1px solid #e2e8f0",
-                      borderRadius: "8px",
-                    }}
-                  />
-                  <Line
-                    type="monotone"
-                    dataKey="ideas"
-                    stroke="#5BA4C7"
-                    strokeWidth={2}
-                    dot={{ fill: "#5BA4C7", r: 4 }}
-                    activeDot={{ r: 6 }}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
-
-          {/* Ideas by Status (Donut) */}
-          <Card className="border-border/20">
-            <CardHeader>
-              <CardTitle>Ideas by Status</CardTitle>
-            </CardHeader>
-            <CardContent className="flex flex-col items-center">
-              <ResponsiveContainer width="100%" height={250}>
-                <PieChart>
-                  <Pie
-                    data={statusChartData}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={50}
-                    outerRadius={80}
-                    paddingAngle={2}
-                    dataKey="count"
-                  >
-                    {statusChartData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.fill} />
-                    ))}
-                  </Pie>
-                  <Tooltip />
-                </PieChart>
-              </ResponsiveContainer>
-              <div className="mt-4 text-center">
-                <p className="text-2xl font-semibold">{analytics.totalIdeas}</p>
-                <p className="text-xs text-muted-foreground">Total</p>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Bottom Grid: Gender Distribution & Activity Feed */}
-        <div className="grid gap-6 lg:grid-cols-3">
-          {/* Gender Distribution */}
-          <Card className="border-border/20 lg:col-span-1">
-            <CardHeader>
-              <CardTitle>Student Gender</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={250}>
-                <PieChart>
-                  <Pie
-                    data={genderChartData}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={40}
-                    outerRadius={70}
-                    paddingAngle={2}
-                    dataKey="value"
-                  >
-                    {genderChartData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.fill} />
-                    ))}
-                  </Pie>
-                  <Tooltip />
-                </PieChart>
-              </ResponsiveContainer>
-              <div className="mt-4 space-y-2 text-xs">
-                {genderChartData.map((item) => (
-                  <div key={item.name} className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <div
-                        className="h-2 w-2 rounded-full"
-                        style={{ backgroundColor: item.fill }}
-                      />
-                      <span>{item.name}</span>
-                    </div>
-                    <span className="font-semibold">{item.value}</span>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Recent Activity Feed */}
-          <Card className="border-border/20 lg:col-span-2">
-            <CardHeader className="flex items-center justify-between">
-              <CardTitle>Recent Activity</CardTitle>
-              <button className="text-xs text-primary hover:underline">View All</button>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {recentActivity.map((activity, idx) => (
-                  <div key={idx} className="flex items-start gap-4 pb-4 border-b border-border/20 last:border-b-0 last:pb-0">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted/50">
-                      {activityIcons[activity.type]}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-foreground">{activity.title}</p>
-                      <p className="text-xs text-muted-foreground truncate">{activity.desc}</p>
-                    </div>
-                    <span className="whitespace-nowrap text-xs text-muted-foreground">{activity.time}</span>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Data Tables */}
-        <div className="grid gap-6 lg:grid-cols-2">
-          {/* Ideas per School */}
-          <Card className="border-border/20">
-            <CardHeader>
-              <CardTitle className="text-base">Ideas per School</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3 max-h-72 overflow-y-auto">
-                {analytics.ideasPerSchool.map((item) => (
-                  <div key={item.schoolName} className="flex items-center justify-between">
-                    <span className="text-sm font-medium">{item.schoolName}</span>
-                    <span className="inline-flex items-center justify-center rounded-full bg-primary/10 px-2.5 py-1 text-xs font-semibold text-primary">
-                      {item.count}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Top Teams */}
-          <Card className="border-border/20">
-            <CardHeader>
-              <CardTitle className="text-base">Top Teams by Ideas</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3 max-h-72 overflow-y-auto">
-                {analytics.ideasPerTeam.slice(0, 8).map((item) => (
-                  <div key={item.teamId} className="flex items-center justify-between">
-                    <span className="text-sm font-medium">{item.teamName}</span>
-                    <span className="inline-flex items-center justify-center rounded-full bg-primary/10 px-2.5 py-1 text-xs font-semibold text-primary">
-                      {item.count}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Ideas by Theme */}
-        <Card className="border-border/20">
-          <CardHeader>
-            <CardTitle>Ideas by Theme</CardTitle>
-            <CardDescription className="text-xs">Distribution across themes</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={analytics.ideasByTheme}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-                <XAxis dataKey="theme" stroke="#94a3b8" style={{ fontSize: "12px" }} angle={-45} textAnchor="end" height={80} />
-                <YAxis stroke="#94a3b8" style={{ fontSize: "12px" }} />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: "#ffffff",
-                    border: "1px solid #e2e8f0",
-                    borderRadius: "8px",
-                  }}
+        {/* Bento grid */}
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-4">
+          {/* Trend — large */}
+          <BentoCard
+            title="Submissions"
+            description="Last 14 days"
+            colSpan={2}
+            index={0}
+          >
+            <ResponsiveContainer width="100%" height={220}>
+              <AreaChart data={trend} margin={{ left: -20, right: 8, top: 8 }}>
+                <CartesianGrid vertical={false} stroke="var(--border)" />
+                <XAxis
+                  dataKey="label"
+                  stroke="var(--muted-foreground)"
+                  tick={{ fontSize: 11 }}
+                  interval={2}
+                  axisLine={false}
+                  tickLine={false}
                 />
-                <Bar dataKey="count" fill="#8b5cf6" radius={[8, 8, 0, 0]} />
+                <YAxis
+                  stroke="var(--muted-foreground)"
+                  tick={{ fontSize: 11 }}
+                  allowDecimals={false}
+                  axisLine={false}
+                  tickLine={false}
+                />
+                <Tooltip content={<CustomTooltip valueLabel="Ideas submitted" />} />
+                <Area
+                  type="monotone"
+                  dataKey="count"
+                  stroke="var(--primary)"
+                  strokeWidth={2}
+                  fill="var(--primary)"
+                  fillOpacity={0.12}
+                  dot={false}
+                  activeDot={{ r: 4 }}
+                />
+              </AreaChart>
+            </ResponsiveContainer>
+          </BentoCard>
+
+          {/* Stage breakdown */}
+          <BentoCard title="By Stage" description="Design Thinking pipeline" colSpan={1} index={1}>
+            <ResponsiveContainer width="100%" height={220}>
+              <BarChart data={stageChartData} margin={{ left: -20, right: 8, top: 8 }}>
+                <CartesianGrid vertical={false} stroke="var(--border)" />
+                <XAxis
+                  dataKey="status"
+                  stroke="var(--muted-foreground)"
+                  tick={{ fontSize: 10 }}
+                  axisLine={false}
+                  tickLine={false}
+                />
+                <YAxis
+                  stroke="var(--muted-foreground)"
+                  tick={{ fontSize: 11 }}
+                  allowDecimals={false}
+                  axisLine={false}
+                  tickLine={false}
+                />
+                <Tooltip content={<CustomTooltip />} />
+                <Bar dataKey="count" radius={[6, 6, 0, 0]}>
+                  {stageChartData.map((entry) => (
+                    <Cell key={entry.status} fill={STAGE_VAR[entry.status]} />
+                  ))}
+                </Bar>
               </BarChart>
             </ResponsiveContainer>
-          </CardContent>
-        </Card>
+          </BentoCard>
 
-        {/* Design Thinking Progression */}
-        <div className="grid gap-6 lg:grid-cols-2">
-          <Card className="border-border/20">
-            <CardHeader>
-              <CardTitle>Design Thinking Progression</CardTitle>
-              <CardDescription className="text-xs">Ideas through each stage</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={analytics.designProgressionPath}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-                  <XAxis dataKey="stage" stroke="#94a3b8" style={{ fontSize: "12px" }} />
-                  <YAxis stroke="#94a3b8" style={{ fontSize: "12px" }} />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: "#ffffff",
-                      border: "1px solid #e2e8f0",
-                      borderRadius: "8px",
-                    }}
-                    formatter={(value) => [value, "Ideas"]}
-                  />
-                  <Bar dataKey="ideasReached" fill="#10b981" radius={[8, 8, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
+          {/* Gender breakdown */}
+          <BentoCard title="Student Gender" colSpan={1} index={2}>
+            <GenderBar breakdown={analytics.studentsByGender} />
+          </BentoCard>
 
-          {/* Grade Distribution */}
-          <Card className="border-border/20">
-            <CardHeader>
-              <CardTitle>Student Grade Distribution</CardTitle>
-              <CardDescription className="text-xs">Students by grade level</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={analytics.gradeDistribution}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-                  <XAxis dataKey="grade" stroke="#94a3b8" style={{ fontSize: "12px" }} />
-                  <YAxis stroke="#94a3b8" style={{ fontSize: "12px" }} />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: "#ffffff",
-                      border: "1px solid #e2e8f0",
-                      borderRadius: "8px",
-                    }}
-                    formatter={(value) => [value, "Students"]}
-                  />
-                  <Bar dataKey="count" fill="#ec4899" radius={[8, 8, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
-        </div>
+          {/* Geography roll-up — super-admin / program-lead only */}
+          {showGeographyRollup && (
+            <BentoCard
+              title="By State"
+              description="Ideas per state"
+              colSpan={2}
+              index={3}
+            >
+              <RankedList
+                rows={geography.slice(0, 8).map((g) => ({ label: g.geographyName, count: g.count }))}
+                emptyLabel="No geography-linked schools yet."
+              />
+            </BentoCard>
+          )}
 
-        {/* Team Size Distribution */}
-        <Card className="border-border/20">
-          <CardHeader>
-            <CardTitle>Team Size Distribution</CardTitle>
-            <CardDescription className="text-xs">Number of teams by member count</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={analytics.teamSizeDistribution}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-                <XAxis dataKey="size" stroke="#94a3b8" style={{ fontSize: "12px" }} label={{ value: "Team Size", position: "insideBottomRight", offset: -5 }} />
-                <YAxis stroke="#94a3b8" style={{ fontSize: "12px" }} label={{ value: "Count", angle: -90, position: "insideLeft" }} />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: "#ffffff",
-                    border: "1px solid #e2e8f0",
-                    borderRadius: "8px",
-                  }}
-                  formatter={(value) => [value, "Teams"]}
+          {/* Theme breakdown */}
+          <BentoCard
+            title="By Theme"
+            description="Distribution across monthly themes"
+            colSpan={showGeographyRollup ? 2 : 3}
+            index={4}
+          >
+            <ResponsiveContainer width="100%" height={240}>
+              <BarChart data={analytics.ideasByTheme} margin={{ left: -20, right: 8, top: 8 }}>
+                <CartesianGrid vertical={false} stroke="var(--border)" />
+                <XAxis
+                  dataKey="theme"
+                  stroke="var(--muted-foreground)"
+                  tick={{ fontSize: 10 }}
+                  angle={-35}
+                  textAnchor="end"
+                  height={70}
+                  axisLine={false}
+                  tickLine={false}
                 />
-                <Bar dataKey="count" fill="#f59e0b" radius={[8, 8, 0, 0]} />
+                <YAxis
+                  stroke="var(--muted-foreground)"
+                  tick={{ fontSize: 11 }}
+                  allowDecimals={false}
+                  axisLine={false}
+                  tickLine={false}
+                />
+                <Tooltip content={<CustomTooltip />} />
+                <Bar dataKey="count" fill="var(--primary)" fillOpacity={0.85} radius={[6, 6, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
-          </CardContent>
-        </Card>
+          </BentoCard>
+
+          {/* Grade distribution */}
+          <BentoCard title="By Grade" description="Student grade levels" colSpan={1} index={5}>
+            <ResponsiveContainer width="100%" height={220}>
+              <BarChart data={analytics.gradeDistribution} margin={{ left: -20, right: 8, top: 8 }}>
+                <CartesianGrid vertical={false} stroke="var(--border)" />
+                <XAxis
+                  dataKey="grade"
+                  stroke="var(--muted-foreground)"
+                  tick={{ fontSize: 11 }}
+                  axisLine={false}
+                  tickLine={false}
+                />
+                <YAxis
+                  stroke="var(--muted-foreground)"
+                  tick={{ fontSize: 11 }}
+                  allowDecimals={false}
+                  axisLine={false}
+                  tickLine={false}
+                />
+                <Tooltip content={<CustomTooltip valueLabel="Students" />} />
+                <Bar dataKey="count" fill="var(--primary)" fillOpacity={0.85} radius={[6, 6, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </BentoCard>
+
+          {/* Ranked: schools — hidden for single-school role */}
+          {!isSingleSchool && (
+            <BentoCard title="Top Schools" description="By ideas submitted" colSpan={2} index={6}>
+              <RankedList
+                rows={analytics.ideasPerSchool.slice(0, 8).map((s) => ({
+                  label: s.schoolName,
+                  count: s.count,
+                }))}
+                emptyLabel="No ideas submitted yet."
+              />
+            </BentoCard>
+          )}
+
+          {/* Ranked: teams */}
+          <BentoCard
+            title="Top Teams"
+            description="By ideas submitted"
+            colSpan={isSingleSchool ? 4 : 2}
+            index={7}
+          >
+            <RankedList
+              rows={analytics.ideasPerTeam.slice(0, 8).map((t) => ({
+                label: t.teamName,
+                count: t.count,
+              }))}
+              emptyLabel="No teams yet."
+            />
+          </BentoCard>
+        </div>
       </div>
     </div>
   );

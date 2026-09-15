@@ -165,7 +165,7 @@ export default function DashboardPage() {
               if (!a.schoolName) return true;
               return a.schoolName === currentUser.schoolName;
             });
-            return <GoogleStyleCalendar activities={filteredActs} isAdmin={false} />;
+            return <GoogleStyleCalendar activities={filteredActs} themes={themes} isAdmin={false} />;
           })()}
         </div>
       )}

@@ -25,7 +25,7 @@ interface IdeaState {
   ideas: Idea[];
   isLoaded: boolean;
   loadIdeas: () => Promise<void>;
-  addIdea: (idea: Omit<Idea, "id" | "status" | "lastUpdated" | "stageData" | "timeline">) => Promise<MutationResult>;
+  addIdea: (idea: Omit<Idea, "id" | "status" | "lastUpdated" | "createdAt" | "stageData" | "timeline">) => Promise<MutationResult>;
   updateStatus: (id: string, newStatus: DesignThinkingStatus) => Promise<MutationResult>;
   reorderIdeas: (updatedIdeas: Idea[]) => void;
   getIdeasByTheme: (theme: string) => Idea[];
@@ -64,6 +64,7 @@ export const useIdeaStore = create<IdeaState>((set, get) => ({
       id: crypto.randomUUID(),
       status: "Empathize",
       lastUpdated: now.toISOString().split("T")[0],
+      createdAt: now.toISOString(),
       stageData: {},
       timeline: [],
     };

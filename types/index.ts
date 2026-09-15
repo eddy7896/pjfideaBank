@@ -33,6 +33,12 @@ export interface School {
   udaiseCode: string;
   createdAt: string;
   createdBy?: string;
+  subGeography?: {
+    id: string;
+    name: string;
+    geographyId: string;
+    geography: { id: string; name: string; code: string };
+  } | null;
 }
 
 export interface User {
@@ -154,6 +160,7 @@ export interface Idea {
   targetAudience: string;
   status: DesignThinkingStatus;
   lastUpdated: string;
+  createdAt: string;
   stageData: {
     Empathize?: EmpathizeData;
     Define?: DefineData;
