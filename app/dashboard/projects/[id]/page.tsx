@@ -33,6 +33,7 @@ import { KanbanBoard } from "@/components/dashboard/kanban-board";
 import { DESIGN_THINKING_STAGES, STATUS_COLORS } from "@/lib/constants";
 import { useIdeaStore } from "@/store/use-idea-store";
 import { usePermissions } from "@/lib/permissions";
+import { isStageDataComplete } from "@/lib/stage-data";
 import type { DesignThinkingStatus } from "@/types";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
@@ -88,7 +89,7 @@ export default function ProjectDetailPage({
   const nextStage = currentStageIndex < DESIGN_THINKING_STAGES.length - 1
     ? DESIGN_THINKING_STAGES[currentStageIndex + 1]
     : null;
-  const hasStageData = !!idea.stageData[idea.status];
+  const hasStageData = isStageDataComplete(idea.status, idea.stageData[idea.status]);
 
   const handleGateSubmit = async (formData: any) => {
     setIsSubmitting(true);

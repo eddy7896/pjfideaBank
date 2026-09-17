@@ -1,10 +1,10 @@
-"use client";
+"use client"
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
-import Image from "next/image";
-import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
+import Link from "next/link"
+import Image from "next/image"
+import { usePathname } from "next/navigation"
 import {
   LogOut,
   LayoutDashboard,
@@ -24,21 +24,21 @@ import {
   BookOpen,
   Sun,
   Moon,
-} from "lucide-react";
-import { useTheme } from "next-themes";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Toaster } from "@/components/ui/sonner";
-import { useAuthStore } from "@/store/use-auth-store";
-import { useTeamStore } from "@/store/use-team-store";
-import { useIdeaStore } from "@/store/use-idea-store";
-import { useActivityStore } from "@/store/use-activity-store";
-import { useSchoolStore } from "@/store/use-school-store";
-import { useThemeStore } from "@/store/use-theme-store";
-import { usePermissions } from "@/lib/permissions";
-import { fetchWithRetry } from "@/lib/fetch-with-retry";
-import { cn } from "@/lib/utils";
-import type { ThemeMonth } from "@/types";
+} from "lucide-react"
+import { useTheme } from "next-themes"
+import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
+import { Toaster } from "@/components/ui/sonner"
+import { useAuthStore } from "@/store/use-auth-store"
+import { useTeamStore } from "@/store/use-team-store"
+import { useIdeaStore } from "@/store/use-idea-store"
+import { useActivityStore } from "@/store/use-activity-store"
+import { useSchoolStore } from "@/store/use-school-store"
+import { useThemeStore } from "@/store/use-theme-store"
+import { usePermissions } from "@/lib/permissions"
+import { fetchWithRetry } from "@/lib/fetch-with-retry"
+import { cn } from "@/lib/utils"
+import type { ThemeMonth } from "@/types"
 
 const roleIcons: Record<string, typeof ShieldCheck> = {
   "super-admin": ShieldCheck,
@@ -48,125 +48,159 @@ const roleIcons: Record<string, typeof ShieldCheck> = {
   school: School,
   "sed-department": Building2,
   student: UsersIcon,
-};
+}
 
 // Role identity is carried by the icon + label, not a rainbow of badge colors —
 // color is reserved for the stage/status semantic channel, not role identity.
-const ROLE_BADGE_CLASS = "bg-primary/10 text-primary border-primary/20";
+const ROLE_BADGE_CLASS = "bg-primary/10 text-primary border-primary/20"
 
 export default function DashboardLayout({
   children,
 }: {
-  children: React.ReactNode;
+  children: React.ReactNode
 }) {
-  const router = useRouter();
-  const pathname = usePathname();
-  const { currentUser, isAuthenticated, logout, hydrate } = useAuthStore();
-  const { loadTeams, isLoaded: teamsLoaded } = useTeamStore();
-  const { ideas, loadIdeas, isLoaded: ideasLoaded } = useIdeaStore();
-  const { loadActivities, isLoaded: activitiesLoaded } = useActivityStore();
-  const { loadSchools, isLoaded: schoolsLoaded } = useSchoolStore();
-  const { loadThemes, isLoaded: themesLoaded } = useThemeStore();
-  const { canApproveAdvance, hasPendingAdvance } = usePermissions();
-  const { resolvedTheme, setTheme } = useTheme();
+  const router = useRouter()
+  const pathname = usePathname()
+  const { currentUser, isAuthenticated, logout, hydrate } = useAuthStore()
+  const { loadTeams, isLoaded: teamsLoaded } = useTeamStore()
+  const { ideas, loadIdeas, isLoaded: ideasLoaded } = useIdeaStore()
+  const { loadActivities, isLoaded: activitiesLoaded } = useActivityStore()
+  const { loadSchools, isLoaded: schoolsLoaded } = useSchoolStore()
+  const { loadThemes, isLoaded: themesLoaded } = useThemeStore()
+  const { canApproveAdvance, hasPendingAdvance } = usePermissions()
+  const { resolvedTheme, setTheme } = useTheme()
   const dataLoaded =
-    teamsLoaded && ideasLoaded && activitiesLoaded && schoolsLoaded && themesLoaded;
+    teamsLoaded &&
+    ideasLoaded &&
+    activitiesLoaded &&
+    schoolsLoaded &&
+    themesLoaded
   const pendingReviewCount = ideas.filter(
     (idea) => canApproveAdvance(idea) && hasPendingAdvance(idea)
-  ).length;
-  const [mounted, setMounted] = useState(false);
-  const [hydrated, setHydrated] = useState(false);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  ).length
+  const [mounted, setMounted] = useState(false)
+  const [hydrated, setHydrated] = useState(false)
+  const [sidebarOpen, setSidebarOpen] = useState(false)
 
   useEffect(() => {
-    setMounted(true);
-    hydrate().finally(() => setHydrated(true));
-  }, [hydrate]);
+    setMounted(true)
+    hydrate().finally(() => setHydrated(true))
+  }, [hydrate])
 
   useEffect(() => {
     if (mounted && hydrated && !isAuthenticated) {
-      router.replace("/login");
+      router.replace("/login")
     }
-  }, [mounted, hydrated, isAuthenticated, router]);
+  }, [mounted, hydrated, isAuthenticated, router])
 
   useEffect(() => {
-    if (!mounted || !isAuthenticated) return;
+    if (!mounted || !isAuthenticated) return
 
-    (async () => {
+    ;(async () => {
       // One request for everything the shell needs, instead of 5 separate
       // round-trips - matters on a slow/flaky connection where round-trip
       // count costs as much as payload size. Falls back to the old
       // per-store fetches if the aggregate endpoint itself fails, so a
       // single bad response doesn't leave the dashboard stuck.
       try {
-        const res = await fetchWithRetry("/api/dashboard/bootstrap", { credentials: "include" });
-        if (!res.ok) throw new Error(`bootstrap failed: ${res.status}`);
-        const data = await res.json();
-        useTeamStore.setState({ teams: data.teams, isLoaded: true });
-        useIdeaStore.setState({ ideas: data.ideas, isLoaded: true });
-        useActivityStore.setState({ activities: data.activities, isLoaded: true });
-        useSchoolStore.setState({ schools: data.schools, isLoaded: true });
+        const res = await fetchWithRetry("/api/dashboard/bootstrap", {
+          credentials: "include",
+        })
+        if (!res.ok) throw new Error(`bootstrap failed: ${res.status}`)
+        const data = await res.json()
+        useTeamStore.setState({ teams: data.teams, isLoaded: true })
+        useIdeaStore.setState({ ideas: data.ideas, isLoaded: true })
+        useActivityStore.setState({
+          activities: data.activities,
+          isLoaded: true,
+        })
+        useSchoolStore.setState({ schools: data.schools, isLoaded: true })
         useThemeStore.setState({
           // Match loadThemes()'s own shape - id/sortOrder aren't part of
           // the ThemeMonth type the rest of the app expects.
-          themes: (data.themes as Array<ThemeMonth & { id: string; sortOrder: number }>).map(
-            ({ id: _id, sortOrder: _sortOrder, ...t }) => t
-          ),
+          themes: (
+            data.themes as Array<ThemeMonth & { id: string; sortOrder: number }>
+          ).map(({ id: _id, sortOrder: _sortOrder, ...t }) => t),
           isLoaded: true,
-        });
+        })
       } catch (error) {
-        console.error("Dashboard bootstrap failed, falling back to individual loads:", error);
-        loadTeams();
-        loadIdeas();
-        loadActivities();
-        loadSchools();
-        loadThemes();
+        console.error(
+          "Dashboard bootstrap failed, falling back to individual loads:",
+          error
+        )
+        loadTeams()
+        loadIdeas()
+        loadActivities()
+        loadSchools()
+        loadThemes()
       }
-    })();
-  }, [mounted, isAuthenticated, loadTeams, loadIdeas, loadActivities, loadSchools, loadThemes]);
+    })()
+  }, [
+    mounted,
+    isAuthenticated,
+    loadTeams,
+    loadIdeas,
+    loadActivities,
+    loadSchools,
+    loadThemes,
+  ])
 
-  if (!mounted || !hydrated || !isAuthenticated || !currentUser || !dataLoaded) {
+  if (
+    !mounted ||
+    !hydrated ||
+    !isAuthenticated ||
+    !currentUser ||
+    !dataLoaded
+  ) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background">
         <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
       </div>
-    );
+    )
   }
 
-  const RoleIcon = roleIcons[currentUser.role] || ShieldCheck;
+  const RoleIcon = roleIcons[currentUser.role] || ShieldCheck
 
   const handleLogout = async () => {
-    await logout();
-    router.replace("/login");
-  };
+    await logout()
+    router.replace("/login")
+  }
 
   return (
     <div className="flex min-h-screen bg-background">
       {/* Mobile Header */}
-      <div className="fixed top-0 left-0 right-0 z-40 flex items-center justify-between px-4 py-3 bg-background/95 backdrop-blur-sm border-b border-border/40 md:hidden">
+      <div className="fixed top-0 right-0 left-0 z-40 flex items-center justify-between border-b border-border/40 bg-background/95 px-4 py-3 backdrop-blur-sm md:hidden">
         <Button
           variant="ghost"
           size="icon"
           onClick={() => setSidebarOpen(!sidebarOpen)}
-          className="hover:bg-primary/10 hover:text-primary transition-colors"
+          className="transition-colors hover:bg-primary/10 hover:text-primary"
         >
-          {sidebarOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          {sidebarOpen ? (
+            <X className="h-5 w-5" />
+          ) : (
+            <Menu className="h-5 w-5" />
+          )}
         </Button>
         <div className="flex-1 text-center">
-          <h1 className="text-sm font-heading font-bold text-foreground">Pi Jam</h1>
+          <h1 className="font-heading text-sm font-bold text-foreground">
+            Pi Jam
+          </h1>
         </div>
         <div className="w-10" />
       </div>
 
       {/* Sidebar Navigation */}
-      <aside className={cn(
-        "fixed inset-y-0 left-0 z-50 flex w-64 flex-col border-r border-border bg-card shadow-sm transition-all",
-        "md:translate-x-0",
-        sidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
-      )}>
-        <div className="md:hidden pt-14" />
+      <aside
+        className={cn(
+          "fixed inset-y-0 left-0 z-50 flex w-64 flex-col border-r border-border bg-card shadow-sm transition-all",
+          "md:translate-x-0",
+          sidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
+        )}
+      >
+        <div className="pt-14 md:hidden" />
         {/* Logo Area */}
-        <div className="flex h-24 shrink-0 items-center justify-center px-6 border-b border-border/40">
+        <div className="flex h-24 shrink-0 items-center justify-center border-b border-border/40 px-6">
           <Image
             src="/pijam logo.jpeg"
             alt="Pi Jam Logo"
@@ -178,8 +212,9 @@ export default function DashboardLayout({
         </div>
 
         {/* Links */}
-        <nav className="flex-1 space-y-1.5 px-4 py-6 overflow-y-auto">
+        <nav className="flex-1 space-y-1.5 overflow-y-auto px-4 py-6">
           <Link
+            prefetch={false}
             href="/dashboard"
             className={cn(
               "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold transition-all active:scale-[0.98]",
@@ -193,6 +228,7 @@ export default function DashboardLayout({
           </Link>
 
           <Link
+            prefetch={false}
             href="/dashboard/calendar"
             className={cn(
               "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold transition-all active:scale-[0.98]",
@@ -207,6 +243,7 @@ export default function DashboardLayout({
 
           {currentUser.role === "super-admin" && (
             <Link
+              prefetch={false}
               href="/dashboard/admin/users"
               className={cn(
                 "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold transition-all active:scale-[0.98]",
@@ -222,6 +259,7 @@ export default function DashboardLayout({
 
           {currentUser.role !== "student" && (
             <Link
+              prefetch={false}
               href="/dashboard/activities"
               className={cn(
                 "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold transition-all active:scale-[0.98]",
@@ -237,6 +275,7 @@ export default function DashboardLayout({
 
           {currentUser.role === "school" && (
             <Link
+              prefetch={false}
               href="/dashboard/teams"
               className={cn(
                 "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold transition-all active:scale-[0.98]",
@@ -252,6 +291,7 @@ export default function DashboardLayout({
 
           {currentUser.role !== "student" && (
             <Link
+              prefetch={false}
               href="/dashboard/projects"
               className={cn(
                 "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold transition-all active:scale-[0.98]",
@@ -272,6 +312,7 @@ export default function DashboardLayout({
 
           {currentUser.role === "school" && (
             <Link
+              prefetch={false}
               href="/dashboard/submit"
               className={cn(
                 "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold transition-all active:scale-[0.98]",
@@ -287,6 +328,7 @@ export default function DashboardLayout({
 
           {currentUser.role !== "school" && currentUser.role !== "student" && (
             <Link
+              prefetch={false}
               href="/dashboard/schools"
               className={cn(
                 "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold transition-all active:scale-[0.98]",
@@ -302,6 +344,7 @@ export default function DashboardLayout({
 
           {currentUser.role !== "student" && (
             <Link
+              prefetch={false}
               href="/dashboard/analytics"
               className={cn(
                 "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold transition-all active:scale-[0.98]",
@@ -316,6 +359,7 @@ export default function DashboardLayout({
           )}
 
           <Link
+            prefetch={false}
             href="/dashboard/settings"
             className={cn(
               "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold transition-all active:scale-[0.98]",
@@ -347,7 +391,9 @@ export default function DashboardLayout({
               <Button
                 variant="outline"
                 size="icon"
-                onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
+                onClick={() =>
+                  setTheme(resolvedTheme === "dark" ? "light" : "dark")
+                }
                 className="h-8 w-8 shrink-0 border-border bg-background text-muted-foreground hover:text-foreground"
                 aria-label="Toggle theme"
                 title="Toggle theme (D)"
@@ -364,7 +410,7 @@ export default function DashboardLayout({
               variant="outline"
               size="sm"
               onClick={handleLogout}
-              className="w-full justify-start gap-2 text-muted-foreground hover:text-foreground border-border bg-background"
+              className="w-full justify-start gap-2 border-border bg-background text-muted-foreground hover:text-foreground"
             >
               <LogOut className="h-4 w-4" />
               Logout
@@ -382,10 +428,10 @@ export default function DashboardLayout({
       )}
 
       {/* Main Content Area */}
-      <main id="main-content" className="flex-1 md:pl-64 pt-16 md:pt-0">
+      <main id="main-content" className="flex-1 pt-16 md:pt-0 md:pl-64">
         {children}
       </main>
       <Toaster richColors position="top-right" />
     </div>
-  );
+  )
 }
