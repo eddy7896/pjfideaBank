@@ -16,7 +16,7 @@ import { LearningStep } from "@/components/ideabank/learning-step";
 import { HeroCollage } from "@/components/ideabank/hero-collage";
 import { PurposeStatement } from "@/components/ideabank/purpose-statement";
 import { TeacherResourcePanels } from "@/components/ideabank/teacher-resources";
-import { ScrollReveal } from "@/components/ideabank/scroll-reveal";
+import { ScrollReveal, ScrollParallax } from "@/components/ideabank/scroll-reveal";
 import { NotebookGrid } from "@/components/ideabank/background-texture";
 import { Magnetic } from "@/components/ideabank/magnetic";
 import { IdeaIllustration, CATEGORY_ICONS } from "@/components/ideabank/illustration";
@@ -259,9 +259,9 @@ export default function HomePage() {
         {/* Featured problem story */}
         <section className="px-5 py-20 sm:px-8 lg:px-12">
           <div className="mx-auto grid max-w-[1240px] grid-cols-1 items-center gap-10 lg:grid-cols-[1.1fr_1fr] lg:gap-16">
-            <ScrollReveal>
+            <ScrollParallax strength={28}>
               <IdeaIllustration imageKey={storyProblem.image} className="aspect-[4/3] w-full" iconClassName="h-20 w-20" />
-            </ScrollReveal>
+            </ScrollParallax>
             <ScrollReveal delay={0.1}>
               <p className="text-sm font-semibold uppercase tracking-[0.12em] text-[#4282A4]">
                 {storyProblem.category}
@@ -319,19 +319,23 @@ export default function HomePage() {
 
         {/* Closing CTA */}
         <section className="px-5 py-20 sm:px-8 lg:px-12">
-          <div className="mx-auto max-w-[1240px] overflow-hidden rounded-[32px] bg-[#15425B] px-8 py-16 text-center sm:px-16 sm:py-20">
-            <h2 className="text-[clamp(1.875rem,4.5vw,3.25rem)] font-bold leading-[1.1] tracking-tight text-white font-heading">
-              What did you notice today?
-            </h2>
-            <p className="mx-auto mt-5 max-w-lg text-lg leading-relaxed text-white/85">
-              A small observation could be the beginning of your next project.
-            </p>
-            <div className="mt-9">
-              <IdeabankButton href="/dashboard" variant="cyan">
-                Share an Idea
-              </IdeabankButton>
+          <ScrollReveal className="mx-auto max-w-[1240px]">
+            <div className="overflow-hidden rounded-[32px] bg-[#15425B] px-8 py-16 text-center sm:px-16 sm:py-20">
+              <h2 className="text-[clamp(1.875rem,4.5vw,3.25rem)] font-bold leading-[1.1] tracking-tight text-white font-heading">
+                What did you notice today?
+              </h2>
+              <p className="mx-auto mt-5 max-w-lg text-lg leading-relaxed text-white/85">
+                A small observation could be the beginning of your next project.
+              </p>
+              <div className="mt-9 flex justify-center">
+                <Magnetic strength={10}>
+                  <IdeabankButton href="/dashboard" variant="cyan">
+                    Share an Idea
+                  </IdeabankButton>
+                </Magnetic>
+              </div>
             </div>
-          </div>
+          </ScrollReveal>
         </section>
       </main>
 
