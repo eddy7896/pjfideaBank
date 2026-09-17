@@ -26,9 +26,13 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Ideabank by PiJam — Small observations, ideas that make a difference",
+  metadataBase: new URL("https://ideabank-six.vercel.app"),
+  title: {
+    default: "Ideabank by PiJam — Track your idea from observation to prototype",
+    template: "%s | Ideabank by PiJam",
+  },
   description:
-    "Explore everyday problems, learn from young creators, and turn your own observations into ideas worth building. A student and teacher idea-sharing platform from PiJam.",
+    "Ideabank is where student teams document their own idea through the Design Thinking process — Empathize, Define, Ideate, Prototype, and Test — starting from a real problem in the Problem Bank.",
   keywords: [
     "Ideabank",
     "PiJam",
@@ -36,6 +40,7 @@ export const metadata: Metadata = {
     "Design Thinking",
     "Education",
     "Innovation",
+    "Problem Bank",
   ],
 };
 

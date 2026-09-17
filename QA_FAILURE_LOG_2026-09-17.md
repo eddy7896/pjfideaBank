@@ -22,11 +22,11 @@ Every step below is a real wall-clock measurement (click/navigation start → ac
 | Student login (Team ID + PIN → dashboard) | 2.7s |
 | Open a project from the list | 6.2s |
 
-**Root cause (confirmed separately by direct DB benchmarking against the same Supabase project used in production):** the database is hosted in `ap-northeast-2` (Seoul), and a raw `SELECT 1` round-trip measured **~1000ms**, with a real `user.findUnique` query measured at **~1.6–3.7s**. Registration, login, and every dashboard page all run 1–5 sequential/parallel DB queries, so their wall-clock time is dominated by this per-query network latency, not application logic. `vercel.json` has no `regions` set, so Vercel's serverless functions default to a US region — meaning **every request crosses two long hops** (client → US function → Seoul DB → US function → client), not one.
+**Root cause (confirmed separately by direct DB benchmarking against the same Supabase project used in production):** the database is hosted in `ap-northeast-2` (Seoul), and a raw `SELECT 1` round-trip measured **~1000ms**, with a real `user.findUnique` query measured at **~1.6–3.7s**. Registration, login, and every dashboard page all run 1–5 sequential/parallel DB queries, so their wall-clock time is dominated by this per-query network latency, not application logic.
 
-**Fix, in order of impact:**
-1. Move the Supabase project to a region near your actual users (India — `ap-south-1`) and/or your Vercel deployment region. This is the real fix; requires a DB migration/restore, needs your sign-off before I touch it.
-2. Set `"regions"` in `vercel.json` to whatever's closest to the current Supabase region, to at least remove one leg of the round trip without touching data.
+Note: `X-Vercel-Id` on the live deployment reads `bom1` (Mumbai) — Vercel's function is already running close to India, so the round trip is **Mumbai (function) ↔ Seoul (DB)**, not the US↔Seoul hop this section originally guessed from `vercel.json` having no explicit `regions` set. That guess was wrong; correcting it here. The latency is real either way — it's one long hop, not two, but it's still the dominant cost on every DB-backed request.
+
+**Fix:** move the Supabase project to a region near the DB's actual counterpart — `ap-south-1` (Mumbai), matching where the Vercel function already runs. This is a DB migration/restore; needs your sign-off before I touch it. (Pinning `vercel.json` `regions` to `bom1` explicitly is low-value here since Vercel is already routing there.)
 
 ---
 
