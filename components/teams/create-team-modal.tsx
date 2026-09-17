@@ -19,7 +19,12 @@ interface CreateTeamModalProps {
   open: boolean;
   schoolName: string;
   onClose: () => void;
-  onSubmit: (name: string, members: TeamMember[], type?: "student" | "teacher") => Promise<{ id: string; pin: string }>;
+  onSubmit: (
+    name: string,
+    members: TeamMember[],
+    type?: "student" | "teacher",
+    guardianConsentAcknowledged?: boolean
+  ) => Promise<{ id: string; pin: string }>;
   teamToEdit?: StudentTeam | null;
 }
 
@@ -36,16 +41,19 @@ export function CreateTeamModal({
   const [teamName, setTeamName] = useState("");
   const [teamType, setTeamType] = useState<"student" | "teacher">("student");
   const [members, setMembers] = useState<TeamMember[]>([]);
+  const [guardianConsentAcknowledged, setGuardianConsentAcknowledged] = useState(false);
 
   useEffect(() => {
     if (teamToEdit) {
       setTeamName(teamToEdit.name);
       setMembers(teamToEdit.members || []);
       setTeamType(teamToEdit.type || "student");
+      setGuardianConsentAcknowledged(!!teamToEdit.guardianConsentAcknowledged);
     } else {
       setTeamName("");
       setMembers([]);
       setTeamType("student");
+      setGuardianConsentAcknowledged(false);
     }
     setCreatedTeam(null);
   }, [teamToEdit, open]);
@@ -59,18 +67,13 @@ export function CreateTeamModal({
   const [copiedField, setCopiedField] = useState<"id" | "pin" | null>(null);
 
   const handleAddMember = () => {
-    if (
-      newMember.name.trim() &&
-      newMember.grade &&
-      newMember.contactNumber.trim() &&
-      newMember.gender
-    ) {
+    if (newMember.name.trim() && newMember.grade && newMember.gender) {
       setMembers([
         ...members,
         {
           name: newMember.name.trim(),
           grade: newMember.grade,
-          contactNumber: newMember.contactNumber.trim(),
+          contactNumber: newMember.contactNumber.trim() || undefined,
           gender: newMember.gender as "Male" | "Female" | "Non-binary" | "Prefer not to say",
         },
       ]);
@@ -83,8 +86,8 @@ export function CreateTeamModal({
   };
 
   const handleCreate = async () => {
-    if (!teamName.trim()) return;
-    const result = await onSubmit(teamName.trim(), members, teamType);
+    if (!teamName.trim() || !guardianConsentAcknowledged) return;
+    const result = await onSubmit(teamName.trim(), members, teamType, guardianConsentAcknowledged);
     setCreatedTeam(result);
   };
 
@@ -93,6 +96,7 @@ export function CreateTeamModal({
     setMembers([]);
     setNewMember({ name: "", grade: "", contactNumber: "", gender: "" });
     setTeamType("student");
+    setGuardianConsentAcknowledged(false);
     setCreatedTeam(null);
     onClose();
   };
@@ -279,12 +283,12 @@ export function CreateTeamModal({
 
                 <div>
                   <Label htmlFor="memberContact" className="text-xs text-muted-foreground mb-1">
-                    Contact Number
+                    Parent/Guardian Contact Number (optional)
                   </Label>
                   <div className="flex gap-2">
                     <Input
                       id="memberContact"
-                      placeholder="e.g., 555-0123"
+                      placeholder="e.g., 98765 43210 — not the student's own number"
                       value={newMember.contactNumber}
                       onChange={(e) =>
                         setNewMember({ ...newMember, contactNumber: e.target.value })
@@ -295,12 +299,7 @@ export function CreateTeamModal({
                       variant="outline"
                       size="sm"
                       onClick={handleAddMember}
-                      disabled={
-                        !newMember.name.trim() ||
-                        !newMember.grade ||
-                        !newMember.gender ||
-                        !newMember.contactNumber.trim()
-                      }
+                      disabled={!newMember.name.trim() || !newMember.grade || !newMember.gender}
                     >
                       <Plus className="h-4 w-4" />
                     </Button>
@@ -322,7 +321,8 @@ export function CreateTeamModal({
                     <div className="flex-1">
                       <p className="text-sm font-medium">{member.name}</p>
                       <p className="text-xs text-muted-foreground">
-                        Grade {member.grade} · {member.gender} · {member.contactNumber}
+                        Grade {member.grade} · {member.gender}
+                        {member.contactNumber ? ` · Guardian: ${member.contactNumber}` : ""}
                       </p>
                     </div>
                     <button
@@ -337,13 +337,32 @@ export function CreateTeamModal({
             )}
           </div>
 
+          {members.length > 0 && (
+            <label className="flex items-start gap-2.5 rounded-lg border border-border/50 bg-muted/30 p-3 text-xs text-muted-foreground">
+              <input
+                type="checkbox"
+                checked={guardianConsentAcknowledged}
+                onChange={(e) => setGuardianConsentAcknowledged(e.target.checked)}
+                className="mt-0.5 h-4 w-4 shrink-0 rounded border-border accent-primary"
+              />
+              <span>
+                I confirm parent/guardian consent for the students listed above has been
+                obtained, consistent with the school&apos;s own enrolment process, as required
+                under the Digital Personal Data Protection Act, 2023. See the{" "}
+                <a href="/child-safety" target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-foreground">
+                  Child Safety Policy
+                </a>.
+              </span>
+            </label>
+          )}
+
           <div className="flex gap-3">
             <Button variant="outline" onClick={handleClose} className="flex-1">
               Cancel
             </Button>
             <Button
               onClick={handleCreate}
-              disabled={!teamName.trim() || members.length === 0}
+              disabled={!teamName.trim() || members.length === 0 || !guardianConsentAcknowledged}
               className="flex-1"
             >
               {teamToEdit ? "Save Changes" : "Create Team"}

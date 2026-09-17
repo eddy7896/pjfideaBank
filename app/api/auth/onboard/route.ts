@@ -31,6 +31,9 @@ const OnboardSchema = z.object({
   teacherEmail: z.string().email().max(200),
   teacherPassword: z.string().min(8).max(200),
   assignedLeadId: z.string().max(200).optional(),
+  termsAccepted: z.literal(true, {
+    message: "You must accept the Terms of Service and Privacy Policy",
+  }),
 });
 
 export async function POST(request: NextRequest) {
@@ -194,6 +197,7 @@ export async function POST(request: NextRequest) {
             geographyId,
             subGeographyId,
             passwordHash: hashedPassword,
+            termsAcceptedAt: new Date(),
           },
         });
 

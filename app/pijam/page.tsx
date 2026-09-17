@@ -58,6 +58,7 @@ export default function PijamPortalPage() {
   });
 
   const [onboardErrors, setOnboardErrors] = useState<Record<string, string>>({});
+  const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [geographyLeads, setGeographyLeads] = useState<
     Array<{
       id: number;
@@ -194,6 +195,10 @@ export default function PijamPortalPage() {
 
   const handleOnboardSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!agreedToTerms) {
+      toast.error("Please accept the Terms of Service and Privacy Policy to continue");
+      return;
+    }
     setIsLoading(true);
 
     try {
@@ -211,6 +216,7 @@ export default function PijamPortalPage() {
           teacherName: onboardData.teacherName.trim(),
           teacherEmail: onboardData.teacherEmail.trim(),
           teacherPassword: onboardData.teacherPassword,
+          termsAccepted: true,
         };
       } else {
         payload = {
@@ -221,6 +227,7 @@ export default function PijamPortalPage() {
           location: onboardData.locations[0],
           locations: onboardData.locations,
           assignedLeadId: onboardData.assignedLeadId,
+          termsAccepted: true,
         };
       }
 
@@ -803,6 +810,28 @@ export default function PijamPortalPage() {
                 </>
               )}
 
+              {onboardStep === totalOnboardSteps && (
+                <label className="flex items-start gap-2.5 rounded-xl border border-border/60 bg-muted/40 p-3.5 text-xs text-muted-foreground">
+                  <input
+                    type="checkbox"
+                    checked={agreedToTerms}
+                    onChange={(e) => setAgreedToTerms(e.target.checked)}
+                    className="mt-0.5 h-4 w-4 shrink-0 rounded border-border accent-primary"
+                  />
+                  <span>
+                    I have read and agree to the{" "}
+                    <Link href="/terms" target="_blank" className="text-primary underline underline-offset-2 hover:text-primary/80">
+                      Terms of Service
+                    </Link>{" "}
+                    and{" "}
+                    <Link href="/privacy" target="_blank" className="text-primary underline underline-offset-2 hover:text-primary/80">
+                      Privacy Policy
+                    </Link>
+                    , including how student data is handled under the DPDP Act, 2023.
+                  </span>
+                </label>
+              )}
+
               <div className="flex gap-3 pt-4 border-t border-border/20">
                 {onboardStep > 1 && (
                   <Button type="button" variant="outline" onClick={handleOnboardPrev} className="flex-1 rounded-xl shadow-sm text-sm">
@@ -814,7 +843,7 @@ export default function PijamPortalPage() {
                     Next
                   </Button>
                 ) : (
-                  <Button type="submit" className="flex-1 bg-primary hover:bg-primary/95 text-white font-bold rounded-xl shadow-lg transition-transform active:scale-[0.98] text-sm" disabled={isLoading}>
+                  <Button type="submit" className="flex-1 bg-primary hover:bg-primary/95 text-white font-bold rounded-xl shadow-lg transition-transform active:scale-[0.98] text-sm" disabled={isLoading || !agreedToTerms}>
                     {isLoading ? "Submitting..." : "Join Team"}
                   </Button>
                 )}

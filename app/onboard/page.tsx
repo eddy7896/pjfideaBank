@@ -34,6 +34,7 @@ export default function OnboardPage() {
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [agreedToTerms, setAgreedToTerms] = useState(false);
 
   // District selector modal states
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -119,6 +120,10 @@ export default function OnboardPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!agreedToTerms) {
+      toast.error("Please accept the Terms of Service and Privacy Policy to continue");
+      return;
+    }
     setIsLoading(true);
 
     try {
@@ -134,6 +139,7 @@ export default function OnboardPage() {
         teacherName: formData.teacherName.trim(),
         teacherEmail: formData.teacherEmail.trim(),
         teacherPassword: formData.teacherPassword,
+        termsAccepted: true,
       };
 
       const response = await fetch("/api/auth/onboard", {
@@ -552,6 +558,26 @@ export default function OnboardPage() {
                       </div>
                     </div>
                   </div>
+
+                  <label className="flex items-start gap-2.5 rounded-xl border border-border/60 bg-muted/40 p-3.5 text-xs text-muted-foreground">
+                    <input
+                      type="checkbox"
+                      checked={agreedToTerms}
+                      onChange={(e) => setAgreedToTerms(e.target.checked)}
+                      className="mt-0.5 h-4 w-4 shrink-0 rounded border-border accent-primary"
+                    />
+                    <span>
+                      I have read and agree to the{" "}
+                      <Link href="/terms" target="_blank" className="text-primary underline underline-offset-2 hover:text-primary/80">
+                        Terms of Service
+                      </Link>{" "}
+                      and{" "}
+                      <Link href="/privacy" target="_blank" className="text-primary underline underline-offset-2 hover:text-primary/80">
+                        Privacy Policy
+                      </Link>
+                      , including how student data is handled under the DPDP Act, 2023.
+                    </span>
+                  </label>
                 </div>
               )}
 
@@ -578,7 +604,7 @@ export default function OnboardPage() {
                   <Button
                     type="submit"
                     className="flex-1 bg-primary hover:bg-primary/95 text-white font-bold rounded-xl shadow-lg transition-transform active:scale-[0.98] text-sm"
-                    disabled={isLoading}
+                    disabled={isLoading || !agreedToTerms}
                   >
                     {isLoading ? "Submitting..." : "Complete Registration"}
                   </Button>

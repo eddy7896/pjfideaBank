@@ -95,6 +95,7 @@ Every non-student account (super-admin, program-lead, geography-lead, teacher-tr
 | `assignedLeadUserId` | `Int?` | Self-FK → User, `onDelete: SetNull`. Links a Teacher Trainer to their Geography Lead |
 | `createdById` | `Int?` | Self-FK → User, `onDelete: SetNull`. Audit trail of who minted this account |
 | `createdAt` | `DateTime` | |
+| `termsAcceptedAt` | `DateTime?` | Stamped at self-registration when the registrant accepts the Terms/Privacy Policy. Null for admin-minted accounts |
 
 Relations: `geography`, `subGeography`, `school`, `assignedSubGeos[]` (via `UserSubGeography` — multi-district assignment), `createdBy`/`createdUsers[]`, `assignedLead`/`assignedTrainers[]`.
 
@@ -127,6 +128,8 @@ A team of students at a school. Also the **login credential** for the `student` 
 | `schoolId` | `String` | Authoritative FK → School, `onDelete: Cascade` |
 | `type` | `String` | `"student"` or `"teacher"` — default `"student"`. Teacher-run teams bypass the advance-approval gate |
 | `createdAt` | `DateTime` | |
+| `guardianConsentAcknowledged` | `Boolean` | Default `false`. School Admin's affirmation, at team creation, that guardian consent for the listed students was obtained (DPDP Act §9) |
+| `guardianConsentAcknowledgedAt` | `DateTime?` | Stamped when the above is set true |
 
 Unique: `(schoolName, pin)` — PIN only needs to be unique per school, not globally.
 Relations: `members[]` (TeamMember), `ideas[]` (Idea), `school`.
@@ -140,7 +143,8 @@ An individual student inside a `StudentTeam`.
 |---|---|---|
 | `id` | `String` (cuid) | PK |
 | `studentTeamId` | `String` | FK → StudentTeam, `onDelete: Cascade` |
-| `name`, `grade`, `contactNumber` | `String` | |
+| `name`, `grade` | `String` | |
+| `contactNumber` | `String?` | Optional. A parent/guardian number, not the student's own — see DPDP_COMPLIANCE_REPORT.md |
 | `gender` | `String` | Free-text, not a DB enum (app-level type is `"Male" \| "Female" \| "Non-binary" \| "Prefer not to say"`) |
 
 ---

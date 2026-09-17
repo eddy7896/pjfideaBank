@@ -45,6 +45,7 @@ const validSchoolPayload = {
   teacherName: 'A Teacher',
   teacherEmail: 'teacher@springfield.edu',
   teacherPassword: 'password123',
+  termsAccepted: true,
 };
 
 describe('POST /api/auth/onboard — school self-registration', () => {
@@ -135,6 +136,7 @@ describe('POST /api/auth/onboard — pijam teacher-trainer registration', () => 
     teacherEmail: 'trainer@pijam.org',
     teacherPassword: 'password123',
     assignedLeadId: '7',
+    termsAccepted: true,
   };
 
   beforeEach(() => {

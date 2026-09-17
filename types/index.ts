@@ -59,7 +59,8 @@ export interface User {
 export interface TeamMember {
   name: string;
   grade: string;
-  contactNumber: string;
+  /** Parent/guardian contact number — optional, not the student's own. */
+  contactNumber?: string;
   gender: "Male" | "Female" | "Non-binary" | "Prefer not to say";
 }
 
@@ -71,6 +72,8 @@ export interface StudentTeam {
   type: "student" | "teacher";
   members: TeamMember[];
   createdAt: string;
+  guardianConsentAcknowledged?: boolean;
+  guardianConsentAcknowledgedAt?: string | null;
 }
 
 export interface DemoCredential {

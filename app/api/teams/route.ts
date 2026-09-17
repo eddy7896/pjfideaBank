@@ -52,6 +52,19 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Guardian consent for student-team members is a required capture step
+    // (DPDP Act §9, children's data) — a teacher account cannot create a
+    // student team without affirming it. Teacher-only teams have no student
+    // data, so the gate doesn't apply there.
+    const isStudentTeam = (data.type || "student") === "student";
+    const memberCount = (data.members ?? []).length;
+    if (isStudentTeam && memberCount > 0 && data.guardianConsentAcknowledged !== true) {
+      return NextResponse.json(
+        { error: "Guardian consent acknowledgment is required before adding student members" },
+        { status: 400 }
+      );
+    }
+
     const team = await prisma.studentTeam.create({
       data: {
         id: data.id,
@@ -60,12 +73,14 @@ export async function POST(request: NextRequest) {
         schoolName: user.schoolName,
         schoolId: school.id,
         type: data.type || "student",
+        guardianConsentAcknowledged: data.guardianConsentAcknowledged === true,
+        guardianConsentAcknowledgedAt: data.guardianConsentAcknowledged === true ? new Date() : null,
         members: data.members ? {
           create: data.members.map((m: any) => ({
             id: m.id,
             name: m.name,
             grade: m.grade,
-            contactNumber: m.contactNumber,
+            contactNumber: m.contactNumber || null,
             gender: m.gender,
           })),
         } : undefined,

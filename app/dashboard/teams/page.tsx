@@ -43,16 +43,16 @@ export default function TeamsPage() {
     return ideas.filter((i) => i.teamId === teamId).length;
   };
 
-  const handleCreateTeam = async (name: string, members: any[], type?: "student" | "teacher") => {
-    const newTeam = await createTeam(name, currentUser.schoolName!, members, type);
+  const handleCreateTeam = async (name: string, members: any[], type?: "student" | "teacher", guardianConsentAcknowledged?: boolean) => {
+    const newTeam = await createTeam(name, currentUser.schoolName!, members, type, guardianConsentAcknowledged);
     toast.success(`Team "${name}" created successfully!`);
     await useTeamStore.getState().loadTeams();
     return { id: newTeam.id, pin: newTeam.pin };
   };
 
-  const handleEditSubmit = async (name: string, members: any[], type?: "student" | "teacher") => {
+  const handleEditSubmit = async (name: string, members: any[], type?: "student" | "teacher", guardianConsentAcknowledged?: boolean) => {
     if (!teamToEdit) throw new Error("No team selected for editing");
-    const updatedTeam = await updateTeam(teamToEdit.id, name, members, type);
+    const updatedTeam = await updateTeam(teamToEdit.id, name, members, type, guardianConsentAcknowledged);
     toast.success(`Team "${name}" updated successfully!`);
     await useTeamStore.getState().loadTeams();
     return { id: updatedTeam.id, pin: updatedTeam.pin };
@@ -229,9 +229,11 @@ export default function TeamsPage() {
                               Grade {member.grade} · {member.gender}
                             </p>
                           </div>
-                          <p className="font-mono text-xs text-muted-foreground">
-                            {member.contactNumber}
-                          </p>
+                          {member.contactNumber && (
+                            <p className="font-mono text-xs text-muted-foreground" title="Guardian contact">
+                              {member.contactNumber}
+                            </p>
+                          )}
                         </div>
                       ))}
                     </div>

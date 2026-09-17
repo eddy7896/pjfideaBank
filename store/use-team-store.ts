@@ -8,8 +8,8 @@ interface TeamState {
   teams: StudentTeam[];
   isLoaded: boolean;
   loadTeams: () => Promise<void>;
-  createTeam: (name: string, schoolName: string, members: TeamMember[], type?: "student" | "teacher") => Promise<StudentTeam>;
-  updateTeam: (id: string, name: string, members: TeamMember[], type?: "student" | "teacher") => Promise<StudentTeam>;
+  createTeam: (name: string, schoolName: string, members: TeamMember[], type?: "student" | "teacher", guardianConsentAcknowledged?: boolean) => Promise<StudentTeam>;
+  updateTeam: (id: string, name: string, members: TeamMember[], type?: "student" | "teacher", guardianConsentAcknowledged?: boolean) => Promise<StudentTeam>;
   deleteTeam: (id: string) => Promise<void>;
   getTeamsBySchool: (schoolName: string) => StudentTeam[];
   getTeamById: (id: string) => StudentTeam | undefined;
@@ -48,7 +48,7 @@ export const useTeamStore = create<TeamState>((set, get) => ({
     }
   },
 
-  createTeam: async (name: string, schoolName: string, members: TeamMember[], type: "student" | "teacher" = "student") => {
+  createTeam: async (name: string, schoolName: string, members: TeamMember[], type: "student" | "teacher" = "student", guardianConsentAcknowledged = false) => {
     const newTeam: StudentTeam = {
       id: generateTeamId(),
       pin: generatePin(),
@@ -57,6 +57,7 @@ export const useTeamStore = create<TeamState>((set, get) => ({
       type,
       members,
       createdAt: new Date().toISOString(),
+      guardianConsentAcknowledged,
     };
 
     try {
@@ -77,12 +78,12 @@ export const useTeamStore = create<TeamState>((set, get) => ({
     return newTeam;
   },
 
-  updateTeam: async (id: string, name: string, members: TeamMember[], type?: "student" | "teacher") => {
+  updateTeam: async (id: string, name: string, members: TeamMember[], type?: "student" | "teacher", guardianConsentAcknowledged?: boolean) => {
     try {
       const res = await fetch(`/api/teams/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, members, type }),
+        body: JSON.stringify({ name, members, type, guardianConsentAcknowledged }),
       });
 
       if (res.ok) {

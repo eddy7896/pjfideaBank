@@ -70,6 +70,9 @@ export async function createUser(
       subGeographyId: user.subGeographyId,
       assignedLeadUserId: user.assignedLeadUserId ?? null,
       passwordHash: user.passwordHash,
+      // Only caller today is the self-registration onboarding flow, which
+      // gates on terms acceptance before calling this — safe to stamp here.
+      termsAcceptedAt: new Date(),
       assignedSubGeos: user.subGeographyIds && user.subGeographyIds.length > 0 ? {
         create: user.subGeographyIds.map(id => ({ subGeographyId: id }))
       } : undefined,

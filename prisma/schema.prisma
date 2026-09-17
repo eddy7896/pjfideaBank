@@ -44,6 +44,10 @@ model User {
   assignedLeadUserId Int?
   createdAt          DateTime @default(now())
   createdById        Int?
+  // Set once, at account creation, when the registrant accepts the Terms of
+  // Service / Privacy Policy. Null for accounts minted directly by an admin
+  // (those are not self-registrations and have no consent step to record).
+  termsAcceptedAt    DateTime?
 
   geography           Geography?         @relation(fields: [geographyId], references: [id])
   subGeography        SubGeography?      @relation(fields: [subGeographyId], references: [id])
@@ -101,7 +105,11 @@ model TeamMember {
   studentTeamId String
   name          String
   grade         String
-  contactNumber String
+  // A parent/guardian contact number, not the student's own — optional,
+  // since not every school collects one at team-creation time. Renamed in
+  // intent (not column name, to avoid a breaking migration) as part of the
+  // DPDP children's-data review; see DPDP_COMPLIANCE_REPORT.md §7.
+  contactNumber String?
   gender        String
 
   studentTeam StudentTeam @relation(fields: [studentTeamId], references: [id], onDelete: Cascade)
@@ -118,6 +126,11 @@ model StudentTeam {
   schoolId   String
   type       String   @default("student")
   createdAt  DateTime @default(now())
+  // Affirmed by the School Admin creating the team: that guardian consent
+  // for the listed students' data has been obtained, consistent with the
+  // school's own enrolment process (DPDP Act §9, children's data).
+  guardianConsentAcknowledged   Boolean   @default(false)
+  guardianConsentAcknowledgedAt DateTime?
 
   members TeamMember[]
   ideas   Idea[]

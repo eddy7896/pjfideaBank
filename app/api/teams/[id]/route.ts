@@ -68,6 +68,18 @@ export async function PUT(
     }
 
     const data = await request.json();
+
+    const isStudentTeam = (data.type || existing.type) === "student";
+    const memberCount = (data.members ?? []).length;
+    const consentAcknowledged =
+      data.guardianConsentAcknowledged === true || existing.guardianConsentAcknowledged;
+    if (isStudentTeam && memberCount > 0 && !consentAcknowledged) {
+      return NextResponse.json(
+        { error: "Guardian consent acknowledgment is required before adding student members" },
+        { status: 400 }
+      );
+    }
+
     const rawPin = Math.floor(100000 + Math.random() * 900000).toString();
     const pinHash = await hashPassword(rawPin);
 
@@ -82,11 +94,15 @@ export async function PUT(
           name: data.name,
           pin: pinHash,
           type: data.type || existing.type,
+          guardianConsentAcknowledged: consentAcknowledged,
+          guardianConsentAcknowledgedAt: consentAcknowledged
+            ? existing.guardianConsentAcknowledgedAt ?? new Date()
+            : null,
           members: data.members ? {
             create: data.members.map((m: any) => ({
               name: m.name,
               grade: m.grade,
-              contactNumber: m.contactNumber,
+              contactNumber: m.contactNumber || null,
               gender: m.gender,
             })),
           } : undefined,
