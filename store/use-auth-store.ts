@@ -7,7 +7,15 @@ import type { User } from "@/types";
 interface AuthState {
   currentUser: User | null;
   isAuthenticated: boolean;
-  hydrate: () => Promise<void>;
+  /**
+   * Sync the store from a session object the caller already has (e.g. from
+   * next-auth's `useSession()`), rather than fetching one. `useSession()`
+   * shares one fetch across every consumer via SessionProvider's context;
+   * calling `getSession()` again here would just duplicate that same
+   * request on every dashboard mount, which is what used to cause the
+   * "Failed to fetch" console errors when one of the two aborted the other.
+   */
+  setSessionUser: (sessionUser: any | null | undefined) => void;
   login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
   loginStudent: (teamId: string, pin: string) => Promise<{ success: boolean; error?: string }>;
   logout: () => Promise<void>;
@@ -32,9 +40,8 @@ export const useAuthStore = create<AuthState>()((set) => ({
   currentUser: null,
   isAuthenticated: false,
 
-  hydrate: async () => {
-    const session = await getSession();
-    const u = sessionToUser(session?.user);
+  setSessionUser: (sessionUser) => {
+    const u = sessionToUser(sessionUser);
     set({ currentUser: u, isAuthenticated: !!u });
   },
 

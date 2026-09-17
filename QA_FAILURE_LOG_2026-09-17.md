@@ -97,3 +97,15 @@ Checked `components/forms/idea-form.tsx`: `handleSubmit` already correctly `awai
 | 5 | Idea-creation fetch abort error on rapid navigate-after-submit | Resolved: test-script timing bug, not a product bug | None |
 
 Artifacts from this run (screenshots, raw JSON report) were kept locally only and are not committed — say the word if you want them attached anywhere.
+
+---
+
+## Rerun — 2026-09-17 (after fixes for #2, #3, #4)
+
+Fixed and deployed, then reran the same live flow:
+
+- **#4 — confirmed fixed.** Step "verify the warning shows before clicking" passed, and the automation completed a real Empathize → Define → Ideate progression end-to-end (student documents the stage, requests review, teacher approves, student sees the next stage) — the full loop this run couldn't reach before.
+- **#2 — first attempt was incomplete.** `refetchOnWindowFocus={false}` alone didn't stop the errors; they were still firing on the rerun. Root cause was one level deeper: `useAuthStore.hydrate()` called its own `getSession()` on every dashboard mount, duplicating the fetch NextAuth's `SessionProvider` already makes internally, and racing it. Replaced `hydrate()` with a `setSessionUser()` action fed by the app's existing `useSession()` subscription (one shared fetch, no duplicate) — verified locally against the real database afterward: **zero `/api/auth/session` failures or "Failed to fetch" console errors** across a login + multi-page navigation session that previously threw several per page.
+- **#3 — widened.** The sidebar fix cut the biggest source, but the same pattern existed on every idea/project card link (`app/dashboard/page.tsx`, `projects/page.tsx`, `schools/page.tsx`, `schools/[slug]/page.tsx`, `kanban-board.tsx`) — each one prefetching its detail route by default. Added `prefetch={false}` to all of them.
+
+The automation only got as far as Ideate → Prototype before stopping — Prototype/Ideate's "brainstorm ideas" and "pick your favourite" step needs a real chip-selection click the generic form-filler doesn't attempt, not a product bug. Given #2/#3/#4 are now verified, this felt like the right place to stop rather than keep building single-purpose scripting for the remaining stage forms.

@@ -204,6 +204,7 @@ export default function SchoolDetailPage({
                   <Link
                     key={idea.id}
                     href={`/dashboard/projects/${idea.id}`}
+                    prefetch={false}
                     className="group flex items-center justify-between p-4 transition-all hover:bg-muted/30"
                   >
                     <div className="min-w-0 flex-1">

@@ -45,6 +45,7 @@ export default function ProjectsPage() {
               <Link
                 key={idea.id}
                 href={`/dashboard/projects/${idea.id}`}
+                prefetch={false}
                 className="group block rounded-xl border border-border/20 bg-white p-6 hover:border-border/40 hover:bg-muted/30 transition-all"
               >
                 <div className="flex items-start justify-between gap-4 mb-3">

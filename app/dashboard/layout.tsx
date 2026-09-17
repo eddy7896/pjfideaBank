@@ -26,6 +26,7 @@ import {
   Moon,
 } from "lucide-react"
 import { useTheme } from "next-themes"
+import { useSession } from "next-auth/react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Toaster } from "@/components/ui/sonner"
@@ -61,7 +62,8 @@ export default function DashboardLayout({
 }) {
   const router = useRouter()
   const pathname = usePathname()
-  const { currentUser, isAuthenticated, logout, hydrate } = useAuthStore()
+  const { currentUser, isAuthenticated, logout, setSessionUser } = useAuthStore()
+  const { data: session, status: sessionStatus } = useSession()
   const { loadTeams, isLoaded: teamsLoaded } = useTeamStore()
   const { ideas, loadIdeas, isLoaded: ideasLoaded } = useIdeaStore()
   const { loadActivities, isLoaded: activitiesLoaded } = useActivityStore()
@@ -84,8 +86,17 @@ export default function DashboardLayout({
 
   useEffect(() => {
     setMounted(true)
-    hydrate().finally(() => setHydrated(true))
-  }, [hydrate])
+  }, [])
+
+  useEffect(() => {
+    // Read the session SessionProvider already fetched (shared across every
+    // useSession() consumer) instead of firing a second, independent
+    // /api/auth/session request here — that duplicate was the source of the
+    // "Failed to fetch" console errors on nearly every dashboard mount.
+    if (sessionStatus === "loading") return
+    setSessionUser(session?.user)
+    setHydrated(true)
+  }, [sessionStatus, session, setSessionUser])
 
   useEffect(() => {
     if (mounted && hydrated && !isAuthenticated) {

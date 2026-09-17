@@ -186,6 +186,7 @@ export default function DashboardPage() {
               <Link
                 key={idea.id}
                 href={`/dashboard/projects/${idea.id}`}
+                prefetch={false}
                 className="group block"
               >
                 <div className="rounded-xl border border-border/50 bg-card p-6 hover:border-primary/30 hover:shadow-md transition-all">
@@ -343,6 +344,7 @@ export default function DashboardPage() {
                   <Link
                     key={idea.id}
                     href={`/dashboard/projects/${idea.id}`}
+                    prefetch={false}
                     className="block rounded-lg p-2.5 transition-all hover:bg-muted/50"
                   >
                     <div className="flex items-start justify-between gap-2">

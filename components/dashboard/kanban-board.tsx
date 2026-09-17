@@ -97,7 +97,7 @@ export function KanbanBoard({ ideas, readOnly = false, visibleStages }: KanbanBo
                               snapshot.isDragging && "scale-[1.02] shadow-lg rotate-1"
                             )}
                           >
-                            <Link href={`/dashboard/projects/${idea.id}`} className="block">
+                            <Link href={`/dashboard/projects/${idea.id}`} prefetch={false} className="block">
                               {hasPendingAdvance(idea) && (
                                 <span className="mb-2 inline-flex w-fit items-center gap-1.5 rounded-full border border-status-pending-border bg-status-pending-soft px-2 py-0.5 text-[10px] font-semibold text-status-pending">
                                   <span className="h-1.5 w-1.5 rounded-full bg-status-pending" />

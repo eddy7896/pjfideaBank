@@ -195,6 +195,7 @@ export default function SchoolsPage() {
                     <Link
                       key={idea.id}
                       href={`/dashboard/projects/${idea.id}`}
+                      prefetch={false}
                     >
                       <Card className="border-border/20 p-4 hover:shadow-md transition-all cursor-pointer">
                         <div className="flex items-start justify-between gap-4">
