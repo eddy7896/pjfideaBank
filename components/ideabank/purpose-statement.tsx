@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 
 const SENTENCE =
-  "A problem noticed in one classroom can inspire an idea in another.";
+  "What you notice becomes the idea you build, and track, start to finish.";
 
 const container = {
   hidden: {},

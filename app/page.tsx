@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { motion, useScroll, useTransform } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { IdeabankHeader } from "@/components/ideabank/header";
 import { IdeabankFooter } from "@/components/ideabank/footer";
@@ -16,10 +17,13 @@ import { HeroCollage } from "@/components/ideabank/hero-collage";
 import { PurposeStatement } from "@/components/ideabank/purpose-statement";
 import { TeacherResourcePanels } from "@/components/ideabank/teacher-resources";
 import { ScrollReveal } from "@/components/ideabank/scroll-reveal";
+import { NotebookGrid } from "@/components/ideabank/background-texture";
+import { Magnetic } from "@/components/ideabank/magnetic";
 import { IdeaIllustration, CATEGORY_ICONS } from "@/components/ideabank/illustration";
-import { DoodleSpark, DoodleUnderline, DoodleArrow } from "@/components/ideabank/doodle";
+import { DoodleSpark, DoodleUnderline, DoodleArrow, DoodleLoop } from "@/components/ideabank/doodle";
 import { PROBLEMS, FEATURED_PROBLEM_SLUGS, FEATURED_STORY_SLUG } from "@/lib/ideabank/data";
 import { PROBLEM_CATEGORIES } from "@/lib/ideabank/types";
+import { usePrefersReducedMotion } from "@/hooks/use-reduced-motion";
 
 const TOPIC_CHIPS = ["Water", "Agriculture", "Environment", "Accessibility", "School Life", "Community"];
 
@@ -72,6 +76,16 @@ export default function HomePage() {
   const router = useRouter();
   const [query, setQuery] = useState("");
 
+  const heroRef = useRef<HTMLDivElement>(null);
+  const reducedMotion = usePrefersReducedMotion();
+  const { scrollYProgress: heroProgress } = useScroll({
+    target: heroRef,
+    offset: ["start start", "end start"],
+  });
+  const heroOpacity = useTransform(heroProgress, [0, 1], reducedMotion ? [1, 1] : [1, 0.25]);
+  const heroY = useTransform(heroProgress, [0, 1], reducedMotion ? [0, 0] : [0, -56]);
+  const heroScale = useTransform(heroProgress, [0, 1], reducedMotion ? [1, 1] : [1, 0.94]);
+
   const featuredProblems = FEATURED_PROBLEM_SLUGS.map((slug) => PROBLEMS.find((p) => p.slug === slug)!).filter(Boolean);
   const storyProblem = PROBLEMS.find((p) => p.slug === FEATURED_STORY_SLUG)!;
 
@@ -87,8 +101,15 @@ export default function HomePage() {
 
       <main id="main-content">
         {/* Hero */}
-        <section className="relative overflow-hidden px-5 pb-8 pt-16 sm:px-8 sm:pt-20 lg:px-12 lg:pt-24">
-          <div className="mx-auto max-w-[1240px] text-center">
+        <section
+          ref={heroRef}
+          className="relative overflow-hidden px-5 pb-8 pt-16 sm:px-8 sm:pt-20 lg:px-12 lg:pt-24"
+        >
+          <NotebookGrid className="hidden sm:block" />
+          <motion.div
+            style={{ opacity: heroOpacity, y: heroY, scale: heroScale }}
+            className="relative mx-auto max-w-[1240px] text-center"
+          >
             <p className="mb-5 text-sm font-semibold uppercase tracking-[0.14em] text-[#4282A4]">
               Ideabank by PiJam
             </p>
@@ -106,16 +127,20 @@ export default function HomePage() {
             </p>
 
             <div className="mt-9 flex flex-col items-center justify-center gap-4 sm:flex-row">
-              <IdeabankButton href="/problems">Explore Problems</IdeabankButton>
-              <IdeabankButton href="/dashboard" variant="secondary">
-                Share an Idea
-              </IdeabankButton>
+              <Magnetic strength={10}>
+                <IdeabankButton href="/problems">Explore Problems</IdeabankButton>
+              </Magnetic>
+              <Magnetic strength={10}>
+                <IdeabankButton href="/dashboard" variant="secondary">
+                  Share an Idea
+                </IdeabankButton>
+              </Magnetic>
             </div>
 
             <div className="mt-14">
               <HeroCollage />
             </div>
-          </div>
+          </motion.div>
         </section>
 
         {/* Search and discovery entry */}
@@ -142,13 +167,14 @@ export default function HomePage() {
         </section>
 
         {/* Purpose statement */}
-        <section className="border-y border-[#DED8D3] bg-[#F4F2F1] px-5 py-16 sm:px-8 sm:py-20 lg:px-12">
-          <div className="mx-auto max-w-4xl text-center">
+        <section className="relative overflow-hidden border-y border-[#DED8D3] bg-[#F4F2F1] px-5 py-16 sm:px-8 sm:py-20 lg:px-12">
+          <DoodleLoop className="absolute right-[8%] top-8 hidden opacity-70 motion-safe:animate-[spin_18s_linear_infinite] sm:block lg:right-[14%]" />
+          <div className="relative mx-auto max-w-4xl text-center">
             <PurposeStatement />
             <p className="mx-auto mt-6 max-w-xl text-[17px] leading-relaxed text-[#3D3D3D]">
-              Ideabank is a place to write down what you noticed, sketch what you tried, and
-              track how your idea changed after testing — a repository of your own work, not a
-              catalogue of everyone else&apos;s.
+              Ideabank is where you write down what you noticed, sketch what you tried, and log
+              how it changed after every test — your own repository, not a catalogue of
+              everyone else&apos;s.
             </p>
           </div>
         </section>
