@@ -145,7 +145,7 @@ export function AdminActivityForm({ isOpen, onClose, selectedDate, themes }: Adm
           {isSuperAdmin && (
             <div className="space-y-2">
               <Label htmlFor="scope">Scope</Label>
-              <Select value={scope} onValueChange={(val: "system" | "geography") => setScope(val)}>
+              <Select value={scope} onValueChange={(val) => setScope((val as "system" | "geography") || "system")}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
