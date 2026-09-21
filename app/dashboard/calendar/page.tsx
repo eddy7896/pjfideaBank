@@ -11,6 +11,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { GoogleStyleCalendar } from "@/components/calendar/google-style-calendar";
 import { useAuthStore } from "@/store/use-auth-store";
 import { useActivityStore } from "@/store/use-activity-store";
+import { useSchoolStore } from "@/store/use-school-store";
 import { useThemeStore } from "@/store/use-theme-store";
 import { toast } from "sonner";
 
