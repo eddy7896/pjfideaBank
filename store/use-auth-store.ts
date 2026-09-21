@@ -16,7 +16,7 @@ interface AuthState {
    * "Failed to fetch" console errors when one of the two aborted the other.
    */
   setSessionUser: (sessionUser: any | null | undefined) => void;
-  login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
+  login: (email: string, password: string, setLoginStatus?: (s: string) => void) => Promise<{ success: boolean; error?: string }>;
   loginStudent: (teamId: string, pin: string) => Promise<{ success: boolean; error?: string }>;
   logout: () => Promise<void>;
 }
