@@ -162,18 +162,35 @@ export async function applyActivityScoping(user: SessionUser): Promise<any> {
     return {};
   }
 
-  if (user.role === "school") {
-    if (user.schoolIds && user.schoolIds.length > 0) {
-      // ThemeActivity has no schoolId FK, only the legacy schoolName
-      // string, so a multi-school instructor's ids need resolving to
-      // names first (same shape as the geo/district branch below).
-      const schools = await prisma.school.findMany({
-        where: { id: { in: user.schoolIds } },
-        select: { name: true },
-      });
-      return { OR: [{ schoolName: null }, { schoolName: { in: schools.map((s) => s.name) } }] };
+  // Find the geographyId of the user's school if they are a school/student
+  let geographyId = user.geographyId ?? null;
+  let subGeographyId = user.subGeographyId ?? null;
+
+  if (user.role === "school" || user.role === "student") {
+    const schoolNames = user.role === "school" && user.schoolIds && user.schoolIds.length > 0
+      ? await prisma.school.findMany({ where: { id: { in: user.schoolIds } }, select: { name: true, subGeography: true } })
+      : await prisma.school.findMany({ where: { name: user.schoolName ?? "" }, select: { name: true, subGeography: true } });
+    
+    // We want activities where geographyId is null (system wide) or geographyId matches the school's geography
+    const geos = new Set<string>();
+    const subGeos = new Set<string>();
+    const names = new Set<string>();
+
+    for (const s of schoolNames) {
+      if (s.name) names.add(s.name);
+      if (s.subGeography) {
+        geos.add(s.subGeography.geographyId);
+        subGeos.add(s.subGeography.id);
+      }
     }
-    return { OR: [{ schoolName: null }, { schoolName: user.schoolName }] };
+
+    return {
+      OR: [
+        { geographyId: null, schoolName: null }, // System wide or legacy global
+        { geographyId: { in: Array.from(geos) } }, // New geo scoping
+        { schoolName: { in: Array.from(names) } }, // Legacy school scoping
+      ]
+    };
   }
 
   if (
@@ -181,6 +198,11 @@ export async function applyActivityScoping(user: SessionUser): Promise<any> {
     user.role === "teacher-trainer" ||
     user.role === "sed-department"
   ) {
+    const geos = [user.geographyId].filter(Boolean);
+    const subGeos = user.subGeographyIds && user.subGeographyIds.length > 0 
+      ? user.subGeographyIds 
+      : [user.subGeographyId].filter(Boolean);
+
     let schoolGeoWhere: any = {};
     if (user.role === "geography-lead") {
       schoolGeoWhere =
@@ -199,10 +221,16 @@ export async function applyActivityScoping(user: SessionUser): Promise<any> {
     });
     const schoolNames = schools.map((s) => s.name);
 
-    return { OR: [{ schoolName: null }, { schoolName: { in: schoolNames } }] };
+    return { 
+      OR: [
+        { geographyId: null, schoolName: null },
+        { geographyId: { in: geos as string[] } },
+        { schoolName: { in: schoolNames } }
+      ] 
+    };
   }
 
-  return { schoolName: null };
+  return { geographyId: null, schoolName: null };
 }
 
 /**

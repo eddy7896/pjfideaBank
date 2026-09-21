@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import {
   Lightbulb,
@@ -27,6 +27,7 @@ import { usePermissions } from "@/lib/permissions";
 import { KanbanBoard } from "@/components/dashboard/kanban-board";
 import { ThemeCalendar } from "@/components/calendar/theme-calendar";
 import { GoogleStyleCalendar } from "@/components/calendar/google-style-calendar";
+import { AdminActivityForm } from "@/components/dashboard/admin-activity-form";
 import type { DesignThinkingStatus } from "@/types";
 import { cn } from "@/lib/utils";
 
@@ -37,6 +38,9 @@ export default function DashboardPage() {
   const { activities, isLoaded, loadActivities } = useActivityStore();
   const { schools, isLoaded: schoolsLoaded, loadSchools, slugFor } = useSchoolStore();
   const { canViewIdea } = usePermissions();
+
+  const [isActivityModalOpen, setIsActivityModalOpen] = useState(false);
+  const [selectedDate, setSelectedDate] = useState<{ date: number; month: number; year: number } | null>(null);
 
   useEffect(() => {
     if (!isLoaded) loadActivities();
@@ -150,22 +154,45 @@ export default function DashboardPage() {
       )}
 
       {/* Theme Activities Calendar */}
-      {currentUser.role !== "super-admin" && (
+      {currentUser.role !== "student" && (
         <div className="mt-8">
           <div className="flex items-center justify-between mb-4">
             <div>
               <h2 className="text-xl font-semibold text-foreground">Monthly Activities</h2>
               <p className="text-sm text-muted-foreground">
-                Planned activities for your school this month
+                {currentUser.role === "school" ? "Planned activities for your school this month" : "Planned activities"}
               </p>
             </div>
           </div>
           {(() => {
             const filteredActs = activities.filter((a) => {
-              if (!a.schoolName) return true;
-              return a.schoolName === currentUser.schoolName;
+              if (currentUser.role === "super-admin" || currentUser.role === "program-lead") return true;
+              if (currentUser.role === "school") return a.schoolName === currentUser.schoolName;
+              if (currentUser.role === "geography-lead") return a.geographyId === currentUser.geographyId || !a.geographyId;
+              return true;
             });
-            return <GoogleStyleCalendar activities={filteredActs} themes={themes} isAdmin={false} />;
+            const isAdmin = ["super-admin", "program-lead", "geography-lead"].includes(currentUser.role);
+            return (
+              <>
+                <GoogleStyleCalendar 
+                  activities={filteredActs} 
+                  themes={themes} 
+                  isAdmin={isAdmin} 
+                  onAddActivity={(date, month, year) => {
+                    setSelectedDate({ date, month, year });
+                    setIsActivityModalOpen(true);
+                  }}
+                />
+                {isAdmin && (
+                  <AdminActivityForm
+                    isOpen={isActivityModalOpen}
+                    onClose={() => setIsActivityModalOpen(false)}
+                    selectedDate={selectedDate}
+                    themes={themes}
+                  />
+                )}
+              </>
+            );
           })()}
         </div>
       )}

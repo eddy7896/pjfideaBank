@@ -18,6 +18,7 @@ interface ActivityReportFormProps {
   activityTitle: string;
   schoolName: string;
   teacherName: string;
+  existingReport?: any;
   onSuccess?: (report: ActivityReport) => void;
 }
 
@@ -26,33 +27,36 @@ export function ActivityReportForm({
   activityTitle,
   schoolName,
   teacherName,
+  existingReport,
   onSuccess,
 }: ActivityReportFormProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [materials, setMaterials] = useState<Array<{ name: string; quantityUsed: number; stockStatus: string }>>([
-    { name: "", quantityUsed: 0, stockStatus: "Good" },
-  ]);
+  const [materials, setMaterials] = useState<Array<{ name: string; quantityUsed: number; stockStatus: string }>>(
+    existingReport?.materials || [{ name: "", quantityUsed: 0, stockStatus: "Good" }]
+  );
 
   const [form, setForm] = useState({
-    sessionDate: new Date().toISOString().split("T")[0],
-    timeIn: "09:00",
-    timeOut: "10:00",
-    grades: "",
-    totalStudents: 0,
-    boysCount: 0,
-    girlsCount: 0,
-    lcmsCode: "",
-    topicsLessons: "",
-    learningGoal: "",
-    safetyBriefing: true,
-    ppeWorn: true,
-    labCleanup: true,
-    incidentNotes: "",
-    studentEngagement: "Moderate" as const,
-    successes: "",
-    challenges: "",
-    followUpActions: "",
+    sessionDate: existingReport?.sessionDate || new Date().toISOString().split("T")[0],
+    timeIn: existingReport?.timeIn || "09:00",
+    timeOut: existingReport?.timeOut || "10:00",
+    grades: existingReport?.grades || "",
+    totalStudents: existingReport?.totalStudents || 0,
+    boysCount: existingReport?.boysCount || 0,
+    girlsCount: existingReport?.girlsCount || 0,
+    lcmsCode: existingReport?.lcmsCode || "",
+    topicsLessons: existingReport?.topicsLessons || "",
+    learningGoal: existingReport?.learningGoal || "",
+    safetyBriefing: existingReport?.safetyBriefing ?? true,
+    ppeWorn: existingReport?.ppeWorn ?? true,
+    labCleanup: existingReport?.labCleanup ?? true,
+    incidentNotes: existingReport?.incidentNotes || "",
+    studentEngagement: existingReport?.studentEngagement || "Moderate" as const,
+    successes: existingReport?.successes || "",
+    challenges: existingReport?.challenges || "",
+    followUpActions: existingReport?.followUpActions || "",
+    outcome: existingReport?.outcome || "",
+    ideasGenerated: existingReport?.ideasGenerated || 0,
   });
 
   const addMaterial = () => {
@@ -69,19 +73,23 @@ export function ActivityReportForm({
     setMaterials(updated);
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent, isDraft: boolean) => {
     e.preventDefault();
     setIsSubmitting(true);
 
     try {
-      if (!form.grades.trim() || !form.topicsLessons.trim() || !form.learningGoal.trim()) {
-        toast.error("Fill all required fields");
-        return;
+      if (!isDraft) {
+        if (!form.grades.trim() || !form.topicsLessons.trim() || !form.learningGoal.trim()) {
+          toast.error("Fill all required fields to submit");
+          setIsSubmitting(false);
+          return;
+        }
       }
 
       const validMaterials = materials.filter((m) => m.name.trim());
 
       const payload = {
+        id: existingReport?.id,
         activityId,
         schoolName,
         teacherName,
@@ -104,6 +112,9 @@ export function ActivityReportForm({
         successes: form.successes,
         challenges: form.challenges,
         followUpActions: form.followUpActions,
+        outcome: form.outcome,
+        ideasGenerated: form.ideasGenerated,
+        status: isDraft ? "DRAFT" : "SUBMITTED",
         submittedBy: teacherName,
       };
 
@@ -115,11 +126,11 @@ export function ActivityReportForm({
 
       if (res.ok) {
         const report = await res.json();
-        toast.success("Activity report submitted");
+        toast.success(isDraft ? "Draft saved" : "Activity report submitted");
         setIsOpen(false);
         onSuccess?.(report);
       } else {
-        toast.error("Failed to submit report");
+        toast.error("Failed to save report");
       }
     } finally {
       setIsSubmitting(false);
@@ -128,8 +139,8 @@ export function ActivityReportForm({
 
   return (
     <>
-      <Button onClick={() => setIsOpen(true)} className="gap-2">
-        Submit Activity Report
+      <Button onClick={() => setIsOpen(true)} variant={existingReport?.status === 'DRAFT' ? 'secondary' : 'default'} className="gap-2">
+        {existingReport?.status === 'DRAFT' ? "Edit Draft" : "Submit Activity Report"}
       </Button>
 
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -141,7 +152,7 @@ export function ActivityReportForm({
             </DialogDescription>
           </DialogHeader>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={(e) => handleSubmit(e, false)} className="space-y-6">
             {/* General Information */}
             <div className="space-y-4">
               <h3 className="font-semibold text-sm">1. General Information</h3>
@@ -380,22 +391,52 @@ export function ActivityReportForm({
             </div>
 
             {/* Follow-up Actions */}
-            <div>
-              <h3 className="font-semibold text-sm mb-2">6. Follow-up Actions</h3>
-              <Label htmlFor="followUp" className="text-xs">Preparation for Next Class</Label>
-              <Textarea
-                id="followUp"
-                placeholder="Describe next steps..."
-                value={form.followUpActions}
-                onChange={(e) => setForm({ ...form, followUpActions: e.target.value })}
-                className="min-h-12"
-              />
+            <div className="space-y-4">
+              <h3 className="font-semibold text-sm mb-2">6. Follow-up & Outcomes</h3>
+              <div>
+                <Label htmlFor="followUp" className="text-xs">Preparation for Next Class</Label>
+                <Textarea
+                  id="followUp"
+                  placeholder="Describe next steps..."
+                  value={form.followUpActions}
+                  onChange={(e) => setForm({ ...form, followUpActions: e.target.value })}
+                  className="min-h-12"
+                />
+              </div>
+              <div>
+                <Label htmlFor="outcome" className="text-xs">Activity Outcome</Label>
+                <Textarea
+                  id="outcome"
+                  placeholder="What was the overall outcome of the activity?"
+                  value={form.outcome}
+                  onChange={(e) => setForm({ ...form, outcome: e.target.value })}
+                  className="min-h-12"
+                />
+              </div>
+              <div>
+                <Label htmlFor="ideasGenerated" className="text-xs">Ideas/Problems Generated by Students</Label>
+                <Input
+                  id="ideasGenerated"
+                  type="number"
+                  min="0"
+                  value={form.ideasGenerated}
+                  onChange={(e) => setForm({ ...form, ideasGenerated: parseInt(e.target.value) })}
+                />
+              </div>
             </div>
 
             {/* Submit */}
             <div className="flex gap-3 justify-end pt-4 border-t">
-              <Button variant="outline" onClick={() => setIsOpen(false)}>
+              <Button type="button" variant="outline" onClick={() => setIsOpen(false)}>
                 Cancel
+              </Button>
+              <Button
+                type="button"
+                variant="secondary"
+                disabled={isSubmitting}
+                onClick={(e) => handleSubmit(e, true)}
+              >
+                Save as Draft
               </Button>
               <Button type="submit" disabled={isSubmitting}>
                 {isSubmitting ? "Submitting..." : "Submit Report"}

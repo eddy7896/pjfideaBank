@@ -129,22 +129,21 @@ export default function ThemesPage() {
     return ideas.filter((i) => i.theme.toLowerCase().includes(theme.toLowerCase())).length;
   };
 
-  // Filter activities for user's school
   const filteredActivities = activities.filter((a) => {
-    if (!a.schoolName) return true;
-    return a.schoolName === currentUser?.schoolName;
+    if (currentUser?.role === "super-admin" || currentUser?.role === "program-lead") return true;
+    if (currentUser?.role === "geography-lead") return a.geographyId === currentUser.geographyId || !a.geographyId;
+    if (currentUser?.role === "school") return a.schoolName === currentUser.schoolName;
+    return true;
   });
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
       <div className="space-y-12">
         {/* Calendar Section */}
-        {!isAdmin && (
-          <div>
-            <h2 className="text-2xl font-semibold tracking-tight mb-4">Theme Calendar</h2>
-            <GoogleStyleCalendar activities={filteredActivities} isAdmin={false} />
-          </div>
-        )}
+        <div>
+          <h2 className="text-2xl font-semibold tracking-tight mb-4">Theme Calendar</h2>
+          <GoogleStyleCalendar activities={filteredActivities} isAdmin={isAdmin} />
+        </div>
 
         {/* Header */}
         <div className="mb-8 flex items-center justify-between">

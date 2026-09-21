@@ -216,13 +216,17 @@ model AuditLog {
 }
 
 model ThemeActivity {
-  id            String   @id
-  scheduledDate DateTime
-  title         String
-  theme         String
-  schoolName    String?
-  description   String?
-  createdAt     DateTime @default(now())
+  id              String   @id
+  scheduledDate   DateTime
+  title           String
+  theme           String
+  schoolName      String?
+  geographyId     String?
+  subGeographyId  String?
+  description     String?
+  createdAt       DateTime @default(now())
+
+  reports         ActivityReport[]
 
   @@index([scheduledDate])
 }
@@ -230,6 +234,7 @@ model ThemeActivity {
 model ActivityReport {
   id                String   @id @default(cuid())
   activityId        String
+  activity          ThemeActivity @relation(fields: [activityId], references: [id], onDelete: Cascade)
   schoolName        String
   teacherName       String
   sessionDate       String
@@ -251,6 +256,9 @@ model ActivityReport {
   successes         String
   challenges        String
   followUpActions   String
+  outcome           String?
+  ideasGenerated    Int      @default(0)
+  status            String   @default("SUBMITTED")
   createdAt         DateTime @default(now())
   submittedBy       String
 

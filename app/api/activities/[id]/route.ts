@@ -20,7 +20,8 @@ export async function DELETE(
 
     const canDelete =
       user.role === 'super-admin' ||
-      (user.role === 'school' && existing.schoolName === user.schoolName);
+      user.role === 'program-lead' ||
+      (user.role === 'geography-lead' && existing.geographyId === user.geographyId);
     if (!canDelete) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }

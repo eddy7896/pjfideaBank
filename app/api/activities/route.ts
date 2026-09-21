@@ -7,12 +7,12 @@ import { audit } from '@/lib/audit';
 
 const CreateSchema = z.object({
   id: z.string().optional(),
-  date: z.number().int().min(1).max(31),
-  month: z.number().int().min(0).max(11),
-  year: z.number().int().min(2020).max(2100),
+  scheduledDate: z.string().datetime(),
   title: z.string().min(1).max(200),
   theme: z.string().min(1).max(200),
   schoolName: z.string().optional().nullable(),
+  geographyId: z.string().optional().nullable(),
+  subGeographyId: z.string().optional().nullable(),
   description: z.string().max(2000).optional(),
 });
 
@@ -36,8 +36,8 @@ export async function POST(request: NextRequest) {
   if ('error' in gate) return gate.error;
   const { user } = gate;
 
-  // Only super-admin (global activities) and school admins (own school) may create.
-  if (user.role !== 'super-admin' && user.role !== 'school') {
+  // Only super-admin, program-lead, and geography-lead may create activities.
+  if (user.role !== 'super-admin' && user.role !== 'program-lead' && user.role !== 'geography-lead') {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }
 
@@ -52,20 +52,17 @@ export async function POST(request: NextRequest) {
     }
     const data = parsed.data;
 
-    // School admins can only schedule against their own school. super-admins
-    // may explicitly leave schoolName null (global) or set any school.
-    let schoolName = data.schoolName ?? null;
-    if (user.role === 'school') {
-      schoolName = user.schoolName ?? null;
+    let geographyId = data.geographyId ?? null;
+    let subGeographyId = data.subGeographyId ?? null;
+
+    if (user.role === 'geography-lead') {
+      geographyId = user.geographyId ?? null;
+      // If they have multiple subGeographies, it's complex, but generally they create at geography level
+      // or we just rely on what they selected if we want to restrict it further.
+      // For now, enforce geographyId to their own territory.
     }
 
-    // Compute the authoritative `scheduledDate` alongside the legacy
-    // triplet. The frontend still sends month as 0-indexed (JS Date
-    // convention), so add 1 here when storing the 1-indexed legacy
-    // value AND when constructing scheduledDate. Existing legacy rows
-    // were already stored 1-indexed; new rows align with them.
-    const monthOneIndexed = data.month + 1;
-    const scheduledDate = new Date(Date.UTC(data.year, data.month, data.date));
+    const scheduledDate = new Date(data.scheduledDate);
 
     const activity = await prisma.themeActivity.create({
       data: {
@@ -73,7 +70,9 @@ export async function POST(request: NextRequest) {
         scheduledDate,
         title: data.title,
         theme: data.theme,
-        schoolName,
+        schoolName: data.schoolName ?? null, // kept for legacy compat if needed
+        geographyId,
+        subGeographyId,
         description: data.description,
       },
     });
@@ -82,8 +81,8 @@ export async function POST(request: NextRequest) {
       action: 'activity.create',
       entityType: 'ThemeActivity',
       entityId: activity.id,
-      schoolName,
-      payload: { title: data.title, theme: data.theme },
+      schoolName: data.schoolName ?? null,
+      payload: { title: data.title, theme: data.theme, geographyId },
     });
 
     return NextResponse.json(activity, { status: 201 });

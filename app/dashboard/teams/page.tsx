@@ -46,7 +46,6 @@ export default function TeamsPage() {
   const handleCreateTeam = async (name: string, members: any[], type?: "student" | "teacher", guardianConsentAcknowledged?: boolean) => {
     const newTeam = await createTeam(name, currentUser.schoolName!, members, type, guardianConsentAcknowledged);
     toast.success(`Team "${name}" created successfully!`);
-    await useTeamStore.getState().loadTeams();
     return { id: newTeam.id, pin: newTeam.pin };
   };
 
@@ -54,7 +53,6 @@ export default function TeamsPage() {
     if (!teamToEdit) throw new Error("No team selected for editing");
     const updatedTeam = await updateTeam(teamToEdit.id, name, members, type, guardianConsentAcknowledged);
     toast.success(`Team "${name}" updated successfully!`);
-    await useTeamStore.getState().loadTeams();
     return { id: updatedTeam.id, pin: updatedTeam.pin };
   };
 
@@ -72,7 +70,6 @@ export default function TeamsPage() {
     await deleteTeam(id);
     setDeleteTarget(null);
     toast.success("Team deleted");
-    await useTeamStore.getState().loadTeams();
   };
 
   const togglePinVisibility = (teamId: string) => {

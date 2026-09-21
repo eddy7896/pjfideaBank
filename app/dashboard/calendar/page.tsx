@@ -33,7 +33,7 @@ export default function CalendarPage() {
   const [activityForm, setActivityForm] = useState({
     title: "",
     description: "",
-    schoolName: "",
+    geographyId: "",
   });
 
   useEffect(() => {
@@ -79,9 +79,19 @@ export default function CalendarPage() {
     }
   };
 
+  const { schools } = useSchoolStore();
+  
+  // Extract unique geographies
+  const geographies = Array.from(new Map(
+    schools
+      .map(s => s.subGeography?.geography)
+      .filter(g => g != null)
+      .map(g => [g!.id, g!])
+  ).values());
+
   const handleAddActivity = (date: number, month: number, year: number) => {
     setSelectedDate({ date, month, year });
-    setActivityForm({ title: "", description: "", schoolName: "" });
+    setActivityForm({ title: "", description: "", geographyId: "" });
     setIsActivityModalOpen(true);
   };
 
@@ -98,13 +108,13 @@ export default function CalendarPage() {
         scheduledDate: new Date(Date.UTC(selectedDate.year, selectedDate.month, selectedDate.date)).toISOString(),
         title: activityForm.title.trim(),
         theme,
-        schoolName: activityForm.schoolName || undefined,
+        geographyId: activityForm.geographyId || undefined,
         description: activityForm.description || undefined,
       });
 
       toast.success("Activity created");
       setIsActivityModalOpen(false);
-      setActivityForm({ title: "", description: "", schoolName: "" });
+      setActivityForm({ title: "", description: "", geographyId: "" });
       await useActivityStore.getState().loadActivities();
     } catch (error) {
       toast.error("Failed to create activity");
@@ -280,13 +290,21 @@ export default function CalendarPage() {
             </div>
 
             <div>
-              <Label htmlFor="activity-school">School Name (optional)</Label>
-              <Input
-                id="activity-school"
-                value={activityForm.schoolName}
-                onChange={(e) => setActivityForm({ ...activityForm, schoolName: e.target.value })}
-                placeholder="Leave blank for all schools"
-              />
+              <Label htmlFor="activity-geography">Geography (optional)</Label>
+              <select
+                id="activity-geography"
+                value={activityForm.geographyId}
+                onChange={(e) => setActivityForm({ ...activityForm, geographyId: e.target.value })}
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                <option value="">System-wide (All Geographies)</option>
+                {geographies.map((geo) => (
+                  <option key={geo.id} value={geo.id}>
+                    {geo.name}
+                  </option>
+                ))}
+              </select>
+              <p className="text-[10px] text-muted-foreground mt-1">Leave blank to make this activity visible to all schools.</p>
             </div>
 
             <div>

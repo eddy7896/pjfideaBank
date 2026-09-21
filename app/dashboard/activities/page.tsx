@@ -33,7 +33,7 @@ export default function ActivitiesPage() {
   }, [isLoaded, loadActivities]);
 
   useEffect(() => {
-    if (currentUser && currentUser.role !== "school" && currentUser.role !== "student") {
+    if (currentUser && currentUser.role !== "student") {
       setLoadingReports(true);
       fetch("/api/activity-reports")
         .then((res) => res.json())
@@ -78,6 +78,15 @@ export default function ActivitiesPage() {
     "July", "August", "September", "October", "November", "December",
   ];
 
+  const refreshReports = () => {
+    fetch("/api/activity-reports")
+      .then((res) => res.json())
+      .then((data) => {
+        if (Array.isArray(data)) setReports(data);
+      })
+      .catch(console.error);
+  };
+
   return (
     <div className="mx-auto max-w-7xl px-2 sm:px-4 py-4 sm:py-8 lg:px-8">
       <div className="space-y-4 sm:space-y-6">
@@ -97,50 +106,58 @@ export default function ActivitiesPage() {
           /* Activities List View */
           <div className="space-y-3 sm:space-y-4">
             {filteredActivities.length > 0 ? (
-              filteredActivities.map((activity) => (
-                <Card
-                  key={activity.id}
-                  className="border-border/20 p-3 sm:p-4 hover:shadow-md transition-all cursor-pointer"
-                  onClick={() => setSelectedActivityId(activity.id)}
-                >
-                  <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 sm:gap-4">
-                    <div className="flex-1 min-w-0">
-                      <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 mb-2">
-                        <h2 className="text-base sm:text-lg font-semibold text-foreground truncate">
-                          {activity.title}
-                        </h2>
-                        <Badge variant="outline" className="text-xs w-fit">
-                          {monthNames[new Date(activity.scheduledDate).getUTCMonth()]} {new Date(activity.scheduledDate).getUTCDate()}
-                        </Badge>
-                      </div>
+              filteredActivities.map((activity) => {
+                const activityReport = reports.find(r => r.activityId === activity.id && r.schoolName === currentUser.schoolName);
+                return (
+                  <Card
+                    key={activity.id}
+                    className="border-border/20 p-3 sm:p-4 hover:shadow-md transition-all cursor-pointer relative"
+                    onClick={() => setSelectedActivityId(activity.id)}
+                  >
+                    {currentUser.role === "school" && activityReport && (
+                      <Badge variant={activityReport.status === "DRAFT" ? "secondary" : "default"} className="absolute top-3 right-3 text-[10px]">
+                        {activityReport.status === "DRAFT" ? "Draft Saved" : "Report Submitted"}
+                      </Badge>
+                    )}
+                    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 sm:gap-4 mt-2 sm:mt-0">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 mb-2">
+                          <h2 className="text-base sm:text-lg font-semibold text-foreground truncate pr-20 sm:pr-0">
+                            {activity.title}
+                          </h2>
+                          <Badge variant="outline" className="text-xs w-fit">
+                            {monthNames[new Date(activity.scheduledDate).getUTCMonth()]} {new Date(activity.scheduledDate).getUTCDate()}
+                          </Badge>
+                        </div>
 
-                      {activity.description && (
-                        <p className="text-xs sm:text-sm text-muted-foreground line-clamp-2 mb-2">
-                          {activity.description}
-                        </p>
-                      )}
-
-                      <div className="flex flex-col sm:flex-row gap-1 sm:gap-4 text-xs text-muted-foreground">
-                        <span className="flex items-center gap-1">
-                          <Calendar className="h-3 w-3 sm:h-4 sm:w-4" />
-                          {monthNames[new Date(activity.scheduledDate).getUTCMonth()]} {new Date(activity.scheduledDate).getUTCDate()}, {new Date(activity.scheduledDate).getUTCFullYear()}
-                        </span>
-                        {activity.schoolName && (
-                          <span className="flex items-center gap-1">
-                            <Users className="h-3 w-3 sm:h-4 sm:w-4" />
-                            {activity.schoolName}
-                          </span>
+                        {activity.description && (
+                          <p className="text-xs sm:text-sm text-muted-foreground line-clamp-2 mb-2">
+                            {activity.description}
+                          </p>
                         )}
-                        <span className="flex items-center gap-1">
-                          <FileText className="h-3 w-3 sm:h-4 sm:w-4" />
-                          {activity.theme}
-                        </span>
+
+                        <div className="flex flex-col sm:flex-row gap-1 sm:gap-4 text-xs text-muted-foreground">
+                          <span className="flex items-center gap-1">
+                            <Calendar className="h-3 w-3 sm:h-4 sm:w-4" />
+                            {monthNames[new Date(activity.scheduledDate).getUTCMonth()]} {new Date(activity.scheduledDate).getUTCDate()}, {new Date(activity.scheduledDate).getUTCFullYear()}
+                          </span>
+                          {activity.schoolName && (
+                            <span className="flex items-center gap-1">
+                              <Users className="h-3 w-3 sm:h-4 sm:w-4" />
+                              {activity.schoolName}
+                            </span>
+                          )}
+                          <span className="flex items-center gap-1">
+                            <FileText className="h-3 w-3 sm:h-4 sm:w-4" />
+                            {activity.theme}
+                          </span>
+                        </div>
                       </div>
+                      <ChevronRight className="h-4 w-4 text-muted-foreground flex-shrink-0 self-center hidden sm:block" />
                     </div>
-                    <ChevronRight className="h-4 w-4 text-muted-foreground flex-shrink-0 self-center" />
-                  </div>
-                </Card>
-              ))
+                  </Card>
+                );
+              })
             ) : (
               <Card className="border-border/20 p-6 text-center">
                 <p className="text-sm text-muted-foreground">
@@ -201,20 +218,27 @@ export default function ActivitiesPage() {
             {/* Activity Report Form */}
             {currentUser.role === "school" && (
               <div className="rounded-xl border border-border/50 bg-card p-4 sm:p-6">
-                <h2 className="text-lg sm:text-xl font-semibold mb-4">Submit Activity Report</h2>
+                <h2 className="text-lg sm:text-xl font-semibold mb-4">Activity Report</h2>
                 <p className="text-xs sm:text-sm text-muted-foreground mb-6">
-                  Complete this form to document the activity session details, resources used, and session reflection.
+                  {reports.find(r => r.activityId === selectedActivity.id)?.status === "SUBMITTED" 
+                    ? "You have successfully submitted the report for this activity." 
+                    : "Complete this form to document the activity session details, resources used, and session reflection."}
                 </p>
-                <ActivityReportForm
-                  activityId={selectedActivity.id}
-                  activityTitle={selectedActivity.title}
-                  schoolName={selectedActivity.schoolName || currentUser.schoolName || ""}
-                  teacherName={currentUser.displayName}
-                  onSuccess={() => {
-                    // Reset to list view
-                    setSelectedActivityId(null);
-                  }}
-                />
+                {reports.find(r => r.activityId === selectedActivity.id)?.status === "SUBMITTED" ? (
+                  <Badge variant="default" className="text-sm px-4 py-2">✓ Report Submitted Successfully</Badge>
+                ) : (
+                  <ActivityReportForm
+                    activityId={selectedActivity.id}
+                    activityTitle={selectedActivity.title}
+                    schoolName={selectedActivity.schoolName || currentUser.schoolName || ""}
+                    teacherName={currentUser.displayName}
+                    existingReport={reports.find(r => r.activityId === selectedActivity.id)}
+                    onSuccess={() => {
+                      refreshReports();
+                      setSelectedActivityId(null);
+                    }}
+                  />
+                )}
               </div>
             )}
 

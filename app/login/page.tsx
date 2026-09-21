@@ -53,6 +53,7 @@ export default function LoginPage() {
     setError("");
     setLoading(true);
     setLoginStatus("Starting login...");
+    let isRedirecting = false;
 
     try {
       setLoginStatus("Calling NextAuth...");
@@ -60,6 +61,7 @@ export default function LoginPage() {
       setLoginStatus("NextAuth finished.");
       if (result.success) {
         setLoginStatus("Redirecting...");
+        isRedirecting = true;
         router.push("/dashboard");
       } else {
         setError(result.error || "Login failed");
@@ -67,7 +69,7 @@ export default function LoginPage() {
     } catch (err) {
       setError(`Unexpected error: ${err instanceof Error ? err.message : String(err)}`);
     } finally {
-      if (loginStatus !== "Redirecting...") {
+      if (!isRedirecting) {
          setLoading(false);
       }
     }
@@ -77,10 +79,12 @@ export default function LoginPage() {
     e.preventDefault();
     setStudentError("");
     setStudentLoading(true);
+    let isRedirecting = false;
 
     try {
       const result = await loginStudent(teamId, pin);
       if (result.success) {
+        isRedirecting = true;
         router.push("/dashboard");
       } else {
         setStudentError(result.error || "Login failed");
@@ -88,7 +92,9 @@ export default function LoginPage() {
     } catch (err) {
       setStudentError("An unexpected error occurred during login.");
     } finally {
-      setStudentLoading(false);
+      if (!isRedirecting) {
+        setStudentLoading(false);
+      }
     }
   };
 
