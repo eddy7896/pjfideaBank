@@ -123,7 +123,7 @@ export function AdminActivityForm({ isOpen, onClose, selectedDate, themes }: Adm
               </SelectTrigger>
               <SelectContent>
                 {themes.map((t) => (
-                  <SelectItem key={t.id} value={t.theme}>
+                  <SelectItem key={t.month} value={t.theme}>
                     {t.theme} ({t.month})
                   </SelectItem>
                 ))}
