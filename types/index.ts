@@ -223,6 +223,8 @@ export interface ThemeActivity {
   title: string;
   theme: string;
   schoolName?: string;
+  geographyId?: string;
+  subGeographyId?: string;
   description?: string;
   createdAt: string;
 }
