@@ -117,7 +117,7 @@ export function AdminActivityForm({ isOpen, onClose, selectedDate, themes }: Adm
 
           <div className="space-y-2">
             <Label htmlFor="theme">Theme *</Label>
-            <Select value={theme} onValueChange={setTheme} required>
+            <Select value={theme} onValueChange={(val) => setTheme(val || "")} required>
               <SelectTrigger>
                 <SelectValue placeholder="Select a theme" />
               </SelectTrigger>
