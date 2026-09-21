@@ -40,6 +40,7 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [loginStatus, setLoginStatus] = useState("");
 
   // Student login
   const [teamId, setTeamId] = useState("");
@@ -51,18 +52,24 @@ export default function LoginPage() {
     e.preventDefault();
     setError("");
     setLoading(true);
+    setLoginStatus("Starting login...");
 
     try {
-      const result = await login(email, password);
+      setLoginStatus("Calling NextAuth...");
+      const result = await login(email, password, setLoginStatus);
+      setLoginStatus("NextAuth finished.");
       if (result.success) {
+        setLoginStatus("Redirecting...");
         router.push("/dashboard");
       } else {
         setError(result.error || "Login failed");
       }
     } catch (err) {
-      setError("An unexpected error occurred during login.");
+      setError(`Unexpected error: ${err instanceof Error ? err.message : String(err)}`);
     } finally {
-      setLoading(false);
+      if (loginStatus !== "Redirecting...") {
+         setLoading(false);
+      }
     }
   };
 
@@ -231,6 +238,11 @@ export default function LoginPage() {
                     </>
                   )}
                 </Button>
+                {loginStatus && (
+                  <p className="text-center text-xs text-muted-foreground animate-pulse">
+                    Status: {loginStatus}
+                  </p>
+                )}
               </form>
 
               {/* Demo Teacher Credentials — visible only when explicitly

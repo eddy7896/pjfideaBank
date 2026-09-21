@@ -45,20 +45,33 @@ export const useAuthStore = create<AuthState>()((set) => ({
     set({ currentUser: u, isAuthenticated: !!u });
   },
 
-  login: async (email, password) => {
-    const res = await signIn("user-credentials", {
-      email,
-      password,
-      redirect: false,
-    });
-    if (res?.error) {
-      return { success: false, error: "Invalid email or password." };
+  login: async (email, password, setLoginStatus?: (s: string) => void) => {
+    try {
+      if (setLoginStatus) setLoginStatus("signIn called...");
+      const res = await signIn("user-credentials", {
+        email,
+        password,
+        redirect: false,
+      });
+      if (res?.error) {
+        if (setLoginStatus) setLoginStatus(`signIn error: ${res.error}`);
+        return { success: false, error: "Invalid email or password." };
+      }
+      if (setLoginStatus) setLoginStatus("getSession called...");
+      const session = await getSession();
+      if (setLoginStatus) setLoginStatus("sessionToUser called...");
+      const u = sessionToUser(session?.user);
+      if (!u) {
+        if (setLoginStatus) setLoginStatus("Session missing user.");
+        return { success: false, error: "Session not established." };
+      }
+      if (setLoginStatus) setLoginStatus("Updating auth state...");
+      set({ currentUser: u, isAuthenticated: true });
+      return { success: true };
+    } catch (err: any) {
+      if (setLoginStatus) setLoginStatus(`signIn threw: ${err.message}`);
+      throw err;
     }
-    const session = await getSession();
-    const u = sessionToUser(session?.user);
-    if (!u) return { success: false, error: "Session not established." };
-    set({ currentUser: u, isAuthenticated: true });
-    return { success: true };
   },
 
   loginStudent: async (teamId, pin) => {
