@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { Mail, Lock, Phone, MapPin, Building2, Check, Search, X, Map, ArrowRight, User } from "lucide-react";
+import { Mail, Lock, Phone, MapPin, Building2, Check, Search, X, Map, ArrowRight, User, AlertTriangle, CheckCircle2, XCircle, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -35,6 +35,37 @@ export default function OnboardPage() {
 
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [agreedToTerms, setAgreedToTerms] = useState(false);
+
+  // Result modal state
+  const [showResultModal, setShowResultModal] = useState(false);
+  const [resultType, setResultType] = useState<"success" | "error">("success");
+  const [resultMessage, setResultMessage] = useState("");
+  const [resultField, setResultField] = useState<string | null>(null);
+  const [redirectCountdown, setRedirectCountdown] = useState(5);
+
+  // Auto-redirect countdown on success
+  useEffect(() => {
+    if (showResultModal && resultType === "success" && redirectCountdown > 0) {
+      const timer = setTimeout(() => setRedirectCountdown((c) => c - 1), 1000);
+      return () => clearTimeout(timer);
+    }
+    if (showResultModal && resultType === "success" && redirectCountdown === 0) {
+      router.push("/login");
+    }
+  }, [showResultModal, resultType, redirectCountdown, router]);
+
+  // Map API field names back to form steps
+  const fieldToStep: Record<string, number> = {
+    schoolName: 1,
+    udaiseCode: 1,
+    location: 1,
+    address: 2,
+    phone: 2,
+    principalName: 2,
+    teacherName: 3,
+    teacherEmail: 3,
+    teacherPassword: 3,
+  };
 
   // District selector modal states
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -148,19 +179,47 @@ export default function OnboardPage() {
         body: JSON.stringify(payload),
       });
 
+      const data = await response.json();
+
       if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || "Onboarding failed");
+        // Show failure modal with specific error from the API
+        setResultType("error");
+        setResultMessage(data.message || "Registration failed. Please try again.");
+        setResultField(data.field || null);
+        setShowResultModal(true);
+        return;
       }
 
-      toast.success("School onboarded successfully! Redirecting to login...");
-      setTimeout(() => router.push("/login"), 1500);
+      // Show success modal with redirect countdown
+      setResultType("success");
+      setResultMessage(data.message || "School onboarded successfully!");
+      setResultField(null);
+      setRedirectCountdown(5);
+      setShowResultModal(true);
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Onboarding failed");
+      // Network / parsing errors
+      setResultType("error");
+      setResultMessage(
+        error instanceof Error && error.message !== "Failed to fetch"
+          ? error.message
+          : "Could not reach the server. Please check your internet connection and try again."
+      );
+      setResultField(null);
+      setShowResultModal(true);
     } finally {
       setIsLoading(false);
     }
   };
+
+  const handleResultDismiss = useCallback(() => {
+    setShowResultModal(false);
+    if (resultType === "success") {
+      router.push("/login");
+    } else if (resultField && fieldToStep[resultField]) {
+      // Navigate the user back to the step that has the error field
+      setCurrentStep(fieldToStep[resultField]);
+    }
+  }, [resultType, resultField, router, fieldToStep]);
 
   const filteredStates = INDIAN_STATES_DISTRICTS.filter((sd) =>
     sd.state.toLowerCase().includes(searchState.toLowerCase())
@@ -635,6 +694,149 @@ export default function OnboardPage() {
           </div>
         </motion.div>
       </div>
+
+      {/* RESULT MODAL — Success / Failure */}
+      <AnimatePresence>
+        {showResultModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 backdrop-blur-md p-4"
+            onClick={(e) => {
+              if (e.target === e.currentTarget && resultType === "error") {
+                handleResultDismiss();
+              }
+            }}
+          >
+            <motion.div
+              initial={{ scale: 0.85, opacity: 0, y: 30 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.85, opacity: 0, y: 30 }}
+              transition={{ type: "spring", stiffness: 300, damping: 28 }}
+              className="relative w-full max-w-md bg-card border border-border/60 rounded-2xl shadow-2xl overflow-hidden text-foreground"
+            >
+              {/* Top colored band */}
+              <div
+                className={`h-2 w-full ${
+                  resultType === "success"
+                    ? "bg-gradient-to-r from-emerald-400 to-green-500"
+                    : "bg-gradient-to-r from-red-400 to-rose-500"
+                }`}
+              />
+
+              <div className="px-8 py-8 flex flex-col items-center text-center space-y-5">
+                {/* Animated icon */}
+                <motion.div
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 15, delay: 0.15 }}
+                  className={`flex items-center justify-center h-20 w-20 rounded-full ${
+                    resultType === "success"
+                      ? "bg-emerald-100 dark:bg-emerald-500/20"
+                      : "bg-red-100 dark:bg-red-500/20"
+                  }`}
+                >
+                  {resultType === "success" ? (
+                    <CheckCircle2 className="h-10 w-10 text-emerald-600 dark:text-emerald-400" />
+                  ) : (
+                    <XCircle className="h-10 w-10 text-red-600 dark:text-red-400" />
+                  )}
+                </motion.div>
+
+                {/* Heading */}
+                <div className="space-y-1">
+                  <h3 className="text-xl font-bold text-foreground">
+                    {resultType === "success"
+                      ? "Registration Successful!"
+                      : "Registration Failed"}
+                  </h3>
+                  {resultType === "success" && (
+                    <p className="text-sm text-muted-foreground">
+                      Your school has been registered
+                    </p>
+                  )}
+                </div>
+
+                {/* Message body */}
+                {resultType === "success" ? (
+                  <div className="w-full space-y-3">
+                    <div className="rounded-xl bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 p-4 space-y-2 text-sm">
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">School</span>
+                        <span className="font-semibold text-foreground">{formData.schoolName}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Admin Email</span>
+                        <span className="font-semibold text-foreground break-all">{formData.teacherEmail}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Location</span>
+                        <span className="font-semibold text-foreground">{formData.location}</span>
+                      </div>
+                    </div>
+
+                    <p className="text-xs text-muted-foreground">
+                      Redirecting to login in{" "}
+                      <span className="font-bold text-primary">{redirectCountdown}s</span>...
+                    </p>
+
+                    <Button
+                      onClick={() => router.push("/login")}
+                      className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-lg"
+                    >
+                      Go to Login Now
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="w-full space-y-4">
+                    <div className="rounded-xl bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 p-4 text-sm text-left">
+                      <div className="flex items-start gap-2.5">
+                        <AlertTriangle className="h-5 w-5 text-red-500 shrink-0 mt-0.5" />
+                        <p className="text-foreground leading-relaxed">{resultMessage}</p>
+                      </div>
+                    </div>
+
+                    {resultField && (
+                      <p className="text-xs text-muted-foreground">
+                        The issue is with the{" "}
+                        <span className="font-semibold text-foreground">
+                          {resultField === "teacherEmail" ? "Email Address" :
+                           resultField === "schoolName" ? "School Name" :
+                           resultField === "udaiseCode" ? "UDAISE Code" :
+                           resultField}
+                        </span>{" "}
+                        field. You'll be taken back to correct it.
+                      </p>
+                    )}
+
+                    <div className="flex gap-3">
+                      <Button
+                        variant="outline"
+                        onClick={handleResultDismiss}
+                        className="flex-1 rounded-xl text-sm"
+                      >
+                        <RefreshCw className="h-4 w-4 mr-1.5" />
+                        {resultField ? "Fix & Retry" : "Try Again"}
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        onClick={() => {
+                          setShowResultModal(false);
+                          window.open("mailto:support@pijam.org?subject=Registration%20Issue&body=" + encodeURIComponent(resultMessage), "_blank");
+                        }}
+                        className="flex-1 rounded-xl text-sm text-muted-foreground"
+                      >
+                        Contact Support
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* INDIAN GEOGRAPHY SELECTOR MODAL */}
       <AnimatePresence>

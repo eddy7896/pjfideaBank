@@ -280,10 +280,69 @@ export async function POST(request: NextRequest) {
       { message: 'Invalid role' },
       { status: 400 }
     );
-  } catch (error) {
+  } catch (error: any) {
     console.error('POST /api/auth/onboard error:', error);
+
+    // Surface actionable messages for known Prisma/DB error codes
+    const code = error?.code;
+    const meta = error?.meta;
+
+    if (code === 'P2002') {
+      // Unique constraint violation — tell the user which field conflicted
+      const target: string[] | undefined = meta?.target;
+      if (target?.includes('email')) {
+        return NextResponse.json(
+          { message: 'This email address is already registered. Please use a different email or sign in.', field: 'teacherEmail' },
+          { status: 409 }
+        );
+      }
+      if (target?.includes('name')) {
+        return NextResponse.json(
+          { message: 'A school with this name already exists. Please use a different school name.', field: 'schoolName' },
+          { status: 409 }
+        );
+      }
+      if (target?.includes('udaiseCode')) {
+        return NextResponse.json(
+          { message: 'This UDAISE code is already registered to another school.', field: 'udaiseCode' },
+          { status: 409 }
+        );
+      }
+      return NextResponse.json(
+        { message: 'A record with these details already exists. Please check your inputs and try again.' },
+        { status: 409 }
+      );
+    }
+
+    if (code === 'P2003') {
+      return NextResponse.json(
+        { message: 'Invalid reference: a required linked record (geography or district) could not be found. Please re-select your location.' },
+        { status: 400 }
+      );
+    }
+
+    if (code === 'P1001' || code === 'P1002') {
+      return NextResponse.json(
+        { message: 'Unable to connect to the database. This is a temporary issue — please try again in a few moments.' },
+        { status: 503 }
+      );
+    }
+
+    if (code === 'P1008' || code === 'P1017') {
+      return NextResponse.json(
+        { message: 'The database request timed out. Please try again.' },
+        { status: 504 }
+      );
+    }
+
+    // Generic fallback for truly unexpected errors
+    const fallbackMessage =
+      error instanceof Error && error.message && !error.message.includes('prisma')
+        ? error.message
+        : 'Onboarding failed due to an unexpected error. Please try again or contact support if the problem persists.';
+
     return NextResponse.json(
-      { message: 'Onboarding failed' },
+      { message: fallbackMessage },
       { status: 500 }
     );
   }
