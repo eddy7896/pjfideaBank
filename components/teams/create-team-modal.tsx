@@ -65,6 +65,7 @@ export function CreateTeamModal({
   });
   const [createdTeam, setCreatedTeam] = useState<{ id: string; pin: string } | null>(null);
   const [copiedField, setCopiedField] = useState<"id" | "pin" | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleAddMember = () => {
     if (newMember.name.trim() && newMember.grade && newMember.gender) {
@@ -86,9 +87,14 @@ export function CreateTeamModal({
   };
 
   const handleCreate = async () => {
-    if (!teamName.trim() || !guardianConsentAcknowledged) return;
-    const result = await onSubmit(teamName.trim(), members, teamType, guardianConsentAcknowledged);
-    setCreatedTeam(result);
+    if (!teamName.trim() || !guardianConsentAcknowledged || isSubmitting) return;
+    try {
+      setIsSubmitting(true);
+      const result = await onSubmit(teamName.trim(), members, teamType, guardianConsentAcknowledged);
+      setCreatedTeam(result);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleClose = () => {
@@ -98,6 +104,7 @@ export function CreateTeamModal({
     setTeamType("student");
     setGuardianConsentAcknowledged(false);
     setCreatedTeam(null);
+    setIsSubmitting(false);
     onClose();
   };
 
@@ -357,15 +364,15 @@ export function CreateTeamModal({
           )}
 
           <div className="flex gap-3">
-            <Button variant="outline" onClick={handleClose} className="flex-1">
+            <Button variant="outline" onClick={handleClose} className="flex-1" disabled={isSubmitting}>
               Cancel
             </Button>
             <Button
               onClick={handleCreate}
-              disabled={!teamName.trim() || members.length === 0 || !guardianConsentAcknowledged}
+              disabled={!teamName.trim() || members.length === 0 || !guardianConsentAcknowledged || isSubmitting}
               className="flex-1"
             >
-              {teamToEdit ? "Save Changes" : "Create Team"}
+              {isSubmitting ? "Saving..." : (teamToEdit ? "Save Changes" : "Create Team")}
             </Button>
           </div>
         </div>
