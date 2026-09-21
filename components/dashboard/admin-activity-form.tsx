@@ -64,7 +64,7 @@ export function AdminActivityForm({ isOpen, onClose, selectedDate, themes }: Adm
       Date.UTC(selectedDate.year, selectedDate.month, selectedDate.date)
     ).toISOString();
 
-    const geographyId = scope === "geography" ? (currentUser?.geographyId || null) : null;
+    const geographyId = scope === "geography" ? (currentUser?.geographyId || undefined) : undefined;
 
     try {
       await createActivity({
@@ -74,8 +74,8 @@ export function AdminActivityForm({ isOpen, onClose, selectedDate, themes }: Adm
         theme,
         scheduledDate,
         geographyId,
-        subGeographyId: null,
-        schoolName: null,
+        subGeographyId: undefined,
+        schoolName: undefined,
       });
       
       setTitle("");
