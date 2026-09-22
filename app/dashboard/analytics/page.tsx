@@ -22,7 +22,7 @@ import {
 import { HeatmapGrid } from "@/components/analytics/heatmap-grid";
 import { RosterTable } from "@/components/analytics/roster-table";
 import { AuditLogTable } from "@/components/analytics/audit-log-table";
-import { Users, Lightbulb, School as SchoolIcon, Users2, Info, Database, ShieldAlert } from "lucide-react";
+import { Users, Lightbulb, School as SchoolIcon, Users2, Info, Database, ShieldAlert, Calendar, FileText } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { Role } from "@/types";
 
@@ -61,6 +61,14 @@ interface AnalyticsExtra {
       pageSize: number;
     };
     auditByAction: { action: string; count: number }[];
+  };
+  activityStats?: {
+    totalScheduled: number;
+    totalReported: number;
+    studentsEngaged: number;
+    ideasFromActivities: number;
+    engagementCount: Record<string, number>;
+    reportsByGeography: { geographyName: string; count: number }[];
   };
 }
 
@@ -506,6 +514,86 @@ export default function AnalyticsPage() {
                 <RosterTable rows={extra?.roster ?? []} />
               )}
             </BentoCard>
+          )}
+        </div>
+
+        {/* Activity Tracking */}
+        <div className="space-y-4 pt-8 border-t border-border/40">
+          <div className="flex items-center gap-2">
+            <h2 className="text-xl font-bold tracking-tight text-foreground">
+              Activity Tracking
+            </h2>
+          </div>
+          
+          {extraLoading && !extra ? (
+            <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+              <ChartSkeleton height={120} />
+              <ChartSkeleton height={120} />
+              <ChartSkeleton height={120} />
+              <ChartSkeleton height={120} />
+            </div>
+          ) : extra?.activityStats ? (
+            <>
+              <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+                <StatTile
+                  label="Activities Scheduled"
+                  value={extra.activityStats.totalScheduled}
+                  icon={Calendar}
+                  index={0}
+                />
+                <StatTile
+                  label="Reports Submitted"
+                  value={extra.activityStats.totalReported}
+                  icon={FileText}
+                  index={1}
+                />
+                <StatTile
+                  label="Students Engaged"
+                  value={extra.activityStats.studentsEngaged}
+                  icon={Users}
+                  index={2}
+                />
+                <StatTile
+                  label="Ideas Generated"
+                  value={extra.activityStats.ideasFromActivities}
+                  icon={Lightbulb}
+                  index={3}
+                />
+              </div>
+
+              <div className="grid grid-cols-1 gap-4 lg:grid-cols-4 mt-4">
+                <BentoCard title="Student Engagement" description="Based on teacher reports" colSpan={showGeographyRollup ? 2 : 4} index={0}>
+                  <CategoryBarChart
+                    data={Object.entries(extra.activityStats.engagementCount).map(([level, count]) => ({
+                      level,
+                      count,
+                    }))}
+                    xKey="level"
+                    cellColor={(entry) => {
+                      if (entry.level === 'High') return 'var(--color-success, #22c55e)';
+                      if (entry.level === 'Moderate') return 'var(--color-warning, #f59e0b)';
+                      return 'var(--color-destructive, #ef4444)';
+                    }}
+                  />
+                </BentoCard>
+
+                {showGeographyRollup && (
+                  <BentoCard title="Activity Reports by State" description="Top states by reporting" colSpan={2} index={1}>
+                    <RankedList
+                      rows={extra.activityStats.reportsByGeography.slice(0, 8).map((g) => ({
+                        label: g.geographyName,
+                        count: g.count,
+                      }))}
+                      emptyLabel="No activity reports yet."
+                    />
+                  </BentoCard>
+                )}
+              </div>
+            </>
+          ) : (
+             <div className="rounded-lg border border-border bg-muted/20 p-8 text-center text-sm text-muted-foreground">
+              No activity tracking data available in this scope.
+             </div>
           )}
         </div>
 

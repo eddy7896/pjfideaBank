@@ -239,7 +239,90 @@ export async function GET(request: NextRequest) {
       };
     }
 
-    return NextResponse.json({ heatmap, roster, systemHealth });
+    // --- Activity Analytics ---
+    const { applyActivityScoping, applySchoolScoping } = await import('@/lib/db/scoping');
+    
+    // Fetch all activities in scope
+    const activityWhere = await applyActivityScoping(user);
+    const activities = await prisma.themeActivity.findMany({
+      where: activityWhere,
+      select: { id: true, title: true, theme: true, geographyId: true },
+    });
+
+    // Fetch reports in scope. Super Admin / Program Lead see all. 
+    // Others see reports from schools in their scope.
+    let reportsWhere: any = {};
+    const schoolsInScope = await prisma.school.findMany({
+      where: applySchoolScoping(user),
+      select: { name: true, subGeography: { select: { geography: { select: { name: true } } } } }
+    });
+
+    if (user.role !== 'super-admin' && user.role !== 'program-lead') {
+      const allowedSchoolNames = schoolsInScope.map(s => s.name);
+      reportsWhere.schoolName = { in: allowedSchoolNames };
+    }
+
+    const reports = await prisma.activityReport.findMany({
+      where: reportsWhere,
+      select: {
+        id: true,
+        schoolName: true,
+        totalStudents: true,
+        boysCount: true,
+        girlsCount: true,
+        studentEngagement: true,
+        ideasGenerated: true,
+      }
+    });
+
+    // Compute basic stats
+    const engagementCount: Record<string, number> = { High: 0, Moderate: 0, Low: 0 };
+    let studentsEngaged = 0;
+    let ideasFromActivities = 0;
+
+    for (const report of reports) {
+      studentsEngaged += (report.totalStudents || 0);
+      ideasFromActivities += (report.ideasGenerated || 0);
+      
+      const eng = report.studentEngagement || 'Moderate';
+      if (engagementCount[eng] !== undefined) {
+        engagementCount[eng]++;
+      }
+    }
+
+    // Reports by Geography (only for Super Admin / Program Lead)
+    let reportsByGeography: { geographyName: string; count: number }[] = [];
+    if (user.role === 'super-admin' || user.role === 'program-lead') {
+      const schoolToGeo = new Map<string, string>();
+      for (const school of schoolsInScope) {
+        if (school.subGeography?.geography?.name) {
+          schoolToGeo.set(school.name, school.subGeography.geography.name);
+        }
+      }
+      
+      const geoCounts: Record<string, number> = {};
+      for (const report of reports) {
+        const geo = schoolToGeo.get(report.schoolName);
+        if (geo) {
+          geoCounts[geo] = (geoCounts[geo] || 0) + 1;
+        }
+      }
+
+      reportsByGeography = Object.entries(geoCounts)
+        .map(([geographyName, count]) => ({ geographyName, count }))
+        .sort((a, b) => b.count - a.count);
+    }
+
+    const activityStats = {
+      totalScheduled: activities.length,
+      totalReported: reports.length,
+      studentsEngaged,
+      ideasFromActivities,
+      engagementCount,
+      reportsByGeography,
+    };
+
+    return NextResponse.json({ heatmap, roster, systemHealth, activityStats });
   } catch (error) {
     console.error('Failed to load analytics data:', error);
     return NextResponse.json({ error: 'Failed to load analytics data' }, { status: 500 });
